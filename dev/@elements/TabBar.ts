@@ -1,0 +1,39 @@
+import { dstring } from "@cyftech/signal";
+import { component, m } from "@mufw/maya";
+
+type TabBarProps = {
+  classNames?: string;
+  selectedTabClassNames?: string;
+  tabs: string[];
+  selectedTabIndex: number;
+  onTabChange: (tabIndex: number) => void;
+};
+
+export const TabBar = component<TabBarProps>(
+  ({
+    classNames,
+    selectedTabClassNames,
+    tabs,
+    selectedTabIndex,
+    onTabChange,
+  }) => {
+    return m.Div({
+      class: dstring`bg-near-white br3 ${classNames}`,
+      children: m.Div({
+        class: "flex items-center justify-between pa1",
+        children: m.For({
+          subject: tabs,
+          map: (tab, i) =>
+            m.Span({
+              class: dstring`w-100 br3 pa1 flex justify-center ${() =>
+                i === selectedTabIndex.value
+                  ? "bg-white black"
+                  : "bg-transparent gray pointer"} ${selectedTabClassNames}`,
+              onclick: () => onTabChange(i),
+              children: tab,
+            }),
+        }),
+      }),
+    });
+  }
+);
