@@ -13,7 +13,7 @@ export const Section = component<SectionProps>(({ title, child }) => {
         class: "mb2 f5 b",
         children: title,
       }),
-      child,
+      m.Div(child),
     ],
   });
 });

@@ -8,6 +8,21 @@ export const DAYS_OF_WEEK = [
   "Saturday",
 ] as const satisfies string[];
 
+export const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const satisfies string[];
+
 export const BASE_COLORS = [
   "#00cc00",
   "#00ccff",
@@ -16,7 +31,7 @@ export const BASE_COLORS = [
   "#ff66ff",
   "#ff0000",
   "#ff9900",
-  "#e6e600",
+  "#cccc00",
   "#99ff33",
 ] as const satisfies string[];
 

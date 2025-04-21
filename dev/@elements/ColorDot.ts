@@ -19,13 +19,26 @@ export const ColorDot = component<ColorDotProps>(
           255
       ).toString(16)
     );
+    const bgColor = derive(() =>
+      level.value < 0 || opacityHex.value === "0"
+        ? "transparent"
+        : `${color.value}${opacityHex.value}`
+    );
+    const fontColor = derive(() =>
+      level.value < 0 ? "lightgray" : `${bgColor.value}`
+    );
 
     return m.Span({
-      class: dstring`bg-light-gray br-100 relative ${classNames}`,
+      class: dstring`br-100 relative ${() =>
+        level.value < 0 ? "transparent" : "bg-light-gray"} ${classNames}`,
       children: [
         m.Span({
-          class: "absolute absolute--fill br-100",
-          style: dstring`background-color: ${color}${opacityHex};`,
+          class: dstring`flex items-center justify-around absolute absolute--fill br-100 pt05`,
+          style: dstring`
+            background-color: ${bgColor};
+            color: ${fontColor};
+          `,
+          children: "·",
         }),
       ],
     });

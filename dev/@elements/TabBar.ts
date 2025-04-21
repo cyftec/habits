@@ -3,6 +3,7 @@ import { component, m } from "@mufw/maya";
 
 type TabBarProps = {
   classNames?: string;
+  tabItemClassNames?: string;
   selectedTabClassNames?: string;
   tabs: string[];
   selectedTabIndex: number;
@@ -12,6 +13,7 @@ type TabBarProps = {
 export const TabBar = component<TabBarProps>(
   ({
     classNames,
+    tabItemClassNames,
     selectedTabClassNames,
     tabs,
     selectedTabIndex,
@@ -27,8 +29,8 @@ export const TabBar = component<TabBarProps>(
             m.Span({
               class: dstring`w-100 br3 pa1 flex justify-center ${() =>
                 i === selectedTabIndex.value
-                  ? "bg-white black"
-                  : "bg-transparent gray pointer"} ${selectedTabClassNames}`,
+                  ? `bg-white black ${selectedTabClassNames?.value}`
+                  : "bg-transparent silver pointer"} ${tabItemClassNames}`,
               onclick: () => onTabChange(i),
               children: tab,
             }),

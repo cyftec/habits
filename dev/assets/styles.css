@@ -7,5 +7,11 @@ body {
   scrollbar-width: thin;
 }
 
+.overflow-break-word { overflow-wrap: break-word; }
+.f8 { font-size: 0.5rem; }
+.bg-pale { background-color: #f6f6f6; }
+.bg-light-moon-gray { background-color: #e8e8e8; }
+.pt05 { padding-top: 0.2rem; }
+.mt05 { margin-top: 0.1rem; }
 .mr05 { margin-right: 0.1rem; }
 .sticky { position: sticky; }

@@ -2,7 +2,7 @@ import { derive, dobject, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { BASE_COLORS, BASE_LEVELS, DAYS_OF_WEEK } from "../@common/constants";
 import { DayFrequency, Habit } from "../@common/types";
-import { getNewHabitId } from "../@common/utils";
+import { getNewHabitId, getUrlParams } from "../@common/utils";
 import {
   AddRemoveButton,
   Button,
@@ -13,9 +13,12 @@ import {
   TextBox,
 } from "../@elements";
 import { Section } from "./@components";
+import { fetchHabit } from "../@common/localstorage";
 
+const isNew = signal(true);
 const error = signal("");
 const habit = signal<Habit>({
+  id: getNewHabitId(),
   title: "",
   frequency: [1, 1, 1, 1, 1, 1, 1],
   startAtDay0: 1,
@@ -101,7 +104,7 @@ const saveHabit = () => {
   validateHabit();
   if (error.value) return;
 
-  const habitID = `h.${getNewHabitId()}`;
+  const habitID = `h.${habit.value.id}`;
   const habitJSON = JSON.stringify(habit.value);
   localStorage.setItem(habitID, habitJSON);
 
@@ -110,13 +113,29 @@ const saveHabit = () => {
 
 export default Page({
   onMount: () => {
-    const params = location.href.split("?")[1].split("&");
-    console.log(params);
+    const params = getUrlParams();
+    if (!params.length) return;
+
+    for (let param of params) {
+      if (!param.startsWith("habit-id=")) continue;
+      const habitID = `h.${param.split("habit-id=")[1]}`;
+      try {
+        habit.value = fetchHabit(habitID);
+        isNew.value = false;
+      } catch (errMsg) {
+        error.value = errMsg.toString();
+      }
+      break;
+    }
   },
   body: Scaffold({
     classNames: "bg-white ph3",
-    header: dstring`${() =>
-      title.value ? `Edit habit '${title.value}'` : "New habit"}`,
+    header: m.Div({
+      children: dstring`${() =>
+        !isNew.value && title.value
+          ? `Edit '${title.value}'`
+          : "New target habit"}`,
+    }),
     content: m.Div([
       m.If({
         subject: error,
@@ -158,109 +177,173 @@ export default Page({
           }),
         }),
       }),
-      Section({
-        title: "Frequency",
-        child: m.Div({
-          children: [
-            m.Div({
-              class: "mb3 f6 flex items-center flex-wrap",
-              children: m.For({
-                subject: DAYS_OF_WEEK,
-                n: 0,
-                nthChild: m.Span({
-                  class: dstring`pointer br-pill pv1 ph2 mr2 ${() =>
-                    everyDay.value ? selectedCss : unSelectedCss}`,
-                  children: "Daily",
-                  onclick: () => updateFrequency(-1),
+      m.Div({
+        children: m.If({
+          subject: isNew,
+          isFalsy: m.Div({
+            class: "pb5",
+            children: [
+              Section({
+                title: "Actions",
+                child: m.Div({
+                  children: [
+                    m.A({
+                      class: "db mb3",
+                      href: "/",
+                      children: "Pause this habit for a while",
+                    }),
+                    m.A({
+                      class: "db mb3",
+                      href: "/",
+                      children: "Stop this habit permanently",
+                    }),
+                    m.A({
+                      class: "db mb3",
+                      href: "/",
+                      children:
+                        "Stop this habit and recreate a new one with updated schedule and levels",
+                    }),
+                    m.A({
+                      class: "db mb3",
+                      href: "/",
+                      children:
+                        "Connect this stopped habit with a related, newly created habit",
+                    }),
+                    m.A({
+                      class: "db mb3",
+                      href: "/",
+                      children:
+                        "Connect this new habit with a related, old stopped habit",
+                    }),
+                    m.A({
+                      class: "db mb3 red",
+                      href: "/",
+                      children:
+                        "Delete this habit permanently along with its data",
+                    }),
+                  ],
                 }),
-                map: (day, dayIndex) => {
-                  const colorCss = derive(() =>
-                    frequency.value[dayIndex] && !everyDay.value
-                      ? selectedCss
-                      : unSelectedCss
-                  );
-
-                  return m.Span({
-                    class: dstring`pointer br-100 pv1 ph2 mr2 ${colorCss}`,
-                    children: day.charAt(0),
-                    onclick: () => updateFrequency(dayIndex),
-                  });
-                },
               }),
-            }),
-            m.Div({
-              class: "flex items-center",
-              children: [
-                m.Span({
-                  class: "f6 w-30 silver",
-                  children: "Start from",
-                }),
-                TabBar({
-                  classNames: "w-100",
-                  tabs: ["Today", "Tomorrow"],
-                  selectedTabIndex: 0,
-                  onTabChange: function (tabIndex: number): void {
-                    throw new Error("Function not implemented.");
-                  },
-                }),
-              ],
-            }),
-          ],
-        }),
-      }),
-      Section({
-        title: "Levels",
-        child: m.Div({
-          children: m.For({
-            subject: levels,
-            map: (level, i) =>
-              m.Div({
+            ],
+          }),
+          isTruthy: m.Div([
+            Section({
+              title: "Frequency",
+              child: m.Div({
                 children: [
                   m.Div({
-                    class: "flex items-center justify-between",
-                    children: [
-                      m.Div({
-                        class: "flex items-center",
-                        children: [
-                          ColorDot({
-                            classNames: "pa2 mr2",
-                            colorIndex,
-                            level: i,
-                            totalLevels: levels.value.length,
-                          }),
-                          TextBox({
-                            classNames: "ba bw1 b--light-gray br3 pa2 w-100",
-                            placeholder: "",
-                            text: level,
-                            onchange: (text) => updateLevel(text, i),
-                          }),
-                        ],
+                    class: "mb3 f6 flex items-center flex-wrap",
+                    children: m.For({
+                      subject: DAYS_OF_WEEK,
+                      n: 0,
+                      nthChild: m.Span({
+                        class: dstring`pointer br-pill pv1 ph2 mr2 ${() =>
+                          everyDay.value ? selectedCss : unSelectedCss}`,
+                        children: "Daily",
+                        onclick: () => updateFrequency(-1),
                       }),
-                      AddRemoveButton({
-                        onAdd: () => addLevel(i + 1),
-                        onRemove: () => removeLevel(i),
+                      map: (day, dayIndex) => {
+                        const colorCss = derive(() =>
+                          frequency.value[dayIndex] && !everyDay.value
+                            ? selectedCss
+                            : unSelectedCss
+                        );
+
+                        return m.Span({
+                          class: dstring`pointer br-100 pv1 ph2 mr2 ${colorCss}`,
+                          children: day.charAt(0),
+                          onclick: () => updateFrequency(dayIndex),
+                        });
+                      },
+                    }),
+                  }),
+                  m.Div({
+                    class: "flex items-center",
+                    children: [
+                      m.Span({
+                        class: "f6 w-30 silver",
+                        children: "Start from",
+                      }),
+                      TabBar({
+                        classNames: "w-100",
+                        tabs: ["Today", "Tomorrow"],
+                        selectedTabIndex: 0,
+                        onTabChange: function (tabIndex: number): void {
+                          throw new Error("Function not implemented.");
+                        },
                       }),
                     ],
                   }),
-                  m.If({
-                    subject: i < levels.value.length - 1,
-                    isTruthy: m.Div({
-                      class: "pa2 ml2 bl bw1 b--near-white",
-                    }),
-                  }),
                 ],
               }),
-          }),
+            }),
+            Section({
+              title: "Levels",
+              child: m.Div({
+                children: m.For({
+                  subject: levels,
+                  map: (level, i) =>
+                    m.Div({
+                      children: [
+                        m.Div({
+                          class: "flex items-center justify-between",
+                          children: [
+                            m.Div({
+                              class: "flex items-center",
+                              children: [
+                                ColorDot({
+                                  classNames: "pa2 mr2",
+                                  colorIndex,
+                                  level: i,
+                                  totalLevels: levels.value.length,
+                                }),
+                                TextBox({
+                                  classNames:
+                                    "ba bw1 b--light-gray br3 pa2 w-100",
+                                  placeholder: "",
+                                  text: level,
+                                  onchange: (text) => updateLevel(text, i),
+                                }),
+                              ],
+                            }),
+                            AddRemoveButton({
+                              onAdd: () => addLevel(i + 1),
+                              onRemove: () => removeLevel(i),
+                            }),
+                          ],
+                        }),
+                        m.If({
+                          subject: i < levels.value.length - 1,
+                          isTruthy: m.Div({
+                            class: "pa2 ml2 bl bw1 b--light-gray",
+                          }),
+                        }),
+                      ],
+                    }),
+                }),
+              }),
+            }),
+          ]),
         }),
       }),
       m.Div({
         class: "pa5",
       }),
     ]),
-    bottombar: Button({
-      className: "w-100 mb3",
-      label: "Save",
-      onTap: saveHabit,
+    bottombar: m.Div({
+      class: "w-100 pv3 flex items-center justify-between",
+      children: [
+        Button({
+          className: "w-100 mr2",
+          label: "Go back",
+          onTap: () => history.back(),
+        }),
+        Button({
+          className: "w-100 ml2",
+          label: "Save",
+          onTap: saveHabit,
+        }),
+      ],
     }),
   }),
 });

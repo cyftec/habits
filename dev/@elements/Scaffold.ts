@@ -1,8 +1,9 @@
+import { dstring } from "@cyftech/signal";
 import { Child, component, m } from "@mufw/maya";
 
 type ScaffoldProps = {
   classNames?: string;
-  header: string;
+  header: Child;
   content: Child;
   bottombar: Child;
 };
@@ -10,15 +11,16 @@ type ScaffoldProps = {
 export const Scaffold = component<ScaffoldProps>(
   ({ classNames, header, content, bottombar }) => {
     return m.Div({
-      class: classNames,
+      class: dstring`${classNames}`,
       children: [
         m.Div({
-          class: "sticky top-0 left-0 right-0 bg-white f2 b pv3",
+          class:
+            "overflow-break-word sticky top-0 left-0 right-0 bg-inherit z-999 f2 b pv3",
           children: header,
         }),
         content,
         m.Div({
-          class: "sticky bottom-0 left-0 right-0 bg-white",
+          class: "sticky bottom-0 left-0 right-0 z-9999",
           children: bottombar,
         }),
       ],
