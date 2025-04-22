@@ -8,7 +8,7 @@ body {
 }
 
 .overflow-break-word { overflow-wrap: break-word; }
-.f8 { font-size: 0.5rem; }
+.f8 { font-size: 0.65rem; }
 .bg-pale { background-color: #f6f6f6; }
 .bg-light-moon-gray { background-color: #e8e8e8; }
 .pt05 { padding-top: 0.2rem; }

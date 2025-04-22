@@ -1,9 +1,10 @@
-import { compute, derive, dstring, signal } from "@cyftech/signal";
+import { derive, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
+import { fetchHabits } from "./@common/localstorage";
 import { Habit } from "./@common/types";
+import { getMonthStatus } from "./@common/utils";
 import { MonthMap } from "./@components";
 import { Button, Page, Scaffold, TabBar } from "./@elements";
-import { fetchHabits } from "./@common/localstorage";
 
 const habits = signal<Habit[]>([]);
 const TABS = ["Monthly", "Weekly"];
@@ -17,7 +18,26 @@ export default Page({
   },
   body: Scaffold({
     classNames: "bg-near-white ph3",
-    header: "Daily habits",
+    header: m.Div({
+      class: "flex items-start justify-between",
+      children: [
+        "Daily habits",
+        m.Div({
+          class: "bg-light-gray ba br3 b--moon-gray mt1 pa2 f6",
+          children: [
+            m.Span({
+              class: "f7 mid-gray",
+              children: "Sort by",
+            }),
+            m.Span({
+              class: "ml1 f6",
+              // children: "&#128344;",
+              children: "&#128175;",
+            }),
+          ],
+        }),
+      ],
+    }),
     content: m.Div({
       children: [
         m.Div({
@@ -30,19 +50,10 @@ export default Page({
               selectedTabIndex: selectedTabIndex,
               onTabChange: (tabIndex) => (selectedTabIndex.value = tabIndex),
             }),
-            m.Div({
-              class: "bg-light-gray pa2 ba br3 b--moon-gray",
-              children: [
-                m.Span({
-                  class: "f7 mid-gray",
-                  children: "Sort by",
-                }),
-                m.Span({
-                  class: "ml1 f6",
-                  // children: "&#128344;",
-                  children: "&#128175;",
-                }),
-              ],
+            m.A({
+              class: "f6",
+              href: "/",
+              children: "Last 2 weeks",
             }),
           ],
         }),
@@ -79,23 +90,45 @@ export default Page({
                   }),
                   MonthMap({
                     classNames: "mt05",
+                    month: "November",
+                    colorIndex: habit.colorIndex,
+                    totalLevels: habit.levels.length,
+                    status: getMonthStatus(habit.id, habit.tracker, 2024, 10),
+                  }),
+                  MonthMap({
+                    classNames: "mt05",
+                    month: "December",
+                    colorIndex: habit.colorIndex,
+                    totalLevels: habit.levels.length,
+                    status: getMonthStatus(habit.id, habit.tracker, 2024, 11),
+                  }),
+                  MonthMap({
+                    classNames: "mt05",
                     month: "January",
                     colorIndex: habit.colorIndex,
+                    totalLevels: habit.levels.length,
+                    status: getMonthStatus(habit.id, habit.tracker, 2025, 0),
                   }),
                   MonthMap({
                     classNames: "mt05",
                     month: "February",
                     colorIndex: habit.colorIndex,
+                    totalLevels: habit.levels.length,
+                    status: getMonthStatus(habit.id, habit.tracker, 2025, 1),
                   }),
                   MonthMap({
                     classNames: "mt05",
                     month: "March",
                     colorIndex: habit.colorIndex,
+                    totalLevels: habit.levels.length,
+                    status: getMonthStatus(habit.id, habit.tracker, 2025, 2),
                   }),
                   MonthMap({
                     classNames: "mt05",
                     month: "April",
                     colorIndex: habit.colorIndex,
+                    totalLevels: habit.levels.length,
+                    status: getMonthStatus(habit.id, habit.tracker, 2025, 3),
                   }),
                 ],
               }),

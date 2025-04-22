@@ -40,6 +40,10 @@ export type MonthStatus = [
   number
 ];
 
+export type HabitPause = {
+  start: number;
+  end: number;
+};
 export type Habit = {
   id: number;
   title: string;
@@ -48,4 +52,8 @@ export type Habit = {
   colorIndex: number;
   levels: string[];
   tracker: number[];
+  pauses: HabitPause[];
+  isStopped: boolean;
+  newerVersion?: number;
+  olderVersion?: number;
 };

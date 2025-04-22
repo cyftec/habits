@@ -1,3 +1,13 @@
+import { MonthStatus } from "./types";
+
+export const DAY_IN_MS = 1000 * 60 * 60 * 24;
+export const GOLDEN_RATIO = 1.6181;
+
+export const EMPTY_MONTH: MonthStatus = [
+  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+];
+
 export const DAYS_OF_WEEK = [
   "Sunday",
   "Monday",
@@ -24,7 +34,7 @@ export const MONTHS = [
 ] as const satisfies string[];
 
 export const BASE_COLORS = [
-  "#00cc00",
+  "#339933",
   "#00ccff",
   "#0000ff",
   "#9900cc",
@@ -32,7 +42,7 @@ export const BASE_COLORS = [
   "#ff0000",
   "#ff9900",
   "#cccc00",
-  "#99ff33",
+  "#99cc00",
 ] as const satisfies string[];
 
 export const BASE_LEVELS = ["Not done", "Done"] as const satisfies string[];

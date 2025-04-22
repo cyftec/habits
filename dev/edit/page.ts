@@ -1,6 +1,11 @@
 import { derive, dobject, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { BASE_COLORS, BASE_LEVELS, DAYS_OF_WEEK } from "../@common/constants";
+import {
+  BASE_COLORS,
+  BASE_LEVELS,
+  DAY_IN_MS,
+  DAYS_OF_WEEK,
+} from "../@common/constants";
 import { DayFrequency, Habit } from "../@common/types";
 import { getNewHabitId, getUrlParams } from "../@common/utils";
 import {
@@ -15,16 +20,19 @@ import {
 import { Section } from "./@components";
 import { fetchHabit } from "../@common/localstorage";
 
+const backDays = 2;
 const isNew = signal(true);
 const error = signal("");
 const habit = signal<Habit>({
-  id: getNewHabitId(),
+  id: getNewHabitId() - DAY_IN_MS * backDays,
   title: "",
   frequency: [1, 1, 1, 1, 1, 1, 1],
   startAtDay0: 1,
   colorIndex: 0,
   levels: BASE_LEVELS,
   tracker: [],
+  pauses: [],
+  isStopped: false,
 });
 
 const { title, frequency, levels, colorIndex } = dobject(habit).props;
@@ -105,7 +113,13 @@ const saveHabit = () => {
   if (error.value) return;
 
   const habitID = `h.${habit.value.id}`;
-  const habitJSON = JSON.stringify(habit.value);
+
+  const habitJSON = JSON.stringify({
+    ...habit.value,
+    tracker: [...Array(backDays).keys()].map((i) =>
+      Math.trunc(Math.random() * habit.value.levels.length)
+    ),
+  });
   localStorage.setItem(habitID, habitJSON);
 
   location.href = "/";
@@ -307,6 +321,9 @@ export default Page({
                               ],
                             }),
                             AddRemoveButton({
+                              hideAdd: i >= levels.value.length - 1,
+                              hideRemove:
+                                i === 0 || i >= levels.value.length - 1,
                               onAdd: () => addLevel(i + 1),
                               onRemove: () => removeLevel(i),
                             }),

@@ -12,12 +12,14 @@ type AddRemoveButtonProps = {
 export const AddRemoveButton = component<AddRemoveButtonProps>(
   ({ classNames, hideRemove, hideAdd, onRemove, onAdd }) => {
     return m.Span({
-      class: dstring`br3 pb1 f4 ba bw1 b--light-silver dark-gray ${classNames}`,
+      class: dstring`br3 pb1 f4 bw1 b--light-silver dark-gray ${() =>
+        hideRemove?.value && hideAdd?.value ? "bn" : "ba"} ${classNames}`,
       children: [
         m.If({
           subject: hideRemove,
           isFalsy: m.Span({
-            class: "pointer ph2 pb1 br bw1 b--light-silver",
+            class: dstring`pointer ph2 pb1 bw1 b--light-silver ${() =>
+              hideAdd?.value ? "" : "br"}`,
             onclick: onRemove,
             children: "-",
           }),
