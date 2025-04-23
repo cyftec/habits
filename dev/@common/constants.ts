@@ -3,6 +3,16 @@ import { MonthStatus } from "./types";
 export const DAY_IN_MS = 1000 * 60 * 60 * 24;
 export const GOLDEN_RATIO = 1.6181;
 
+export const HOMEPAGE_OVERVIEW_TABS = [
+  { label: "Recent", months: 2 },
+  { label: "Long", months: 6 },
+] as const;
+
+export const STATUS_VIEW_TYPES = [
+  "Monthly",
+  "Weekly",
+] as const satisfies string[];
+
 export const EMPTY_MONTH: MonthStatus = [
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,

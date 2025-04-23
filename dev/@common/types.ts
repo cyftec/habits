@@ -1,4 +1,4 @@
-import { DAYS_OF_WEEK, MONTHS } from "./constants";
+import { DAYS_OF_WEEK, MONTHS, STATUS_VIEW_TYPES } from "./constants";
 
 export type DayFrequency = [0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1];
 

@@ -1,4 +1,4 @@
-import { DAY_IN_MS, EMPTY_MONTH } from "./constants";
+import { EMPTY_MONTH } from "./constants";
 import { MonthStatus } from "./types";
 
 export const getNewHabitId = () => new Date().getTime();
@@ -8,8 +8,7 @@ export const getUrlParams = () => {
   return location.href.split("?")[1].split("&");
 };
 
-export const getMomentZeroDate = (msFromEpoch: number) => {
-  const date = new Date(msFromEpoch);
+export const getMomentZeroDate = (date: Date) => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 };
 
@@ -20,10 +19,10 @@ export const getMonthStatus = (
   monthIndex: number
 ) => {
   const monthStatus: MonthStatus = [...EMPTY_MONTH];
-  const habitCreationDate = new Date(habitCreationTime);
-  const y = habitCreationDate.getFullYear();
-  const m = habitCreationDate.getMonth();
-  const d = habitCreationDate.getDate();
+  const firstStatusDate = new Date(habitCreationTime);
+  const y = firstStatusDate.getFullYear();
+  const m = firstStatusDate.getMonth();
+  const d = firstStatusDate.getDate();
   for (let i = 0; i < statusTrack.length; i++) {
     const date = new Date(y, m, d + i);
     const dateY = date.getFullYear();

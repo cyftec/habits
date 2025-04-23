@@ -1,14 +1,17 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
+import { HOMEPAGE_OVERVIEW_TABS } from "./@common/constants";
 import { fetchHabits } from "./@common/localstorage";
 import { Habit } from "./@common/types";
-import { getMonthStatus } from "./@common/utils";
-import { MonthMap } from "./@components";
+import { CompletionStatusMap } from "./@components";
 import { Button, Page, Scaffold, TabBar } from "./@elements";
 
 const habits = signal<Habit[]>([]);
-const TABS = ["Monthly", "Weekly"];
 const selectedTabIndex = signal(0);
+const totalOverviewMonths = derive(
+  () => HOMEPAGE_OVERVIEW_TABS[selectedTabIndex.value].months
+);
+const today = new Date();
 
 export default Page({
   onMount: () => {
@@ -40,22 +43,12 @@ export default Page({
     }),
     content: m.Div({
       children: [
-        m.Div({
-          class: "flex items-center justify-between f6 mb3 pb1",
-          children: [
-            TabBar({
-              classNames: "w-60 nl1 b",
-              selectedTabClassNames: "pv2",
-              tabs: TABS,
-              selectedTabIndex: selectedTabIndex,
-              onTabChange: (tabIndex) => (selectedTabIndex.value = tabIndex),
-            }),
-            m.A({
-              class: "f6",
-              href: "/",
-              children: "Last 2 weeks",
-            }),
-          ],
+        TabBar({
+          classNames: "w-60 nl1 b f7 mb3",
+          selectedTabClassNames: "pv2",
+          tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
+          selectedTabIndex: selectedTabIndex,
+          onTabChange: (tabIndex) => (selectedTabIndex.value = tabIndex),
         }),
         m.If({
           subject: derive(() => habits.value.length),
@@ -70,8 +63,8 @@ export default Page({
         m.Div({
           children: m.For({
             subject: habits,
-            map: (habit) =>
-              m.Div({
+            map: (habit) => {
+              return m.Div({
                 class: "mb3 bg-white br4 pa3",
                 onclick: () => (location.href = `/habit/?id=${habit.id}`),
                 children: [
@@ -88,50 +81,18 @@ export default Page({
                       }),
                     ],
                   }),
-                  MonthMap({
-                    classNames: "mt05",
-                    month: "November",
+                  CompletionStatusMap({
+                    habitCreationTime: habit.id,
+                    trackRecord: habit.tracker,
+                    completionLevels: habit.levels.length,
                     colorIndex: habit.colorIndex,
-                    totalLevels: habit.levels.length,
-                    status: getMonthStatus(habit.id, habit.tracker, 2024, 10),
-                  }),
-                  MonthMap({
-                    classNames: "mt05",
-                    month: "December",
-                    colorIndex: habit.colorIndex,
-                    totalLevels: habit.levels.length,
-                    status: getMonthStatus(habit.id, habit.tracker, 2024, 11),
-                  }),
-                  MonthMap({
-                    classNames: "mt05",
-                    month: "January",
-                    colorIndex: habit.colorIndex,
-                    totalLevels: habit.levels.length,
-                    status: getMonthStatus(habit.id, habit.tracker, 2025, 0),
-                  }),
-                  MonthMap({
-                    classNames: "mt05",
-                    month: "February",
-                    colorIndex: habit.colorIndex,
-                    totalLevels: habit.levels.length,
-                    status: getMonthStatus(habit.id, habit.tracker, 2025, 1),
-                  }),
-                  MonthMap({
-                    classNames: "mt05",
-                    month: "March",
-                    colorIndex: habit.colorIndex,
-                    totalLevels: habit.levels.length,
-                    status: getMonthStatus(habit.id, habit.tracker, 2025, 2),
-                  }),
-                  MonthMap({
-                    classNames: "mt05",
-                    month: "April",
-                    colorIndex: habit.colorIndex,
-                    totalLevels: habit.levels.length,
-                    status: getMonthStatus(habit.id, habit.tracker, 2025, 3),
+                    currentYear: today.getFullYear(),
+                    currentMonth: today.getMonth(),
+                    monthsCount: totalOverviewMonths,
                   }),
                 ],
-              }),
+              });
+            },
           }),
         }),
         m.Div({
