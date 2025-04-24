@@ -4,9 +4,33 @@ export const DAY_IN_MS = 1000 * 60 * 60 * 24;
 export const GOLDEN_RATIO = 1.6181;
 
 export const HOMEPAGE_OVERVIEW_TABS = [
-  { label: "Recent", months: 2 },
-  { label: "Long", months: 6 },
+  { label: "This month", months: 1 },
+  { label: "2 months", months: 2 },
+  { label: "5 months", months: 5 },
 ] as const;
+
+export const HOMEPAGE_SORT_OPTIONS = [
+  {
+    icon: "calendar_month",
+    decending: true,
+    label: "Date created (Newest first)",
+  },
+  {
+    icon: "calendar_month",
+    decending: false,
+    label: "Date created (Oldest first)",
+  },
+  {
+    icon: "task_alt",
+    decending: true,
+    label: "Completion (Highest first)",
+  },
+  {
+    icon: "task_alt",
+    decending: false,
+    label: "Completion (Lowest first)",
+  },
+] as const satisfies object[];
 
 export const STATUS_VIEW_TYPES = [
   "Monthly",
