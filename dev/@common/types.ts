@@ -1,4 +1,12 @@
-import { DAYS_OF_WEEK, MONTHS, STATUS_VIEW_TYPES } from "./constants";
+import { DAYS_OF_WEEK, MONTHS } from "./constants";
+
+export type LocalSettings = {
+  id: "local-settings";
+  habitsPage: {
+    tabIndex: number;
+    sortOptionIndex: number;
+  };
+};
 
 export type DayFrequency = [0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1];
 

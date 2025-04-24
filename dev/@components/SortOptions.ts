@@ -3,20 +3,21 @@ import { Icon, Modal } from "../@elements";
 import { derive, dstring, signal } from "@cyftech/signal";
 import { HOMEPAGE_SORT_OPTIONS } from "../@common/constants";
 
-type SortOption = (typeof HOMEPAGE_SORT_OPTIONS)[number];
-
 type SortOptionsProps = {
   classNames?: string;
-  selectedOption: SortOption;
-  onChange: (option: SortOption) => void;
+  selectedOptionIndex: number;
+  onChange: (optionIndex: number) => void;
 };
 
 export const SortOptions = component<SortOptionsProps>(
-  ({ classNames, selectedOption, onChange }) => {
+  ({ classNames, selectedOptionIndex, onChange }) => {
     const isSortingOptionsModalOpen = signal(false);
+    const selectedOption = derive(
+      () => HOMEPAGE_SORT_OPTIONS[selectedOptionIndex.value]
+    );
 
-    const onOptionTap = (option: SortOption) => {
-      onChange(option);
+    const onOptionTap = (optionIndex: number) => {
+      onChange(optionIndex);
       isSortingOptionsModalOpen.value = false;
     };
 
@@ -43,7 +44,7 @@ export const SortOptions = component<SortOptionsProps>(
                 class: "f5 mb1",
                 children: m.For({
                   subject: HOMEPAGE_SORT_OPTIONS,
-                  map: (option) => {
+                  map: (option, optionIndex) => {
                     const optionCSS = dstring`flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
                       option.label === selectedOption.value.label
                         ? "bg-near-white"
@@ -51,7 +52,7 @@ export const SortOptions = component<SortOptionsProps>(
 
                     return m.Div({
                       class: optionCSS,
-                      onclick: () => onOptionTap(option),
+                      onclick: () => onOptionTap(optionIndex),
                       children: [
                         SortIcon({
                           classNames: "ml1 mr2",

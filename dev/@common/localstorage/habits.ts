@@ -1,4 +1,4 @@
-import { Habit } from "./types";
+import { Habit } from "../types";
 
 export const fetchHabits = () => {
   const updatedHabits: Habit[] = [];

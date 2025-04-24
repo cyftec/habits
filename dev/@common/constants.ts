@@ -1,7 +1,15 @@
-import { MonthStatus } from "./types";
+import { LocalSettings, MonthStatus } from "./types";
 
 export const DAY_IN_MS = 1000 * 60 * 60 * 24;
 export const GOLDEN_RATIO = 1.6181;
+
+export const INITIAL_SETTINGS: LocalSettings = {
+  id: "local-settings",
+  habitsPage: {
+    tabIndex: 0,
+    sortOptionIndex: 0,
+  },
+};
 
 export const HOMEPAGE_OVERVIEW_TABS = [
   { label: "This month", months: 1 },

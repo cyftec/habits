@@ -4,26 +4,24 @@ import {
   HOMEPAGE_OVERVIEW_TABS,
   HOMEPAGE_SORT_OPTIONS,
 } from "./@common/constants";
-import { fetchHabits } from "./@common/localstorage";
+import { fetchHabits, localSettings } from "./@common/localstorage";
 import { Habit } from "./@common/types";
 import { getCompletionPercentage } from "./@common/utils";
 import { SortOptions } from "./@components";
 import { HabitCard } from "./@components/HabitCard";
 import { Button, Page, Scaffold, TabBar } from "./@elements";
 
-const selectedSortOption = signal<(typeof HOMEPAGE_SORT_OPTIONS)[number]>({
-  icon: "calendar_month",
-  decending: true,
-  label: "Date created (Newest first)",
-});
-const selectedTabIndex = signal(0);
+const selectedSortOptionIndex = derive(
+  () => localSettings.value.habitsPage.sortOptionIndex
+);
+const selectedTabIndex = derive(() => localSettings.value.habitsPage.tabIndex);
 const totalOverviewMonths = derive(
   () => HOMEPAGE_OVERVIEW_TABS[selectedTabIndex.value].months
 );
 
 const habits = signal<Habit[]>([]);
 const sortedHabits = derive(() => {
-  const selectedOption = selectedSortOption.value;
+  const selectedOption = HOMEPAGE_SORT_OPTIONS[selectedSortOptionIndex.value];
   const totalMonths = totalOverviewMonths.value;
   const optionLabel = selectedOption.label;
   const sortedHabitsWithCompletion = habits.value.map((habit) => ({
@@ -54,8 +52,17 @@ export default Page({
         "Daily habits",
         SortOptions({
           classNames: "mt2 mr2",
-          selectedOption: selectedSortOption,
-          onChange: (option) => (selectedSortOption.value = option),
+          selectedOptionIndex: selectedSortOptionIndex,
+          onChange: (optionIndex) => {
+            const settings = localSettings.value;
+            localSettings.value = {
+              ...settings,
+              habitsPage: {
+                ...settings.habitsPage,
+                sortOptionIndex: optionIndex,
+              },
+            };
+          },
         }),
       ],
     }),
@@ -63,10 +70,16 @@ export default Page({
       children: [
         TabBar({
           classNames: "nl1 b f7 pb2 mb3",
-          selectedTabClassNames: "pv3",
+          selectedTabClassNames: "pv3 br4",
           tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
           selectedTabIndex: selectedTabIndex,
-          onTabChange: (tabIndex) => (selectedTabIndex.value = tabIndex),
+          onTabChange: (tabIndex) => {
+            const settings = localSettings.value;
+            localSettings.value = {
+              ...settings,
+              habitsPage: { ...settings.habitsPage, tabIndex },
+            };
+          },
         }),
         m.If({
           subject: derive(() => sortedHabits.value.length),
