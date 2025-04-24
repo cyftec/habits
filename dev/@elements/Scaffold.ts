@@ -15,7 +15,7 @@ export const Scaffold = component<ScaffoldProps>(
       children: [
         m.Div({
           class:
-            "overflow-break-word sticky top-0 left-0 right-0 bg-inherit z-999 f2 b pv3",
+            "overflow-break-word sticky top-0 left-0 right-0 bg-inherit z-999 f2 b pv3 mt2",
           children: header,
         }),
         content,

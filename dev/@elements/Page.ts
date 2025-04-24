@@ -1,11 +1,12 @@
 import { Child, Children, component, m } from "@mufw/maya";
 
 type PageProps = {
+  classNames?: string;
   body: Child;
   onMount?: () => void;
 };
 
-export const Page = component<PageProps>(({ body, onMount }) => {
+export const Page = component<PageProps>(({ classNames, body, onMount }) => {
   return m.Html({
     lang: "en",
     children: [
@@ -28,6 +29,7 @@ export const Page = component<PageProps>(({ body, onMount }) => {
         ],
       }),
       m.Body({
+        class: classNames,
         onmount: onMount,
         children: [m.Script({ src: "main.js", defer: "true" }), body],
       }),
