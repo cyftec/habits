@@ -19,7 +19,7 @@ export const Modal = component<ModalProps>(
           })
         ),
       onclick: onTapOutside,
-      class: dstring`pa0 br3 b--gray ${classNames}`,
+      class: dstring`pa0 br3 ${classNames}`,
       children: [
         m.Div({
           class: dstring``,

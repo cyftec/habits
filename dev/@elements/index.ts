@@ -4,6 +4,7 @@ export * from "./ColorDot";
 export * from "./Icon";
 export * from "./Modal";
 export * from "./Page";
+export * from "./Progressbar";
 export * from "./Scaffold";
 export * from "./TabBar";
 export * from "./Textbox";
