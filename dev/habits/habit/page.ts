@@ -1,29 +1,23 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { Habit } from "../../@common/types";
+import { tryFetchingHabitUsingParams } from "../../@common/utils";
 import { Button, Page, Scaffold } from "../../@elements";
-import { getUrlParams } from "../../@common/utils";
-import { fetchHabit } from "../../@common/localstorage";
 
 const error = signal("");
 const habit = signal<Habit | undefined>(undefined);
 
-export default Page({
-  onMount: () => {
-    const params = getUrlParams();
-    if (!params.length) return;
+const onPageMount = () => {
+  const [fetchedHabit, err] = tryFetchingHabitUsingParams();
+  if (err || !fetchedHabit) {
+    error.value = err || "Nohabit found for 'id' in query param";
+    return;
+  }
+  habit.value = fetchedHabit;
+};
 
-    for (let param of params) {
-      if (!param.startsWith("id=")) continue;
-      const habitID = `h.${param.split("id=").pop()}`;
-      try {
-        habit.value = fetchHabit(habitID);
-      } catch (errMsg) {
-        error.value = errMsg.toString();
-      }
-      break;
-    }
-  },
+export default Page({
+  onMount: onPageMount,
   body: Scaffold({
     classNames: "bg-white ph3",
     header: m.Div({
