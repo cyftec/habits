@@ -91,7 +91,6 @@ export default Page({
           }),
         }),
         m.Div({
-          class: "pb7 mb6",
           children: m.For({
             subject: sortedHabits,
             itemKey: "id",

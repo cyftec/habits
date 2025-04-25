@@ -22,6 +22,7 @@ export const Scaffold = component<ScaffoldProps>(
           }),
         }),
         content,
+        m.Div({ class: "pv6 mt5" }),
         m.If({
           subject: bottombar,
           isTruthy: m.Div({

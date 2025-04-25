@@ -16,30 +16,27 @@ const transitionToHabitsPage = () => {
 export default Page({
   classNames: "bg-near-white",
   onMount: transitionToHabitsPage,
-  body: Scaffold({
-    classNames: "bg-near-white ph3",
-    content: m.Div({
-      class: "flex flex-column justify-center items-center vh-100",
-      children: [
-        m.Img({
-          class: "mt6 br4",
-          src: "/assets/habits-logo.png",
-          height: "100",
-          width: "100",
-        }),
-        m.Div({
-          class: "f3 b mv3",
-          children: "Habits",
-        }),
-        ProgressBar({
-          classNames: "w-40",
-          progress: progress,
-        }),
-        m.Div({
-          class: "mt7 pv4",
-          children: "A Cyfer Product",
-        }),
-      ],
-    }),
+  body: m.Div({
+    class: "flex flex-column justify-center items-center vh-100",
+    children: [
+      m.Img({
+        class: "mt6 br4",
+        src: "/assets/habits-logo.png",
+        height: "100",
+        width: "100",
+      }),
+      m.Div({
+        class: "f3 b mv3",
+        children: "Habits",
+      }),
+      ProgressBar({
+        classNames: "w-40",
+        progress: progress,
+      }),
+      m.Div({
+        class: "mt7 pv4",
+        children: "A Cyfer Product",
+      }),
+    ],
   }),
 });
