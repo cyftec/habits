@@ -1,9 +1,9 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { Habit } from "../@common/types";
-import { Button, Page, Scaffold } from "../@elements";
-import { getUrlParams } from "../@common/utils";
-import { fetchHabit } from "../@common/localstorage";
+import { Habit } from "../../@common/types";
+import { Button, Page, Scaffold } from "../../@elements";
+import { getUrlParams } from "../../@common/utils";
+import { fetchHabit } from "../../@common/localstorage";
 
 const error = signal("");
 const habit = signal<Habit | undefined>(undefined);
@@ -15,7 +15,7 @@ export default Page({
 
     for (let param of params) {
       if (!param.startsWith("id=")) continue;
-      const habitID = `h.${param.split("id=")[1]}`;
+      const habitID = `h.${param.split("id=").pop()}`;
       try {
         habit.value = fetchHabit(habitID);
       } catch (errMsg) {
@@ -34,8 +34,7 @@ export default Page({
           class: "ml2 mt2 pa2 bg-near-white ba br3 b--light-silver f5",
           children: "&#128395;",
           onclick: () => {
-            if (habit.value)
-              location.href = `/edit/?habit-id=${habit.value?.id}`;
+            if (habit.value) location.href = `edit/?id=${habit.value?.id}`;
           },
         }),
       ],

@@ -18,8 +18,7 @@ const fetchSettings = () => {
   const settings = JSON.parse(
     localStorage.getItem("settings") as string
   ) as LocalSettings;
-  console.log(settings);
-  console.log(typeof settings);
+
   return settings;
 };
 

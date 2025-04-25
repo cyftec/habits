@@ -7,8 +7,7 @@ import {
 import { fetchHabits, localSettings } from "../@common/localstorage";
 import { Habit } from "../@common/types";
 import { getCompletionPercentage } from "../@common/utils";
-import { SortOptions } from "../@components";
-import { HabitCard } from "../@components/HabitCard";
+import { HabitCard, SortOptions } from "../@components";
 import { Button, Page, Scaffold, TabBar } from "../@elements";
 
 const selectedSortOptionIndex = derive(
@@ -101,6 +100,8 @@ export default Page({
                 classNames: "mb3",
                 habit: habit,
                 months: totalOverviewMonths,
+                onClick: () =>
+                  (location.href = `/habits/habit/?id=${habit.value.id}`),
               }),
           }),
         }),
@@ -111,7 +112,7 @@ export default Page({
       children: Button({
         className: "pv3 ph4 mb4 shadow-4 b",
         label: dstring`Add new habit`,
-        onTap: () => (location.href = "/edit/"),
+        onTap: () => (location.href = "/habits/new"),
       }),
     }),
   }),

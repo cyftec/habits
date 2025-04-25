@@ -1,7 +1,55 @@
-import { EMPTY_MONTH } from "./constants";
+import { BASE_LEVELS, DAY_IN_MS, EMPTY_MONTH } from "./constants";
+import { fetchHabit } from "./localstorage";
 import { Habit, MonthStatus } from "./types";
 
-export const getNewHabitId = () => new Date().getTime();
+export const getNewHabit = (backDays?: number): Habit => {
+  const now = new Date().getTime();
+  return {
+    id: backDays ? now - DAY_IN_MS * backDays : now,
+    title: "",
+    frequency: [1, 1, 1, 1, 1, 1, 1],
+    startAtDay0: 1,
+    colorIndex: 0,
+    levels: BASE_LEVELS,
+    tracker: [],
+    pauses: [],
+    isStopped: false,
+  };
+};
+export const getHabitValidationError = (habit: Habit): string => {
+  if (!habit.title) {
+    return "Title should not be empty";
+  }
+  if (habit.frequency.every((day) => !day)) {
+    return "Select at least one day in a week";
+  }
+  if (!habit.levels.every((level) => !!level)) {
+    return "One of the levels is empty";
+  }
+
+  return "";
+};
+export const tryFetchingHabitUsingParams = (): readonly [
+  Habit | undefined,
+  string
+] => {
+  const params = getUrlParams();
+  if (!params.length) [undefined, "No query params found"];
+  let habit: Habit | undefined;
+  let error: string = "";
+
+  for (let param of params) {
+    if (!param.startsWith("id=")) continue;
+    const habitID = `h.${param.split("id=").pop()}`;
+    try {
+      habit = fetchHabit(habitID);
+    } catch (errMsg) {
+      error = errMsg.toString();
+    }
+  }
+
+  return [habit, error];
+};
 
 export const getUrlParams = () => {
   if (!location) return [];

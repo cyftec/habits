@@ -9,10 +9,11 @@ type HabitCardProps = {
   classNames?: string;
   habit: Habit & { completion: number };
   months: number;
+  onClick?: () => void;
 };
 
 export const HabitCard = component<HabitCardProps>(
-  ({ classNames, habit, months }) => {
+  ({ classNames, habit, months, onClick }) => {
     const { id, title, completion, colorIndex, levels } = dobject(
       derive(() => habit.value)
     ).props;
@@ -22,7 +23,7 @@ export const HabitCard = component<HabitCardProps>(
 
     return m.Div({
       class: dstring`bg-white br4 pa3 ${classNames}`,
-      onclick: () => (location.href = `/habit/?id=${id}`),
+      onclick: onClick,
       children: [
         m.Div({
           class: "flex items-center justify-between nt1 mb2",
