@@ -8,7 +8,6 @@ export const getNewHabit = (backDays?: number): Habit => {
     id: backDays ? now - DAY_IN_MS * backDays : now,
     title: "",
     frequency: [1, 1, 1, 1, 1, 1, 1],
-    startAtDay0: 1,
     colorIndex: 0,
     levels: BASE_LEVELS,
     tracker: [],

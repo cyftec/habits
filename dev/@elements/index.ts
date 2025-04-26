@@ -2,6 +2,7 @@ export * from "./AddRemoveButton";
 export * from "./Button";
 export * from "./ColorDot";
 export * from "./Icon";
+export * from "./Link";
 export * from "./Modal";
 export * from "./Page";
 export * from "./Progressbar";

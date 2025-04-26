@@ -29,7 +29,7 @@ export const HabitCard = component<HabitCardProps>(
           class: "flex items-center justify-between nt1 mb2",
           children: [
             m.Div({
-              class: "f5 b",
+              class: "f4 dark-gray b",
               children: title,
             }),
             m.Div({

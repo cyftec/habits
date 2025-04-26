@@ -74,13 +74,16 @@ export default Page({
             pageTitle.value.length > 22 ? "f2dot66" : ""}`,
           children: pageTitle,
         }),
-        Icon({
-          className: "mt2 mr1 ba b--moon-gray bw1 br-100 pa1 noselect",
-          size: 22,
-          iconName: "edit",
-          onClick: () => {
-            if (habit.value) location.href = `edit/?id=${habit.value.id}`;
-          },
+        m.If({
+          subject: derive(() => habit.value?.isStopped),
+          isFalsy: Icon({
+            className: "mt2 mr1 ba b--moon-gray bw1 br-100 pa1 noselect",
+            size: 22,
+            iconName: "edit",
+            onClick: () => {
+              if (habit.value) location.href = `edit/?id=${habit.value.id}`;
+            },
+          }),
         }),
       ],
     }),
@@ -95,6 +98,22 @@ export default Page({
               isFalsy: m.Div({ class: "", children: "habit.." }),
               isTruthy: m.Div({
                 children: [
+                  m.If({
+                    subject: derive(() => !!habit.value?.isStopped),
+                    isTruthy: m.Div([
+                      m.Div({
+                        class: "red mb3",
+                        children: "Status: STOPPED PERMANENTLY",
+                      }),
+                      Button({
+                        className: "pv2 ph3 nt2 mb4 red",
+                        onTap: function (): void {
+                          throw new Error("Function not implemented.");
+                        },
+                        children: "Delete Permanently",
+                      }),
+                    ]),
+                  }),
                   Section({
                     title: "Acheivment",
                     child: m.Div({

@@ -56,12 +56,9 @@ export type Habit = {
   id: number;
   title: string;
   frequency: DayFrequency;
-  startAtDay0: 0 | 1;
   colorIndex: number;
   levels: string[];
   tracker: number[];
   pauses: HabitPause[];
   isStopped: boolean;
-  newerVersion?: number;
-  olderVersion?: number;
 };

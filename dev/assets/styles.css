@@ -21,10 +21,7 @@ body {
   scrollbar-color: #e8e8e8 #f2f1f0;
   scrollbar-width: thin;
 }
-
-dialog::backdrop {
-  background: rgba(55, 55, 55, 0.45);
-}
+dialog::backdrop { background: rgba(105, 105, 105, 0.85); }
 
 .app-theme-color { color: var(--themeColor); }
 .bg-app-theme-color { background-color: var(--themeColor); }

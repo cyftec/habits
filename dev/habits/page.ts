@@ -39,6 +39,12 @@ const sortedHabits = derive(() => {
 
   return sortedHabitsWithCompletion;
 });
+const sortedActiveHabits = derive(() =>
+  sortedHabits.value.filter((h) => !h.isStopped)
+);
+const sortedStoppedHabits = derive(() =>
+  sortedHabits.value.filter((h) => h.isStopped)
+);
 
 export default Page({
   classNames: "bg-near-white",
@@ -92,15 +98,34 @@ export default Page({
         }),
         m.Div({
           children: m.For({
-            subject: sortedHabits,
+            subject: sortedActiveHabits,
             itemKey: "id",
-            map: (habit) =>
+            map: (activeHabit) =>
               HabitCard({
                 classNames: "mb3",
-                habit: habit,
+                habit: activeHabit,
                 months: totalOverviewMonths,
                 onClick: () =>
-                  (location.href = `/habits/habit/?id=${habit.value.id}`),
+                  (location.href = `/habits/habit/?id=${activeHabit.value.id}`),
+              }),
+          }),
+        }),
+        m.Div({
+          children: m.For({
+            subject: sortedStoppedHabits,
+            itemKey: "id",
+            n: 0,
+            nthChild: m.Div({
+              class: "silver f6 ml3 mt5 mb3",
+              children: "OLD HABITS (DIE HARD)",
+            }),
+            map: (stoppedHabit) =>
+              HabitCard({
+                classNames: "mb3",
+                habit: stoppedHabit,
+                months: totalOverviewMonths,
+                onClick: () =>
+                  (location.href = `/habits/habit/?id=${stoppedHabit.value.id}`),
               }),
           }),
         }),
@@ -109,7 +134,7 @@ export default Page({
     bottombar: m.Div({
       class: "w-100 flex justify-around",
       children: Button({
-        className: "pv3 ph4 mb4 shadow-4 b",
+        className: "pv3 ph4 mb3 shadow-4 b",
         children: `Add new habit`,
         onTap: () => (location.href = "/habits/new"),
       }),
