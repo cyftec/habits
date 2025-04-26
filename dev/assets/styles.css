@@ -29,6 +29,8 @@ dialog::backdrop {
 .app-theme-color { color: var(--themeColor); }
 .bg-app-theme-color { background-color: var(--themeColor); }
 .overflow-break-word { overflow-wrap: break-word; }
+.f2dot33 { font-size: 2rem; }
+.f2dot66 { font-size: 1.75rem; }
 .f8 { font-size: 0.65rem; }
 .bg-pale { background-color: #f6f6f6; }
 .bg-light-moon-gray { background-color: #e8e8e8; }
@@ -36,3 +38,13 @@ dialog::backdrop {
 .mt05 { margin-top: 0.1rem; }
 .mr05 { margin-right: 0.1rem; }
 .sticky { position: sticky; }
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}

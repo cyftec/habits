@@ -7,7 +7,7 @@ type SectionProps = {
 
 export const Section = component<SectionProps>(({ title, child }) => {
   return m.Div({
-    class: "mb4",
+    class: "mt3 mb4",
     children: [
       m.Div({
         class: "mb2 f5 b",

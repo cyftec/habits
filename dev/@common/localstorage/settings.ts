@@ -8,7 +8,7 @@ const initializeSettings = () => {
 
 const fetchSettings = () => {
   if (!globalThis.localStorage) return INITIAL_SETTINGS;
-  const settingsString = localStorage.getItem("settings") || "";
+  const settingsString = localStorage.getItem("settings") || "{}";
   const settingsObject = JSON.parse(settingsString) as LocalSettings;
   const validSettings =
     typeof settingsObject === "object" &&

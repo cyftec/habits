@@ -68,7 +68,7 @@ export default Page({
     content: m.Div({
       children: [
         TabBar({
-          classNames: "nl1 b f7 pb2 mb3",
+          classNames: "nl1 b f7 pb2 mb2 w-90",
           selectedTabClassNames: "pv3 br4",
           tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
           selectedTabIndex: selectedTabIndex,
@@ -110,7 +110,7 @@ export default Page({
       class: "w-100 flex justify-around",
       children: Button({
         className: "pv3 ph4 mb4 shadow-4 b",
-        label: dstring`Add new habit`,
+        children: `Add new habit`,
         onTap: () => (location.href = "/habits/new"),
       }),
     }),

@@ -7,16 +7,21 @@ type ColorDotProps = {
   colorIndex: number;
   level: number;
   totalLevels: number;
+  textContent?: string;
+  textColor?: string;
+  showText?: boolean;
 };
 
 export const ColorDot = component<ColorDotProps>(
-  ({ classNames, colorIndex, level, totalLevels }) => {
+  ({ classNames, colorIndex, level, totalLevels, textContent, showText }) => {
     const color = derive(() => BASE_COLORS[colorIndex.value]);
-    const opacityHex = derive(() => {
-      const hex = Math.trunc(
+    const opacityHexNum = derive(() =>
+      Math.trunc(
         Math.pow(level.value / (totalLevels.value - 1), GOLDEN_RATIO) * 255
-      ).toString(16);
-
+      )
+    );
+    const opacityHex = derive(() => {
+      const hex = opacityHexNum.value.toString(16);
       return hex.length === 1 ? `0${hex}` : hex;
     });
     const bgColor = derive(() =>
@@ -25,7 +30,13 @@ export const ColorDot = component<ColorDotProps>(
         : `${color.value}${opacityHex.value}`
     );
     const fontColor = derive(() =>
-      level.value < 0 ? "lightgray" : "transparent"
+      showText?.value
+        ? level.value / (totalLevels.value - 1) > 0.5
+          ? "white"
+          : "black"
+        : level.value < 0
+        ? "lightgray"
+        : "transparent"
     );
 
     return m.Span({
@@ -38,7 +49,7 @@ export const ColorDot = component<ColorDotProps>(
             background-color: ${bgColor};
             color: ${fontColor};
           `,
-          children: "·",
+          children: derive(() => textContent?.value || "·"),
         }),
       ],
     });

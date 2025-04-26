@@ -1,4 +1,4 @@
-import { signal } from "@cyftech/signal";
+import { derive, dstring, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { Habit } from "../@common/types";
 import {
@@ -7,16 +7,19 @@ import {
   tryFetchingHabitUsingParams,
 } from "../@common/utils";
 import { HabitEditor } from "../@components";
-import { Button, Page, Scaffold } from "../@elements";
+import { Button, Icon, Page, Scaffold } from "../@elements";
 
 type HabitEditorPageProps = {
   isNew: boolean;
 };
 
 export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
-  const backDays = isNew.value ? 2 : 0;
+  const backDays = isNew.value ? 200 : 0;
   const error = signal("");
   const habit = signal<Habit>(getNewHabit(backDays));
+  const pageTitle = derive(() =>
+    isNew.value ? "New target habit" : `Edit '${habit.value.title}'`
+  );
 
   const saveHabit = () => {
     error.value = getHabitValidationError(habit.value);
@@ -49,7 +52,10 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
     onMount: onPageMount,
     body: Scaffold({
       classNames: "bg-white ph3",
-      header: m.Div("New target habit"),
+      header: m.Div({
+        class: dstring`${() => (pageTitle.value.length > 22 ? "f2dot66" : "")}`,
+        children: pageTitle,
+      }),
       content: m.Div([
         m.If({
           subject: error,
@@ -65,16 +71,22 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
         }),
       ]),
       bottombar: m.Div({
-        class: "w-100 pv3 flex items-center justify-between",
+        class: "w-100 pv3 flex items-center justify-stretch",
         children: [
           Button({
-            className: "w-100 mr2",
-            label: "Go back",
+            className: "pa3 flex items-center mr2",
+            children: [
+              Icon({ iconName: "arrow_back" }),
+              m.Span({
+                class: "ml1",
+                children: `Go Back`,
+              }),
+            ],
             onTap: () => history.back(),
           }),
           Button({
-            className: "w-100 ml2",
-            label: "Save",
+            className: "w-60 pa3 ml2 b",
+            children: derive(() => (isNew.value ? "Save" : "Update")),
             onTap: saveHabit,
           }),
         ],

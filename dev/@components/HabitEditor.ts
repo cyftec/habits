@@ -190,35 +190,35 @@ export const HabitEditor = component<HabitEditorProps>(
                   child: m.Div({
                     children: [
                       m.A({
-                        class: "db mb3",
+                        class: "db mb3 f6 gray",
                         href: "/",
                         children: "Pause this habit for a while",
                       }),
                       m.A({
-                        class: "db mb3",
+                        class: "db mb3 f6 gray",
                         href: "/",
                         children: "Stop this habit permanently",
                       }),
                       m.A({
-                        class: "db mb3",
+                        class: "db mb3 f6 gray",
                         href: "/",
                         children:
                           "Stop this habit and recreate a new one with updated schedule and levels",
                       }),
                       m.A({
-                        class: "db mb3",
+                        class: "db mb3 f6 gray",
                         href: "/",
                         children:
                           "Connect this stopped habit with a related, newly created habit",
                       }),
                       m.A({
-                        class: "db mb3",
+                        class: "db mb3 f6 gray",
                         href: "/",
                         children:
                           "Connect this new habit with a related, old stopped habit",
                       }),
                       m.A({
-                        class: "db mb3 red",
+                        class: "db mb3 f6 red",
                         href: "/",
                         children:
                           "Delete this habit permanently along with its data",
