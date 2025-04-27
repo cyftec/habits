@@ -1,6 +1,6 @@
 import { BASE_LEVELS, DAY_IN_MS, EMPTY_MONTH } from "./constants";
 import { fetchHabit } from "./localstorage";
-import { Habit, MonthStatus } from "./types";
+import { Habit, MilestonesData, MilestoneUI, MonthStatus } from "./types";
 
 export const getNewHabit = (backDays?: number): Habit => {
   const now = new Date().getTime();
@@ -11,9 +11,45 @@ export const getNewHabit = (backDays?: number): Habit => {
     colorIndex: 0,
     levels: BASE_LEVELS,
     tracker: [],
+    milestones: [95, 85, 60],
     pauses: [],
     isStopped: false,
   };
+};
+export const getDetailedMilestones = (
+  milestones: MilestonesData
+): MilestoneUI[] => [
+  {
+    label: "Successful",
+    percent: milestones[0],
+    icon: "verified_user",
+    color: "green",
+  },
+  {
+    label: "Going good",
+    percent: milestones[1],
+    icon: "done_all",
+    color: "black",
+  },
+  {
+    label: "Keep it up",
+    percent: milestones[2],
+    icon: "check",
+    color: "black",
+  },
+  { label: "Unacceptable", percent: 0, icon: "close", color: "red" },
+];
+export const getMilestone = (
+  milestones: MilestonesData,
+  completionPercentage: number
+): MilestoneUI => {
+  const dms = getDetailedMilestones(milestones);
+  let milestone: MilestoneUI = dms[0];
+  for (let i = 0; i < dms.length; i++) {
+    milestone = dms[i];
+    if (milestone.percent < completionPercentage) break;
+  }
+  return milestone;
 };
 export const getHabitValidationError = (habit: Habit): string => {
   if (!habit.title) {
@@ -24,6 +60,12 @@ export const getHabitValidationError = (habit: Habit): string => {
   }
   if (!habit.levels.every((level) => !!level)) {
     return "One of the levels is empty";
+  }
+  if (!habit.milestones.every((m) => m <= 100 && m >= 0)) {
+    return `The milestones should be between 0 and 100 percents`;
+  }
+  if (!habit.milestones.every((m, i, ms) => (i === 0 ? true : ms[i - 1] > m))) {
+    return `Milestones should be in order (from high to low)`;
   }
 
   return "";

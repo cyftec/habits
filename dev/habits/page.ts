@@ -110,24 +110,27 @@ export default Page({
               }),
           }),
         }),
-        m.Div({
-          children: m.For({
-            subject: sortedStoppedHabits,
-            itemKey: "id",
-            n: 0,
-            nthChild: m.Div({
-              class: "silver f6 ml3 mt5 mb3",
-              children: "OLD HABITS (DIE HARD)",
-            }),
-            map: (stoppedHabit) =>
-              HabitCard({
-                classNames: "mb3",
-                habit: stoppedHabit,
-                months: totalOverviewMonths,
-                onClick: () =>
-                  (location.href = `/habits/habit/?id=${stoppedHabit.value.id}`),
+        m.If({
+          subject: derive(() => sortedStoppedHabits.value.length),
+          isTruthy: m.Div(
+            m.For({
+              subject: sortedStoppedHabits,
+              itemKey: "id",
+              n: 0,
+              nthChild: m.Div({
+                class: "silver f6 ml3 mt5 mb3",
+                children: "OLD HABITS (DIE HARD)",
               }),
-          }),
+              map: (stoppedHabit) =>
+                HabitCard({
+                  classNames: "mb3",
+                  habit: stoppedHabit,
+                  months: totalOverviewMonths,
+                  onClick: () =>
+                    (location.href = `/habits/habit/?id=${stoppedHabit.value.id}`),
+                }),
+            })
+          ),
         }),
       ],
     }),

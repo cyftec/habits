@@ -201,7 +201,6 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
         }),
         HabitEditor({
           habit: habit,
-          isNew: isNew,
           onChange: (updatedHabit) => (habit.value = updatedHabit),
         }),
         m.If({

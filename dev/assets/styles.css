@@ -31,6 +31,8 @@ dialog::backdrop { background: rgba(105, 105, 105, 0.85); }
 .f8 { font-size: 0.65rem; }
 .bg-pale { background-color: #f6f6f6; }
 .bg-light-moon-gray { background-color: #e8e8e8; }
+.bottom--1dot5 { bottom: -1.75rem; }
+.pa2dot5 { padding: 0.75rem; }
 .pt05 { padding-top: 0.2rem; }
 .mt05 { margin-top: 0.1rem; }
 .mr05 { margin-right: 0.1rem; }

@@ -1,9 +1,10 @@
 import { component, m } from "@mufw/maya";
 import { Habit } from "../@common/types";
 import { derive, dobject, dstring } from "@cyftech/signal";
-import { getMonthsStatus } from "../@common/utils";
+import { getMilestone, getMonthsStatus } from "../@common/utils";
 import { MonthMap } from "./MonthMap";
 import { MONTHS } from "../@common/constants";
+import { Icon } from "../@elements";
 
 type HabitCardProps = {
   classNames?: string;
@@ -14,11 +15,17 @@ type HabitCardProps = {
 
 export const HabitCard = component<HabitCardProps>(
   ({ classNames, habit, months, onClick }) => {
-    const { id, title, completion, colorIndex, levels } = dobject(
+    const { milestones, title, completion, colorIndex, levels } = dobject(
       derive(() => habit.value)
     ).props;
     const monthsTrackerList = derive(() =>
       getMonthsStatus(habit.value, months.value)
+    );
+    const milestoneIcon = derive(
+      () => getMilestone(milestones.value, completion.value).icon
+    );
+    const milestoneIconColor = derive(
+      () => getMilestone(milestones.value, completion.value).color
     );
 
     return m.Div({
@@ -33,8 +40,14 @@ export const HabitCard = component<HabitCardProps>(
               children: title,
             }),
             m.Div({
-              class: "f6 silver b",
-              children: dstring`${completion}%`,
+              class: "f6 silver b flex items-center",
+              children: [
+                Icon({
+                  className: dstring`mr1 ${milestoneIconColor}`,
+                  iconName: milestoneIcon,
+                }),
+                dstring`${completion}%`,
+              ],
             }),
           ],
         }),

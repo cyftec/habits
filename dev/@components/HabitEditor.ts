@@ -1,22 +1,29 @@
-import { derive, dobject, dstring, Signal } from "@cyftech/signal";
+import { derive, dobject, dstring, effect, Signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { BASE_COLORS, DAYS_OF_WEEK } from "../@common/constants";
-import { DayFrequency, Habit } from "../@common/types";
+import { DayFrequency, Habit, MilestonesData } from "../@common/types";
 import { Section } from ".";
-import { AddRemoveButton, ColorDot, TextBox } from "../@elements";
+import {
+  AddRemoveButton,
+  ColorDot,
+  Icon,
+  NumberBox,
+  TextBox,
+} from "../@elements";
+import { getDetailedMilestones } from "../@common/utils";
 
 type HabitEditorProps = {
   classNames?: string;
   habit: Signal<Habit>;
-  isNew: boolean;
   onChange: (updatedHabit: Habit) => void;
 };
 
 export const HabitEditor = component<HabitEditorProps>(
-  ({ classNames, habit, isNew, onChange }) => {
-    const { title, frequency, levels, colorIndex } = dobject(habit).props;
+  ({ classNames, habit, onChange }) => {
+    const { title, frequency, levels, milestones, colorIndex } =
+      dobject(habit).props;
     const everyDay = derive(() => frequency.value.every((day) => !!day));
-    const selectedCss = "bg-gray white";
+    const selectedCss = "bg-mid-gray white";
     const unSelectedCss = "bg-near-white light-silver";
 
     const updateTitle = (title: string) => {
@@ -63,18 +70,17 @@ export const HabitEditor = component<HabitEditorProps>(
       addOrRemoveLevel(fromIndex, false);
     };
 
+    const updateMilestone = (value: number, index: number) => {
+      if (index < 0 || index > 2)
+        throw `Incorrect index of milestone passed. Milestone values should not be more than 3.`;
+      const updatedMilestones: MilestonesData = [...habit.value.milestones];
+      updatedMilestones[index] = value;
+      onChange({ ...habit.value, milestones: updatedMilestones });
+    };
+
     return m.Div({
       class: classNames,
       children: [
-        Section({
-          title: "Title",
-          child: TextBox({
-            classNames: "ba bw1 b--light-gray br3 pa2 w-100",
-            placeholder: "",
-            text: title,
-            onchange: updateTitle,
-          }),
-        }),
         Section({
           title: "Color",
           child: m.Div({
@@ -100,6 +106,15 @@ export const HabitEditor = component<HabitEditorProps>(
           }),
         }),
         Section({
+          title: "Title",
+          child: TextBox({
+            classNames: "ba bw1 b--light-gray br3 pa2 w-100",
+            placeholder: "",
+            text: title,
+            onchange: updateTitle,
+          }),
+        }),
+        Section({
           title: "Frequency",
           child: m.Div({
             class: "mb3 f6 flex items-center flex-wrap",
@@ -107,7 +122,7 @@ export const HabitEditor = component<HabitEditorProps>(
               subject: DAYS_OF_WEEK,
               n: 0,
               nthChild: m.Span({
-                class: dstring`pointer br-pill pv1 ph2 mr2 ${() =>
+                class: dstring`pointer flex items-center justify-center br-pill h2 ph2 mr2 ${() =>
                   everyDay.value ? selectedCss : unSelectedCss}`,
                 children: "Daily",
                 onclick: () => updateFrequency(-1),
@@ -120,7 +135,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 );
 
                 return m.Span({
-                  class: dstring`pointer br-100 pv1 ph2 mr2 ${colorCss}`,
+                  class: dstring`pointer flex items-center justify-center br-100 h2 w2 mr2 ${colorCss}`,
                   children: day.charAt(0),
                   onclick: () => updateFrequency(dayIndex),
                 });
@@ -176,46 +191,74 @@ export const HabitEditor = component<HabitEditorProps>(
           }),
         }),
         Section({
-          title: "Target",
+          title: "Milestones",
           child: m.Div({
             children: m.For({
-              subject: levels,
-              map: (level, i) =>
+              subject: derive(() => getDetailedMilestones(milestones.value)),
+              n: 0,
+              nthChild: m.Div({
+                class:
+                  "mb1 ph2 pv0 bn br3 bw1 b--light-gray relative ts-white-1",
+                children: [
+                  m.Span({
+                    class: "lh-copy",
+                    children: "",
+                  }),
+                  m.Span({
+                    class:
+                      "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
+                    children: [
+                      m.Span({
+                        class:
+                          "w-100 bg-white bn bw1 b--gray br3 pa2dot5 di f4 b light-silver mb1 nl1",
+                        children: "100",
+                      }),
+                      m.Span({
+                        class: "ph2 bg-white light-silver b mr1",
+                        children: "%",
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+              map: (milestone, i) =>
                 m.Div({
+                  class: "mb1 ph4 pv4 ba br3 bw1 b--light-gray relative",
                   children: [
-                    m.Div({
-                      class: "flex items-center justify-between",
+                    m.Span({
+                      class: "lh-copy flex items-center",
                       children: [
-                        m.Div({
-                          class: "flex items-center",
-                          children: [
-                            ColorDot({
-                              classNames: "pa2 mr2",
-                              colorIndex,
-                              level: i,
-                              totalLevels: levels.value.length,
-                            }),
-                            TextBox({
-                              classNames: "ba bw1 b--light-gray br3 pa2 w-100",
-                              placeholder: "",
-                              text: level,
-                              onchange: (text) => updateLevel(text, i),
-                            }),
-                          ],
+                        Icon({
+                          className: `mr2 ${i === 0 ? "green" : ""}`,
+                          size: 20,
+                          iconName: milestone.icon,
                         }),
-                        AddRemoveButton({
-                          hideAdd: i >= levels.value.length - 1,
-                          hideRemove: i === 0 || i >= levels.value.length - 1,
-                          onAdd: () => addLevel(i + 1),
-                          onRemove: () => removeLevel(i),
-                        }),
+                        milestone.label,
                       ],
                     }),
-                    m.If({
-                      subject: i < levels.value.length - 1,
-                      isTruthy: m.Div({
-                        class: "pa2 ml2 bl bw1 b--light-gray",
-                      }),
+                    m.Span({
+                      class:
+                        "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
+                      children: [
+                        m.If({
+                          subject: i === 3,
+                          isTruthy: m.Span({
+                            class:
+                              "w-100 bg-white bn bw1 b--gray br3 pa2dot5 di f4 b light-silver mb1",
+                            children: "00",
+                          }),
+                          isFalsy: NumberBox({
+                            classNames:
+                              "w-100 ba bw1 b--gray br3 pa2dot5 di f5 b dark-gray",
+                            num: milestone.percent,
+                            onchange: (value) => updateMilestone(value, i),
+                          }),
+                        }),
+                        m.Span({
+                          class: "ph2 bg-white light-silver b",
+                          children: "%",
+                        }),
+                      ],
                     }),
                   ],
                 }),

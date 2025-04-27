@@ -52,6 +52,13 @@ export type HabitPause = {
   start: number;
   end: number;
 };
+export type MilestonesData = [number, number, number];
+export type MilestoneUI = {
+  label: string;
+  percent: number;
+  icon: string;
+  color: string;
+};
 export type Habit = {
   id: number;
   title: string;
@@ -59,6 +66,7 @@ export type Habit = {
   colorIndex: number;
   levels: string[];
   tracker: number[];
+  milestones: MilestonesData;
   pauses: HabitPause[];
   isStopped: boolean;
 };
