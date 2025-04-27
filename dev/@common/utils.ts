@@ -26,16 +26,16 @@ export const getDetailedMilestones = (
     color: "green",
   },
   {
-    label: "Going good",
+    label: "Little more to go",
     percent: milestones[1],
     icon: "done_all",
-    color: "black",
+    color: "light-blue",
   },
   {
-    label: "Keep it up",
+    label: "Going good",
     percent: milestones[2],
     icon: "check",
-    color: "black",
+    color: "blue",
   },
   { label: "Unacceptable", percent: 0, icon: "close", color: "red" },
 ];

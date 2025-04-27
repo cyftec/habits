@@ -229,7 +229,7 @@ export const HabitEditor = component<HabitEditorProps>(
                       class: "lh-copy flex items-center",
                       children: [
                         Icon({
-                          className: `mr2 ${i === 0 ? "green" : ""}`,
+                          className: `mr2 ${milestone.color}`,
                           size: 20,
                           iconName: milestone.icon,
                         }),
