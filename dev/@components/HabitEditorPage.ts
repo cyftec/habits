@@ -14,11 +14,11 @@ type HabitEditorPageProps = {
 };
 
 export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
-  const backDays = isNew.value ? 20 : 0;
+  // const backDays = isNew.value ? 20 : 0;
   const deleteActionModalOpen = signal(false);
   const stopActionModalOpen = signal(false);
   const error = signal("");
-  const habit = signal<Habit>(getNewHabit(backDays));
+  const habit = signal<Habit>(getNewHabit());
   const initialLevels = signal<string[]>([]);
   const pageTitle = derive(() =>
     isNew.value ? "New target habit" : `Edit '${habit.value.title}'`
