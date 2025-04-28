@@ -51,7 +51,7 @@ export const ColorDot = component<ColorDotProps>(
     return m.Span({
       class: dstring`br-100 relative ${() =>
         level.value < 0 ? "transparent" : "bg-near-white"} ${classNames}`,
-      onclick: () => onClick && onClick(),
+      onclick: () => onClick && level.value >= 0 && onClick(),
       children: [
         m.Span({
           class: dstring`flex items-center justify-around absolute absolute--fill br-100 pt05`,

@@ -1,4 +1,10 @@
-import { BASE_LEVELS, DAY_IN_MS, EMPTY_MONTH } from "./constants";
+import {
+  BASE_LEVELS,
+  BASE_MILESTONES,
+  BASE_WEEKDAY_FREQUENCY,
+  DAY_IN_MS,
+  EMPTY_MONTH,
+} from "./constants";
 import { Habit, MilestonesData, MilestoneUI, MonthStatus } from "./types";
 
 export const getNewHabit = (backDays?: number): Habit => {
@@ -6,11 +12,11 @@ export const getNewHabit = (backDays?: number): Habit => {
   return {
     id: backDays ? now - DAY_IN_MS * backDays : now,
     title: "",
-    frequency: [1, 1, 1, 1, 1, 1, 1],
+    frequency: BASE_WEEKDAY_FREQUENCY,
     colorIndex: 0,
     levels: BASE_LEVELS,
     tracker: [],
-    milestones: [95, 85, 60],
+    milestones: BASE_MILESTONES,
     pauses: [],
     isStopped: false,
   };

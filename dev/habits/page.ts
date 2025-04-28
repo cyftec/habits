@@ -4,7 +4,11 @@ import {
   HOMEPAGE_OVERVIEW_TABS,
   HOMEPAGE_SORT_OPTIONS,
 } from "../@common/constants";
-import { fetchHabits, localSettings } from "../@common/localstorage";
+import {
+  fetchHabits,
+  intializeTrackerEmptyDays,
+  localSettings,
+} from "../@common/localstorage";
 import { Habit } from "../@common/types";
 import { getCompletionPercentage } from "../@common/utils";
 import { HabitCard, SortOptions } from "../@components";
@@ -46,9 +50,14 @@ const sortedStoppedHabits = derive(() =>
   sortedHabits.value.filter((h) => h.isStopped)
 );
 
+const onPageMount = () => {
+  intializeTrackerEmptyDays();
+  habits.value = fetchHabits();
+};
+
 export default Page({
   classNames: "bg-near-white",
-  onMount: () => (habits.value = fetchHabits()),
+  onMount: onPageMount,
   body: Scaffold({
     classNames: "bg-near-white ph3",
     header: m.Div({

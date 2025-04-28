@@ -1,5 +1,5 @@
-import { Habit } from "../types";
-import { getUrlParams } from "../utils";
+import { Habit, StoreHabitID } from "../types";
+import { getDaysDifference, getUrlParams } from "../utils";
 
 export const fetchHabits = () => {
   const updatedHabits: Habit[] = [];
@@ -21,7 +21,33 @@ export const fetchHabit = (habitID: string) => {
   return habitObj as Habit;
 };
 
-export const updateHabitInStore = (habitID: `h.${number}`, habit: Habit) => {
+export const intializeTrackerEmptyDays = () => {
+  for (let key in localStorage) {
+    if (!key.startsWith("h.")) continue;
+    const habit: Habit | string = JSON.parse(localStorage.getItem(key) || "{}");
+    if (typeof habit !== "object" || !habit["title"]) continue;
+    const habitID: StoreHabitID = `h.${habit.id}`;
+    const day1 = new Date(habit.id);
+    const today = new Date();
+    const daysGap = getDaysDifference(day1, today);
+    const updatedTracker = [...habit.tracker];
+    if (daysGap + 1 <= updatedTracker.length) continue;
+
+    for (let i = updatedTracker.length; i <= daysGap; i++) {
+      const day = new Date(
+        day1.getFullYear(),
+        day1.getMonth(),
+        day1.getDate() + i
+      );
+      const dayOfWeek = day.getDay();
+      updatedTracker[i] = habit.frequency[dayOfWeek] ? 0 : -1;
+    }
+    habit.tracker = updatedTracker;
+    localStorage.setItem(habitID, JSON.stringify(habit));
+  }
+};
+
+export const saveHabitInStore = (habitID: StoreHabitID, habit: Habit) => {
   console.log(habit);
   localStorage.setItem(habitID, JSON.stringify(habit));
 };
@@ -37,7 +63,10 @@ export const tryFetchingHabitUsingParams = (): readonly [
 
   for (let param of params) {
     if (!param.startsWith("id=")) continue;
-    const habitID = `h.${param.split("id=").pop()}`;
+    const idString = param.split("id=").pop();
+    const id = +(idString || "__");
+    if (!id || isNaN(id)) continue;
+    const habitID: StoreHabitID = `h.${id}`;
     try {
       habit = fetchHabit(habitID);
     } catch (errMsg) {

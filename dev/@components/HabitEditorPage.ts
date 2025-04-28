@@ -1,7 +1,10 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { tryFetchingHabitUsingParams } from "../@common/localstorage";
-import { Habit } from "../@common/types";
+import {
+  saveHabitInStore,
+  tryFetchingHabitUsingParams,
+} from "../@common/localstorage";
+import { Habit, StoreHabitID } from "../@common/types";
 import { getHabitValidationError, getNewHabit } from "../@common/utils";
 import { HabitEditor, Section } from "../@components";
 import { Button, Icon, Link, Modal, Page, Scaffold } from "../@elements";
@@ -11,7 +14,7 @@ type HabitEditorPageProps = {
 };
 
 export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
-  const backDays = isNew.value ? 10 : 0;
+  const backDays = isNew.value ? 20 : 0;
   const deleteActionModalOpen = signal(false);
   const stopActionModalOpen = signal(false);
   const error = signal("");
@@ -24,13 +27,9 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
     error.value = getHabitValidationError(habit.value);
     if (error.value) return;
 
-    const habitID = `h.${habit.value.id}`;
-    const tracker = isNew.value
-      ? [...Array(backDays).keys()].map((i) =>
-          Math.trunc(Math.random() * habit.value.levels.length)
-        )
-      : habit.value.tracker;
-    const habitJSON = JSON.stringify({ ...habit.value, tracker });
+    const habitID: StoreHabitID = `h.${habit.value.id}`;
+    saveHabitInStore(habitID, habit.value);
+    const habitJSON = JSON.stringify(habit.value);
     localStorage.setItem(habitID, habitJSON);
     history.back();
   };
@@ -111,7 +110,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
                                 className: "pv2 ph3 ml2 b red",
                                 children: "Yes, delete permanently",
                                 onTap: () => {
-                                  const habitID = `h.${habit.value.id}`;
+                                  const habitID: StoreHabitID = `h.${habit.value.id}`;
                                   localStorage.removeItem(habitID);
                                   deleteActionModalOpen.value = false;
                                   location.href = "/habits/";
@@ -170,7 +169,6 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
                                 className: "w-100 pv2 ph3 ml2 b",
                                 children: "Yes, stop this",
                                 onTap: () => {
-                                  // const habitID = `h.${habit.value.id}`;
                                   habit.value = {
                                     ...habit.value,
                                     isStopped: true,

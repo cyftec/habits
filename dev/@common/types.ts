@@ -8,8 +8,6 @@ export type LocalSettings = {
   };
 };
 
-export type DayFrequency = [0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1, 0 | 1];
-
 export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
 
 export type Month = (typeof MONTHS)[number];
@@ -52,6 +50,15 @@ export type HabitPause = {
   start: number;
   end: number;
 };
+export type WeekdayFrequency = [
+  0 | 1,
+  0 | 1,
+  0 | 1,
+  0 | 1,
+  0 | 1,
+  0 | 1,
+  0 | 1
+];
 export type MilestonesData = [number, number, number];
 export type MilestoneUI = {
   label: string;
@@ -59,10 +66,11 @@ export type MilestoneUI = {
   icon: string;
   color: string;
 };
+export type StoreHabitID = `h.${number}`;
 export type Habit = {
   id: number;
   title: string;
-  frequency: DayFrequency;
+  frequency: WeekdayFrequency;
   colorIndex: number;
   levels: string[];
   tracker: number[];

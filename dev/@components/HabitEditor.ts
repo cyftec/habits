@@ -2,7 +2,7 @@ import { derive, dobject, dstring, Signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { Section } from ".";
 import { BASE_COLORS, DAYS_OF_WEEK } from "../@common/constants";
-import { DayFrequency, Habit, MilestonesData } from "../@common/types";
+import { WeekdayFrequency, Habit, MilestonesData } from "../@common/types";
 import { getDetailedMilestones } from "../@common/utils";
 import {
   AddRemoveButton,
@@ -43,7 +43,7 @@ export const HabitEditor = component<HabitEditorProps>(
       }
 
       const updatedFreq = everyDay.value
-        ? (frequency.value.map((_) => 0) as DayFrequency)
+        ? (frequency.value.map((_) => 0) as WeekdayFrequency)
         : frequency.value;
       updatedFreq[dayIndex] = everyDay.value
         ? 1

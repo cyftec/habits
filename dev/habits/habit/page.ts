@@ -1,19 +1,19 @@
-import { derive, dstring, effect, signal } from "@cyftech/signal";
+import { derive, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { DAY_IN_MS, DAYS_OF_WEEK, MONTHS } from "../../@common/constants";
-import { Habit } from "../../@common/types";
+import { DAYS_OF_WEEK, MONTHS } from "../../@common/constants";
+import {
+  intializeTrackerEmptyDays,
+  saveHabitInStore,
+  tryFetchingHabitUsingParams,
+} from "../../@common/localstorage";
+import { Habit, StoreHabitID } from "../../@common/types";
 import {
   getCompletionPercentage,
   getDaysDifference,
   getMilestone,
-  getMomentZeroDate,
 } from "../../@common/utils";
 import { Section } from "../../@components";
 import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
-import {
-  tryFetchingHabitUsingParams,
-  updateHabitInStore,
-} from "../../@common/localstorage";
 
 const error = signal("");
 const habit = signal<Habit | undefined>(undefined);
@@ -93,12 +93,14 @@ const updateLevel = (levelIndex: number) => {
     updateLevelModalData.value.date
   );
   updatedTracker[index] = levelIndex;
+  const habitID: StoreHabitID = `h.${habit.value.id}`;
   habit.value = { ...habit.value, tracker: updatedTracker };
-  updateHabitInStore(`h.${habit.value.id}`, habit.value);
+  saveHabitInStore(habitID, habit.value);
   updateLevelModalOpen.value = false;
 };
 
 const onPageMount = () => {
+  intializeTrackerEmptyDays();
   const [fetchedHabit, err] = tryFetchingHabitUsingParams();
   if (err || !fetchedHabit) {
     error.value = err || "Nohabit found for 'id' in query param";
@@ -171,8 +173,11 @@ export default Page({
                     className: "pv2 ph3 ml2 b red",
                     children: "Yes, delete permanently",
                     onTap: () => {
-                      const habitID = `h.${habit.value?.id}`;
-                      localStorage.removeItem(habitID);
+                      const habitID: StoreHabitID = `h.${
+                        habit.value?.id || -1
+                      }`;
+                      if (habitID in localStorage)
+                        localStorage.removeItem(habitID);
                       deleteActionModalOpen.value = false;
                       location.href = "/habits/";
                     },
