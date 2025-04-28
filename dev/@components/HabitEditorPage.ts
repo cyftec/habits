@@ -14,7 +14,6 @@ type HabitEditorPageProps = {
 };
 
 export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
-  // const backDays = isNew.value ? 20 : 0;
   const deleteActionModalOpen = signal(false);
   const stopActionModalOpen = signal(false);
   const error = signal("");
@@ -90,7 +89,13 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
       });
     }
     saveHabitInStore(habitID, { ...habit.value, tracker: updatedTracker });
-    history.back();
+    goBack();
+  };
+
+  const goBack = () => {
+    location.href = isNew.value
+      ? "/habits/"
+      : `/habits/habit/?id=${habit.value.id}`;
   };
 
   const onPageMount = () => {
@@ -276,7 +281,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
                     children: `Go Back`,
                   }),
                 ],
-                onTap: () => history.back(),
+                onTap: goBack,
               }),
               Button({
                 className: "w-100 pa3 ml3 b",

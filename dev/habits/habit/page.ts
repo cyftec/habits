@@ -411,7 +411,7 @@ export default Page({
             children: `Go Back`,
           }),
         ],
-        onTap: () => history.back(),
+        onTap: () => (location.href = "/habits/"),
       }),
     }),
   }),
