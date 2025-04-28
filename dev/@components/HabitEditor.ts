@@ -15,11 +15,12 @@ import {
 type HabitEditorProps = {
   classNames?: string;
   habit: Signal<Habit>;
+  initialLevels: string[];
   onChange: (updatedHabit: Habit) => void;
 };
 
 export const HabitEditor = component<HabitEditorProps>(
-  ({ classNames, habit, onChange }) => {
+  ({ classNames, habit, initialLevels, onChange }) => {
     const { title, frequency, levels, milestones, colorIndex } =
       dobject(habit).props;
     const everyDay = derive(() => frequency.value.every((day) => !!day));
@@ -151,8 +152,38 @@ export const HabitEditor = component<HabitEditorProps>(
           child: m.Div({
             children: m.For({
               subject: levels,
-              map: (level, i) =>
-                m.Div({
+              map: (level, i) => {
+                const onlyTwoLeft = habit.value.levels.length < 3;
+                const oldLevel = !!(
+                  initialLevels.value.length &&
+                  initialLevels.value.includes(level)
+                );
+                const levelsLengthMismatch = !!(
+                  initialLevels.value.length &&
+                  initialLevels.value.length !== habit.value.levels.length
+                );
+                const levelsRemoved =
+                  habit.value.levels.length < initialLevels.value.length;
+                const levelsNamesMismatch =
+                  initialLevels.value.length &&
+                  !levelsLengthMismatch &&
+                  !initialLevels.value.every(
+                    (lvl, i) => lvl === habit.value.levels[i]
+                  );
+                const hideAddButton =
+                  levelsRemoved ||
+                  levelsNamesMismatch ||
+                  (levelsLengthMismatch && levelsRemoved && oldLevel);
+                const hideRemoveButton =
+                  onlyTwoLeft ||
+                  levelsRemoved ||
+                  levelsNamesMismatch ||
+                  (levelsLengthMismatch && !levelsRemoved && oldLevel);
+                const textboxDisabled =
+                  initialLevels.value.length !== habit.value.levels.length &&
+                  initialLevels.value.includes(level);
+
+                return m.Div({
                   children: [
                     m.Div({
                       class: "flex items-center justify-between",
@@ -170,14 +201,15 @@ export const HabitEditor = component<HabitEditorProps>(
                               classNames:
                                 "ba bw1 b--light-silver br3 pa2 w-100",
                               placeholder: `Level ${i}`,
+                              disabled: textboxDisabled,
                               text: level,
                               onchange: (text) => updateLevel(text, i),
                             }),
                           ],
                         }),
                         AddRemoveButton({
-                          hideAdd: i >= levels.value.length - 1,
-                          hideRemove: i === 0 || i >= levels.value.length - 1,
+                          hideAdd: hideAddButton,
+                          hideRemove: hideRemoveButton,
                           onAdd: () => addLevel(i + 1),
                           onRemove: () => removeLevel(i),
                         }),
@@ -190,7 +222,8 @@ export const HabitEditor = component<HabitEditorProps>(
                       }),
                     }),
                   ],
-                }),
+                });
+              },
             }),
           }),
         }),

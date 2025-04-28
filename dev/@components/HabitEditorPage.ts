@@ -19,6 +19,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
   const stopActionModalOpen = signal(false);
   const error = signal("");
   const habit = signal<Habit>(getNewHabit(backDays));
+  const initialLevels = signal<string[]>([]);
   const pageTitle = derive(() =>
     isNew.value ? "New target habit" : `Edit '${habit.value.title}'`
   );
@@ -27,10 +28,68 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
     error.value = getHabitValidationError(habit.value);
     if (error.value) return;
 
-    const habitID: StoreHabitID = `h.${habit.value.id}`;
-    saveHabitInStore(habitID, habit.value);
-    const habitJSON = JSON.stringify(habit.value);
-    localStorage.setItem(habitID, habitJSON);
+    const finalHabit = habit.value;
+    const oldLevels = [...initialLevels.value];
+    const habitID: StoreHabitID = `h.${finalHabit.id}`;
+    let updatedTracker = [...finalHabit.tracker];
+
+    const levelsLengthMismatch = !!(
+      !isNew.value &&
+      oldLevels.length &&
+      oldLevels.length !== finalHabit.levels.length
+    );
+    const levelsRemoved = finalHabit.levels.length < oldLevels.length;
+
+    if (levelsLengthMismatch) {
+      const updates: { indices: number[]; newValue: number }[] = [];
+
+      if (!levelsRemoved) {
+        oldLevels.forEach((oldLevelName, oldLevel) => {
+          const newLevel = finalHabit.levels.indexOf(oldLevelName);
+          const levelPositionChanged = newLevel > -1 && newLevel !== oldLevel;
+          if (levelPositionChanged) {
+            const indices: number[] = [];
+            finalHabit.tracker.forEach((lvl, i) => {
+              if (lvl === oldLevel) indices.push(i);
+            });
+            updates.push({
+              indices: indices,
+              newValue: newLevel,
+            });
+          }
+        });
+      } else {
+        // UI only permits one level removal at a time
+        let removedLevel = -1;
+        for (let i = 0; i < oldLevels.length; i++) {
+          if (oldLevels[i] !== finalHabit.levels[i]) {
+            removedLevel = i;
+            break;
+          }
+        }
+        if (removedLevel >= 0) {
+          oldLevels.forEach((oldLevelName, oldLevel) => {
+            if (oldLevel <= removedLevel) return;
+
+            const indices: number[] = [];
+            finalHabit.tracker.forEach((lvl, i) => {
+              if (lvl === oldLevel) indices.push(i);
+            });
+            updates.push({
+              indices: indices,
+              newValue: oldLevel - 1,
+            });
+          });
+        }
+      }
+
+      updates.forEach((update) => {
+        update.indices.forEach((index) => {
+          updatedTracker[index] = update.newValue;
+        });
+      });
+    }
+    saveHabitInStore(habitID, { ...habit.value, tracker: updatedTracker });
     history.back();
   };
 
@@ -44,6 +103,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
       return;
     }
     habit.value = fetchedHabit;
+    if (!isNew.value) initialLevels.value = fetchedHabit.levels;
   };
 
   return Page({
@@ -197,6 +257,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
         }),
         HabitEditor({
           habit: habit,
+          initialLevels: initialLevels,
           onChange: (updatedHabit) => (habit.value = updatedHabit),
         }),
         m.If({

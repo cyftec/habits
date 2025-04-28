@@ -12,6 +12,7 @@ type CustomKeyDownEvent = { key: string; text: string };
 type TextBoxProps = {
   classNames?: string;
   placeholder?: string;
+  disabled?: boolean;
   text: string;
   onmount?: CustomEventValue;
   onchange?: (value: string) => void;
@@ -24,6 +25,7 @@ export const TextBox = component<TextBoxProps>(
   ({
     classNames,
     placeholder,
+    disabled,
     text,
     onmount,
     onchange,
@@ -62,6 +64,7 @@ export const TextBox = component<TextBoxProps>(
       class: dstring`${classNames}`,
       type: "text",
       placeholder,
+      disabled,
       value: text,
       onchange: onTextChange as DomEventValue,
       onkeydown: onKeyDown as DomEventValue,

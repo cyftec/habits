@@ -48,7 +48,6 @@ export const intializeTrackerEmptyDays = () => {
 };
 
 export const saveHabitInStore = (habitID: StoreHabitID, habit: Habit) => {
-  console.log(habit);
   localStorage.setItem(habitID, JSON.stringify(habit));
 };
 
