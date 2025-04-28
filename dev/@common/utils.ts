@@ -133,9 +133,9 @@ export const getMonthsStatus = (habit: Habit, months: number) => {
     .map((x, i) => new Date(today.getFullYear(), today.getMonth() - i, 1))
     .reverse();
 
-  return monthsFirstDateList.map((monthFirstDay) => ({
-    monthIndex: monthFirstDay.getMonth(),
-    status: getMonthStatus(habit, monthFirstDay),
+  return monthsFirstDateList.map((monthFirstDayDate) => ({
+    monthIndex: monthFirstDayDate.getMonth(),
+    status: getMonthStatus(habit, monthFirstDayDate),
   }));
 };
 

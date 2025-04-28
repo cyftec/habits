@@ -52,11 +52,12 @@ export const HabitCard = component<HabitCardProps>(
           ],
         }),
         m.Div({
+          class: "mt3 mb1",
           children: m.For({
             subject: monthsTrackerList,
             map: (tracker) =>
               MonthMap({
-                classNames: "mt05",
+                classNames: "mb1",
                 month: MONTHS[tracker.monthIndex],
                 status: tracker.status,
                 colorIndex: colorIndex,

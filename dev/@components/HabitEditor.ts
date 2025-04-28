@@ -84,7 +84,7 @@ export const HabitEditor = component<HabitEditorProps>(
         Section({
           title: "Color",
           child: m.Div({
-            class: "mb1 flex items-center flex-wrap",
+            class: "mb1 flex items-center justify-between",
             children: m.For({
               subject: BASE_COLORS,
               map: (colorOption, i) => {
@@ -93,7 +93,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 );
 
                 return m.Span({
-                  class: `mb2 pa1 br-100 mr1 bw2 ba flex`,
+                  class: `mb2 pa1 br-100 bw2 ba flex`,
                   style: dstring`border-color: ${borderColorCss}`,
                   onclick: () => updateColor(i),
                   children: m.Span({
@@ -117,12 +117,12 @@ export const HabitEditor = component<HabitEditorProps>(
         Section({
           title: "Frequency",
           child: m.Div({
-            class: "mb3 f6 flex items-center flex-wrap",
+            class: "mb3 f6 flex items-center justify-between",
             children: m.For({
               subject: DAYS_OF_WEEK,
               n: 0,
               nthChild: m.Span({
-                class: dstring`pointer flex items-center justify-center br-pill h2 ph2 mr2 ${() =>
+                class: dstring`pointer flex items-center justify-center br-pill h2 ph2 ${() =>
                   everyDay.value ? selectedCss : unSelectedCss}`,
                 children: "Daily",
                 onclick: () => updateFrequency(-1),
@@ -135,7 +135,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 );
 
                 return m.Span({
-                  class: dstring`pointer flex items-center justify-center br-100 h2 w2 mr2 ${colorCss}`,
+                  class: dstring`pointer flex items-center justify-center br-100 h2 w2 ${colorCss}`,
                   children: day.charAt(0),
                   onclick: () => updateFrequency(dayIndex),
                 });

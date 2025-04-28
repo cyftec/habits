@@ -25,6 +25,7 @@ const fetchSettings = () => {
 export const localSettings = signal(fetchSettings());
 
 effect(() => {
+  const currentSetting = localSettings.value;
   if (globalThis.localStorage)
-    localStorage.setItem("settings", JSON.stringify(localSettings.value));
+    localStorage.setItem("settings", JSON.stringify(currentSetting));
 });

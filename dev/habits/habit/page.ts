@@ -1,8 +1,12 @@
-import { derive, dstring, effect, signal } from "@cyftech/signal";
-import { m, MHtmlElement } from "@mufw/maya";
+import { derive, dstring, signal } from "@cyftech/signal";
+import { m } from "@mufw/maya";
 import { DAYS_OF_WEEK, MONTHS } from "../../@common/constants";
 import { Habit } from "../../@common/types";
-import { tryFetchingHabitUsingParams } from "../../@common/utils";
+import {
+  getCompletionPercentage,
+  getMilestone,
+  tryFetchingHabitUsingParams,
+} from "../../@common/utils";
 import { Section } from "../../@components";
 import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
 
@@ -18,7 +22,20 @@ const acheievemnts = derive(() => {
     if (status > -1) arr[status] = arr[status] ? arr[status] + 1 : 1;
     return arr;
   }, [] as number[]);
-  return acheievemntsList;
+  const achTotal = acheievemntsList.reduce((a, b) => a + b);
+  return acheievemntsList.map((ach, i) => ({
+    level: currentHabit.levels[i],
+    total: ach,
+    percent: Math.round((100 * ach) / achTotal),
+  }));
+});
+const completion = derive(() =>
+  habit.value ? getCompletionPercentage(habit.value, 20) : 0
+);
+const milestoneAchieved = derive(() => {
+  const compl = completion.value;
+  const hab = habit.value;
+  return hab ? getMilestone(hab.milestones, compl) : undefined;
 });
 
 const weekwiseTracker = derive(() => {
@@ -77,7 +94,7 @@ export default Page({
         m.If({
           subject: derive(() => habit.value?.isStopped),
           isFalsy: Icon({
-            className: "mt2 mr1 ba b--moon-gray bw1 br-100 pa1 noselect",
+            className: "mt1 mr1 ba b--gray bw1 br-100 pa1 noselect",
             size: 22,
             iconName: "edit",
             onClick: () => {
@@ -165,11 +182,44 @@ export default Page({
                     child: m.Div({
                       children: m.For({
                         subject: acheievemnts,
+                        n: Infinity,
+                        nthChild: m.Div({
+                          class:
+                            "flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray",
+                          children: [
+                            m.Div(`Overall`),
+                            m.Div({
+                              class: "flex items-center",
+                              children: [
+                                Icon({
+                                  className: dstring`mr2 ${() =>
+                                    milestoneAchieved.value?.color}`,
+                                  size: 20,
+                                  iconName: derive(
+                                    () => `${milestoneAchieved.value?.icon}`
+                                  ),
+                                }),
+                                derive(
+                                  () => `${milestoneAchieved.value?.label}`
+                                ),
+                                m.Span({ class: "ml1" }),
+                                m.Div(derive(() => ` (${completion.value}%)`)),
+                              ],
+                            }),
+                          ],
+                        }),
                         map: (acheievemnt, i) =>
                           m.Div({
-                            children: derive(
-                              () => `${habit.value?.levels[i]}: ${acheievemnt}%`
-                            ),
+                            class: "flex items-center justify-between mb1",
+                            children: [
+                              m.Div(derive(() => `${acheievemnt.level}`)),
+                              m.Div(
+                                derive(
+                                  () =>
+                                    `${acheievemnt.total} (${acheievemnt.percent}%)`
+                                )
+                              ),
+                            ],
                           }),
                       }),
                     }),
@@ -196,7 +246,7 @@ export default Page({
                               top: el.scrollHeight - el.clientHeight,
                             }),
                           class:
-                            "h5 nt2 bb bw1 b--light-gray mh2 overflow-y-scroll",
+                            "h5 nt2 bb bw1 b--near-white mh2 overflow-y-scroll",
                           children: [
                             m.Div({
                               class:
@@ -205,6 +255,8 @@ export default Page({
                             m.Div({
                               children: m.For({
                                 subject: weekwiseTracker,
+                                n: 0,
+                                nthChild: m.Div({ class: "pv4" }),
                                 map: (week) =>
                                   m.Div({
                                     class: "flex items-center h-60",

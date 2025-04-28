@@ -84,6 +84,7 @@ export default Page({
               ...settings,
               habitsPage: { ...settings.habitsPage, tabIndex },
             };
+            // location.reload();
           },
         }),
         m.If({
