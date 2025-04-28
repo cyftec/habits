@@ -48,7 +48,7 @@ input::placeholder {
 
 @media screen and (min-width: 30em) {
   .w4dot25-ns { width: 10rem; }
-  .w6-ns { width: 32rem; }
+  .w6-ns { width: 42rem; }
   .mxh6-ns { max-height: 32rem; }
 }
 .bg-to-top-white {

@@ -10,7 +10,7 @@ type ButtonProps = {
 
 export const Button = component<ButtonProps>(({ className, onTap, children }) =>
   m.Button({
-    class: dstring`br-pill ba bw1 b--light-silver b--hover-black pointer bg-white black ${className}`,
+    class: dstring`pointer br-pill ba bw1 b--light-silver b--hover-black bg-white black ${className}`,
     onclick: vibrateOnTap(() => onTap()),
     children: children,
   })

@@ -14,7 +14,7 @@ export const Link = component<LinkProps>(
   ({ classNames, href, target, onClick, children }) => {
     return m.A({
       class: dstring`${() =>
-        !href && !onClick ? "" : "underline"} ${classNames}`,
+        !href && !onClick ? "" : "pointer underline"} ${classNames}`,
       href,
       target,
       onclick: vibrateOnTap(onClick),

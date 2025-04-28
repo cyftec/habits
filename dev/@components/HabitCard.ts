@@ -10,7 +10,7 @@ type HabitCardProps = {
   classNames?: string;
   habit: Habit & { completion: number };
   months: number;
-  onClick?: () => void;
+  onClick: () => void;
 };
 
 export const HabitCard = component<HabitCardProps>(
@@ -29,7 +29,7 @@ export const HabitCard = component<HabitCardProps>(
     );
 
     return m.Div({
-      class: dstring`bg-white br4 pa3 ${classNames}`,
+      class: dstring`pointer bg-white br4 pa3 ${classNames}`,
       onclick: vibrateOnTap(onClick),
       children: [
         m.Div({

@@ -206,7 +206,7 @@ export default Page({
                 children: m.For({
                   subject: derive(() => habit.value?.levels || []),
                   map: (level, levelIndex) => {
-                    const optionCSS = dstring`flex items-center pv3 pa3 bt b--moon-gray pointer ${() =>
+                    const optionCSS = dstring`pointer flex items-center pv3 pa3 bt b--moon-gray ${() =>
                       levelIndex ===
                       updateLevelModalData.value.selectedLevelIndex
                         ? "bg-near-white black"

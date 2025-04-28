@@ -50,7 +50,7 @@ export const ColorDot = component<ColorDotProps>(
     );
 
     return m.Span({
-      class: dstring`br-100 relative ${() =>
+      class: dstring`pointer br-100 relative ${() =>
         level.value < 0 ? "transparent" : "bg-near-white"} ${classNames}`,
       onclick: vibrateOnTap(() => onClick && level.value >= 0 && onClick()),
       children: [

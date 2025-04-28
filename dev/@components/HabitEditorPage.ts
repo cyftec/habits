@@ -68,6 +68,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
             class: "",
             children: [
               Section({
+                classNames: "pb3",
                 title: "Actions",
                 child: m.Div({
                   children: [

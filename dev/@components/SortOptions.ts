@@ -48,7 +48,7 @@ export const SortOptions = component<SortOptionsProps>(
                 children: m.For({
                   subject: HOMEPAGE_SORT_OPTIONS,
                   map: (option, optionIndex) => {
-                    const optionCSS = dstring`flex items-center pv3 pl2 pr3 bt b--moon-gray pointer ${() =>
+                    const optionCSS = dstring`pointer flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
                       option.label === selectedOption.value.label
                         ? "bg-near-white black"
                         : "gray"}`;
@@ -88,7 +88,8 @@ type SortIconProps = {
 const SortIcon = component<SortIconProps>(
   ({ classNames, descending, iconName, size, onClick }) => {
     return m.Span({
-      class: dstring`flex items-center ${classNames}`,
+      class: dstring`flex items-center ${() =>
+        onClick ? "pointer" : ""} ${classNames}`,
       onclick: vibrateOnTap(onClick),
       children: [
         Icon({

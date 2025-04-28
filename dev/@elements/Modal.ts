@@ -23,8 +23,7 @@ export const Modal = component<ModalProps>(
       class: dstring`pa0 br3 ${classNames}`,
       children: [
         m.Div({
-          class: dstring``,
-          onclick: vibrateOnTap((e: Event) => e.stopPropagation()),
+          onclick: (e: Event) => e.stopPropagation(),
           children: content,
         }),
       ],
