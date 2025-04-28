@@ -116,13 +116,6 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
       }),
       content: m.Div([
         m.If({
-          subject: error,
-          isTruthy: m.Div({
-            class: "red mb3",
-            children: error,
-          }),
-        }),
-        m.If({
           subject: isNew,
           isFalsy: m.Div({
             class: "",
@@ -260,32 +253,37 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
           initialLevels: initialLevels,
           onChange: (updatedHabit) => (habit.value = updatedHabit),
         }),
-        m.If({
-          subject: error,
-          isTruthy: m.Div({
-            class: "red mb3",
-            children: error,
-          }),
-        }),
       ]),
       bottombar: m.Div({
-        class: "bg-white w-100 pv3 flex items-center justify-stretch",
+        class: "bg-white w-100 pv3",
         children: [
-          Button({
-            className: "w4dot50 w4dot25-ns pa3 flex items-center",
+          m.If({
+            subject: error,
+            isTruthy: m.Div({
+              class: "red mb3",
+              children: error,
+            }),
+          }),
+          m.Div({
+            class: "flex items-center justify-stretch",
             children: [
-              Icon({ iconName: "arrow_back" }),
-              m.Span({
-                class: "ml1",
-                children: `Go Back`,
+              Button({
+                className: "w4dot50 w4dot25-ns pa3 flex items-center",
+                children: [
+                  Icon({ iconName: "arrow_back" }),
+                  m.Span({
+                    class: "ml1",
+                    children: `Go Back`,
+                  }),
+                ],
+                onTap: () => history.back(),
+              }),
+              Button({
+                className: "w-100 pa3 ml3 b",
+                children: derive(() => (isNew.value ? "Save" : "Update")),
+                onTap: saveHabit,
               }),
             ],
-            onTap: () => history.back(),
-          }),
-          Button({
-            className: "w-100 pa3 ml3 b",
-            children: derive(() => (isNew.value ? "Save" : "Update")),
-            onTap: saveHabit,
           }),
         ],
       }),
