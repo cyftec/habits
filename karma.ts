@@ -11,7 +11,7 @@ export const projectFileNames: ProjectFileNames = {
   },
   generated: {
     stagingDir: "stage",
-    publishDir: "prod",
+    publishDir: "docs",
     bunLockFile: "bun.lock",
     bunLockBFile: "bun.lockb",
     gitIgnoreFile: ".gitignore",
