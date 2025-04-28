@@ -215,7 +215,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
         class: "bg-white w-100 pv3 flex items-center justify-stretch",
         children: [
           Button({
-            className: "pa3 flex items-center mr2",
+            className: "w4dot50 w4dot25-ns pa3 flex items-center",
             children: [
               Icon({ iconName: "arrow_back" }),
               m.Span({
@@ -226,7 +226,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
             onTap: () => history.back(),
           }),
           Button({
-            className: "w-60 pa3 ml2 b",
+            className: "w-100 pa3 ml3 b",
             children: derive(() => (isNew.value ? "Save" : "Update")),
             onTap: saveHabit,
           }),

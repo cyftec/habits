@@ -1,4 +1,4 @@
-import { derive, dstring, signal } from "@cyftech/signal";
+import { derive, dstring, effect, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { DAYS_OF_WEEK, MONTHS } from "../../@common/constants";
 import { Habit } from "../../@common/types";
@@ -18,17 +18,22 @@ const pageTitle = derive(() => (habit.value ? habit.value.title : "Loading.."));
 const acheievemnts = derive(() => {
   const currentHabit = habit.value;
   if (!currentHabit) return [];
+  const initialAcheievments = currentHabit.levels.map((_) => 0);
+
   const acheievemntsList = currentHabit.tracker.reduce((arr, status) => {
     if (status > -1) arr[status] = arr[status] ? arr[status] + 1 : 1;
     return arr;
-  }, [] as number[]);
+  }, initialAcheievments);
   const achTotal = acheievemntsList.reduce((a, b) => a + b);
-  return acheievemntsList.map((ach, i) => ({
+  const list = acheievemntsList.map((ach, i) => ({
     level: currentHabit.levels[i],
     total: ach,
     percent: Math.round((100 * ach) / achTotal),
   }));
+
+  return list;
 });
+
 const completion = derive(() =>
   habit.value ? getCompletionPercentage(habit.value, 20) : 0
 );
@@ -246,7 +251,7 @@ export default Page({
                               top: el.scrollHeight - el.clientHeight,
                             }),
                           class:
-                            "h5 nt2 bb bw1 b--near-white mh2 overflow-y-scroll",
+                            "mxh5 mxh6-ns nt2 bb bw1 b--near-white mh2 overflow-y-scroll",
                           children: [
                             m.Div({
                               class:

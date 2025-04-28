@@ -37,7 +37,14 @@ dialog::backdrop { background: rgba(105, 105, 105, 0.85); }
 .mt05 { margin-top: 0.1rem; }
 .mr05 { margin-right: 0.1rem; }
 .sticky { position: sticky; }
+.w4dot50 { width: 12rem; }
+.mxh5 { max-height: 16rem; }
 
+@media screen and (min-width: 30em) {
+  .w4dot25-ns { width: 10rem; }
+  .w6-ns { width: 32rem; }
+  .mxh6-ns { max-height: 32rem; }
+}
 .bg-to-top-white {
   background-color: transparent;
   background-image: linear-gradient(white, rgba(255, 255, 255, 0.969), rgba(255, 255, 255, 0.926), rgba(255, 255, 255, 0.68), transparent);

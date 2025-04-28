@@ -1,8 +1,9 @@
-import { derive, dobject, dstring, effect, Signal } from "@cyftech/signal";
+import { derive, dobject, dstring, Signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
+import { Section } from ".";
 import { BASE_COLORS, DAYS_OF_WEEK } from "../@common/constants";
 import { DayFrequency, Habit, MilestonesData } from "../@common/types";
-import { Section } from ".";
+import { getDetailedMilestones } from "../@common/utils";
 import {
   AddRemoveButton,
   ColorDot,
@@ -10,7 +11,6 @@ import {
   NumberBox,
   TextBox,
 } from "../@elements";
-import { getDetailedMilestones } from "../@common/utils";
 
 type HabitEditorProps = {
   classNames?: string;

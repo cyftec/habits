@@ -25,6 +25,7 @@ export const SortOptions = component<SortOptionsProps>(
       class: classNames,
       children: [
         SortIcon({
+          classNames: "pointer",
           descending: derive(() => selectedOption.value.decending),
           iconName: derive(() => selectedOption.value.icon),
           size: 20,
@@ -45,10 +46,10 @@ export const SortOptions = component<SortOptionsProps>(
                 children: m.For({
                   subject: HOMEPAGE_SORT_OPTIONS,
                   map: (option, optionIndex) => {
-                    const optionCSS = dstring`flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
+                    const optionCSS = dstring`flex items-center pv3 pl2 pr3 bt b--moon-gray pointer ${() =>
                       option.label === selectedOption.value.label
-                        ? "bg-near-white"
-                        : ""}`;
+                        ? "bg-near-white black"
+                        : "gray"}`;
 
                     return m.Div({
                       class: optionCSS,

@@ -12,9 +12,9 @@ export const INITIAL_SETTINGS: LocalSettings = {
 };
 
 export const HOMEPAGE_OVERVIEW_TABS = [
-  { label: "This month", months: 1 },
-  { label: "2 months", months: 2 },
   { label: "5 months", months: 5 },
+  { label: "2 months", months: 2 },
+  { label: "This month", months: 1 },
 ] as const;
 
 export const HOMEPAGE_SORT_OPTIONS = [
@@ -76,15 +76,14 @@ export const MONTHS = [
 ] as const satisfies string[];
 
 export const BASE_COLORS = [
-  "#339933",
-  "#00ccff",
-  "#0000ff",
-  "#9900cc",
-  "#ff66ff",
-  "#ff0000",
-  "#ff9900",
-  "#cccc00",
-  "#99cc00",
+  `#e87b52`, //e87b52
+  `#F5B971`,
+  `#F5E06F`,
+  `#A3BA64`,
+  `#679A9E`,
+  `#7095C9`,
+  `#A59EE3`,
+  `#D89DBF`,
 ] as const satisfies string[];
 
 export const BASE_LEVELS = ["Not done", "Done"] as const satisfies string[];
