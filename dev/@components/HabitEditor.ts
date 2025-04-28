@@ -106,15 +106,17 @@ export const HabitEditor = component<HabitEditorProps>(
           }),
         }),
         Section({
+          classNames: "pb1",
           title: "Title",
           child: TextBox({
-            classNames: "ba bw1 b--light-gray br3 pa2 w-100",
-            placeholder: "",
+            classNames: "ba bw1 b--light-silver br3 pa2 w-100",
+            placeholder: "title of target habit",
             text: title,
             onchange: updateTitle,
           }),
         }),
         Section({
+          classNames: "pb1",
           title: "Frequency",
           child: m.Div({
             class: "mb3 f6 flex items-center justify-between",
@@ -144,6 +146,7 @@ export const HabitEditor = component<HabitEditorProps>(
           }),
         }),
         Section({
+          classNames: "pb3",
           title: "Levels",
           child: m.Div({
             children: m.For({
@@ -164,8 +167,9 @@ export const HabitEditor = component<HabitEditorProps>(
                               totalLevels: levels.value.length,
                             }),
                             TextBox({
-                              classNames: "ba bw1 b--light-gray br3 pa2 w-100",
-                              placeholder: "",
+                              classNames:
+                                "ba bw1 b--light-silver br3 pa2 w-100",
+                              placeholder: `Level ${i}`,
                               text: level,
                               onchange: (text) => updateLevel(text, i),
                             }),
@@ -197,8 +201,7 @@ export const HabitEditor = component<HabitEditorProps>(
               subject: derive(() => getDetailedMilestones(milestones.value)),
               n: 0,
               nthChild: m.Div({
-                class:
-                  "mb1 ph2 pv0 bn br3 bw1 b--light-gray relative ts-white-1",
+                class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",
                 children: [
                   m.Span({
                     class: "lh-copy",
@@ -210,7 +213,7 @@ export const HabitEditor = component<HabitEditorProps>(
                     children: [
                       m.Span({
                         class:
-                          "w-100 bg-white bn bw1 b--gray br3 pa2dot5 di f4 b light-silver mb1 nl1",
+                          "w-100 bg-white bn bw1 pa2dot5 di f4 b light-silver mb1 nl1",
                         children: "100",
                       }),
                       m.Span({
@@ -244,12 +247,12 @@ export const HabitEditor = component<HabitEditorProps>(
                           subject: i === 3,
                           isTruthy: m.Span({
                             class:
-                              "w-100 bg-white bn bw1 b--gray br3 pa2dot5 di f4 b light-silver mb1",
+                              "w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1",
                             children: "00",
                           }),
                           isFalsy: NumberBox({
                             classNames:
-                              "w-100 ba bw1 b--gray br3 pa2dot5 di f5 b dark-gray",
+                              "w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray",
                             num: milestone.percent,
                             onchange: (value) => updateMilestone(value, i),
                           }),

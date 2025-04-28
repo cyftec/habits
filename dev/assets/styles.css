@@ -22,6 +22,11 @@ body {
   scrollbar-width: thin;
 }
 dialog::backdrop { background: rgba(105, 105, 105, 0.85); }
+input::placeholder {
+  color: black;
+  opacity: 0.2;
+  font-style: italic;
+}
 
 .app-theme-color { color: var(--themeColor); }
 .bg-app-theme-color { background-color: var(--themeColor); }
