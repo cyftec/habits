@@ -57,6 +57,7 @@ export default Page({
         "Daily habits",
         SortOptions({
           classNames: "mt2 mr2",
+          iconSize: 22,
           selectedOptionIndex: selectedSortOptionIndex,
           onChange: (optionIndex) => {
             const settings = localSettings.value;

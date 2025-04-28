@@ -1,5 +1,4 @@
 import { BASE_LEVELS, DAY_IN_MS, EMPTY_MONTH } from "./constants";
-import { fetchHabit } from "./localstorage";
 import { Habit, MilestonesData, MilestoneUI, MonthStatus } from "./types";
 
 export const getNewHabit = (backDays?: number): Habit => {
@@ -70,27 +69,6 @@ export const getHabitValidationError = (habit: Habit): string => {
 
   return "";
 };
-export const tryFetchingHabitUsingParams = (): readonly [
-  Habit | undefined,
-  string
-] => {
-  const params = getUrlParams();
-  if (!params.length) [undefined, "No query params found"];
-  let habit: Habit | undefined;
-  let error: string = "";
-
-  for (let param of params) {
-    if (!param.startsWith("id=")) continue;
-    const habitID = `h.${param.split("id=").pop()}`;
-    try {
-      habit = fetchHabit(habitID);
-    } catch (errMsg) {
-      error = errMsg.toString();
-    }
-  }
-
-  return [habit, error];
-};
 
 export const getUrlParams = () => {
   if (!location) return [];
@@ -137,6 +115,14 @@ export const getMonthsStatus = (habit: Habit, months: number) => {
     monthIndex: monthFirstDayDate.getMonth(),
     status: getMonthStatus(habit, monthFirstDayDate),
   }));
+};
+
+export const getDaysDifference = (earlierDate: Date, laterDate: Date) => {
+  const earlierDateMZ = getMomentZeroDate(earlierDate);
+  const laterDateMZ = getMomentZeroDate(laterDate);
+  return Math.round(
+    (laterDateMZ.getTime() - earlierDateMZ.getTime()) / DAY_IN_MS
+  );
 };
 
 export const getCompletionPercentage = (habit: Habit, months: number) => {

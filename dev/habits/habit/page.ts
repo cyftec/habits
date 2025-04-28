@@ -1,18 +1,28 @@
 import { derive, dstring, effect, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { DAYS_OF_WEEK, MONTHS } from "../../@common/constants";
+import { DAY_IN_MS, DAYS_OF_WEEK, MONTHS } from "../../@common/constants";
 import { Habit } from "../../@common/types";
 import {
   getCompletionPercentage,
+  getDaysDifference,
   getMilestone,
-  tryFetchingHabitUsingParams,
+  getMomentZeroDate,
 } from "../../@common/utils";
 import { Section } from "../../@components";
 import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
+import {
+  tryFetchingHabitUsingParams,
+  updateHabitInStore,
+} from "../../@common/localstorage";
 
 const error = signal("");
 const habit = signal<Habit | undefined>(undefined);
 const deleteActionModalOpen = signal(false);
+const updateLevelModalOpen = signal(false);
+const updateLevelModalData = signal({
+  date: new Date(),
+  selectedLevelIndex: 0,
+});
 const pageTitle = derive(() => (habit.value ? habit.value.title : "Loading.."));
 
 const acheievemnts = derive(() => {
@@ -75,6 +85,19 @@ const weekwiseTracker = derive(() => {
   return weeklyTracker;
 });
 
+const updateLevel = (levelIndex: number) => {
+  if (!habit.value) return;
+  const updatedTracker = [...habit.value.tracker];
+  const index = getDaysDifference(
+    new Date(habit.value.id),
+    updateLevelModalData.value.date
+  );
+  updatedTracker[index] = levelIndex;
+  habit.value = { ...habit.value, tracker: updatedTracker };
+  updateHabitInStore(`h.${habit.value.id}`, habit.value);
+  updateLevelModalOpen.value = false;
+};
+
 const onPageMount = () => {
   const [fetchedHabit, err] = tryFetchingHabitUsingParams();
   if (err || !fetchedHabit) {
@@ -99,8 +122,8 @@ export default Page({
         m.If({
           subject: derive(() => habit.value?.isStopped),
           isFalsy: Icon({
-            className: "mt1 mr1 ba b--gray bw1 br-100 pa1 noselect",
-            size: 22,
+            className: "mt1 mr1 ba b--silver bw1 br-100 pa1 noselect",
+            size: 18,
             iconName: "edit",
             onClick: () => {
               if (habit.value) location.href = `edit/?id=${habit.value.id}`;
@@ -155,6 +178,41 @@ export default Page({
                     },
                   }),
                 ],
+              }),
+            ],
+          }),
+        }),
+        Modal({
+          classNames: "f5 normal ba bw0 outline-0",
+          isOpen: updateLevelModalOpen,
+          onTapOutside: () => (updateLevelModalOpen.value = false),
+          content: m.Div({
+            class: "mnw5",
+            children: [
+              m.Div({
+                class: "f5 b tc pa3",
+                children: derive(() =>
+                  updateLevelModalData.value.date.toDateString()
+                ),
+              }),
+              m.Div({
+                class: "f5 mb1",
+                children: m.For({
+                  subject: derive(() => habit.value?.levels || []),
+                  map: (level, levelIndex) => {
+                    const optionCSS = dstring`flex items-center pv3 pa3 bt b--moon-gray pointer ${() =>
+                      levelIndex ===
+                      updateLevelModalData.value.selectedLevelIndex
+                        ? "bg-near-white black"
+                        : "gray"}`;
+
+                    return m.Div({
+                      class: optionCSS,
+                      onclick: () => updateLevel(levelIndex),
+                      children: [m.Span(level)],
+                    });
+                  },
+                }),
               }),
             ],
           }),
@@ -298,6 +356,17 @@ export default Page({
                                                 habit.value?.levels.length || 2,
                                               textContent: dateText,
                                               showText: day.level !== undefined,
+                                              onClick: () => {
+                                                if (habit.value?.isStopped)
+                                                  return;
+                                                updateLevelModalOpen.value =
+                                                  true;
+                                                updateLevelModalData.value = {
+                                                  date: day.date,
+                                                  selectedLevelIndex:
+                                                    day.level ?? 0,
+                                                };
+                                              },
                                             });
                                           },
                                         }),

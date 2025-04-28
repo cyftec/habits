@@ -10,10 +10,19 @@ type ColorDotProps = {
   textContent?: string;
   textColor?: string;
   showText?: boolean;
+  onClick?: () => void;
 };
 
 export const ColorDot = component<ColorDotProps>(
-  ({ classNames, colorIndex, level, totalLevels, textContent, showText }) => {
+  ({
+    classNames,
+    colorIndex,
+    level,
+    totalLevels,
+    textContent,
+    showText,
+    onClick,
+  }) => {
     const color = derive(() => BASE_COLORS[colorIndex.value]);
     const opacityHexNum = derive(() =>
       Math.trunc(
@@ -42,6 +51,7 @@ export const ColorDot = component<ColorDotProps>(
     return m.Span({
       class: dstring`br-100 relative ${() =>
         level.value < 0 ? "transparent" : "bg-near-white"} ${classNames}`,
+      onclick: () => onClick && onClick(),
       children: [
         m.Span({
           class: dstring`flex items-center justify-around absolute absolute--fill br-100 pt05`,

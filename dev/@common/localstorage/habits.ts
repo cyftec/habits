@@ -1,4 +1,5 @@
 import { Habit } from "../types";
+import { getUrlParams } from "../utils";
 
 export const fetchHabits = () => {
   const updatedHabits: Habit[] = [];
@@ -18,4 +19,31 @@ export const fetchHabit = (habitID: string) => {
 
   if (!habitObj) throw `Error fetching habit with id '${habitID}' from storage`;
   return habitObj as Habit;
+};
+
+export const updateHabitInStore = (habitID: `h.${number}`, habit: Habit) => {
+  console.log(habit);
+  localStorage.setItem(habitID, JSON.stringify(habit));
+};
+
+export const tryFetchingHabitUsingParams = (): readonly [
+  Habit | undefined,
+  string
+] => {
+  const params = getUrlParams();
+  if (!params.length) [undefined, "No query params found"];
+  let habit: Habit | undefined;
+  let error: string = "";
+
+  for (let param of params) {
+    if (!param.startsWith("id=")) continue;
+    const habitID = `h.${param.split("id=").pop()}`;
+    try {
+      habit = fetchHabit(habitID);
+    } catch (errMsg) {
+      error = errMsg.toString();
+    }
+  }
+
+  return [habit, error];
 };

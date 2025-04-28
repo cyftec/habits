@@ -1,11 +1,8 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
+import { tryFetchingHabitUsingParams } from "../@common/localstorage";
 import { Habit } from "../@common/types";
-import {
-  getHabitValidationError,
-  getNewHabit,
-  tryFetchingHabitUsingParams,
-} from "../@common/utils";
+import { getHabitValidationError, getNewHabit } from "../@common/utils";
 import { HabitEditor, Section } from "../@components";
 import { Button, Icon, Link, Modal, Page, Scaffold } from "../@elements";
 
@@ -14,7 +11,7 @@ type HabitEditorPageProps = {
 };
 
 export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
-  const backDays = isNew.value ? 200 : 0;
+  const backDays = isNew.value ? 10 : 0;
   const deleteActionModalOpen = signal(false);
   const stopActionModalOpen = signal(false);
   const error = signal("");

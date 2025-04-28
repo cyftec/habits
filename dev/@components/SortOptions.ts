@@ -5,12 +5,13 @@ import { HOMEPAGE_SORT_OPTIONS } from "../@common/constants";
 
 type SortOptionsProps = {
   classNames?: string;
+  iconSize?: number;
   selectedOptionIndex: number;
   onChange: (optionIndex: number) => void;
 };
 
 export const SortOptions = component<SortOptionsProps>(
-  ({ classNames, selectedOptionIndex, onChange }) => {
+  ({ classNames, iconSize, selectedOptionIndex, onChange }) => {
     const isSortingOptionsModalOpen = signal(false);
     const selectedOption = derive(
       () => HOMEPAGE_SORT_OPTIONS[selectedOptionIndex.value]
@@ -28,7 +29,7 @@ export const SortOptions = component<SortOptionsProps>(
           classNames: "pointer",
           descending: derive(() => selectedOption.value.decending),
           iconName: derive(() => selectedOption.value.icon),
-          size: 20,
+          size: derive(() => iconSize?.value ?? 20),
           onClick: () => (isSortingOptionsModalOpen.value = true),
         }),
         Modal({
