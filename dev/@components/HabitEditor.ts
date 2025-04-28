@@ -3,7 +3,7 @@ import { component, m } from "@mufw/maya";
 import { Section } from ".";
 import { BASE_COLORS, DAYS_OF_WEEK } from "../@common/constants";
 import { WeekdayFrequency, Habit, MilestonesData } from "../@common/types";
-import { getDetailedMilestones } from "../@common/utils";
+import { getDetailedMilestones, vibrateOnTap } from "../@common/utils";
 import {
   AddRemoveButton,
   ColorDot,
@@ -95,7 +95,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 return m.Span({
                   class: `mb2 pa1 br-100 bw2 ba flex`,
                   style: dstring`border-color: ${borderColorCss}`,
-                  onclick: () => updateColor(i),
+                  onclick: vibrateOnTap(() => updateColor(i)),
                   children: m.Span({
                     class: dstring`pa2 br-100`,
                     style: `background-color: ${colorOption}`,
@@ -125,7 +125,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 class: dstring`pointer flex items-center justify-center br-pill h2 ph2 ${() =>
                   everyDay.value ? selectedCss : unSelectedCss}`,
                 children: "Daily",
-                onclick: () => updateFrequency(-1),
+                onclick: vibrateOnTap(() => updateFrequency(-1)),
               }),
               map: (day, dayIndex) => {
                 const colorCss = derive(() =>
@@ -137,7 +137,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 return m.Span({
                   class: dstring`pointer flex items-center justify-center br-100 h2 w2 ${colorCss}`,
                   children: day.charAt(0),
-                  onclick: () => updateFrequency(dayIndex),
+                  onclick: vibrateOnTap(() => updateFrequency(dayIndex)),
                 });
               },
             }),

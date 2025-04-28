@@ -1,6 +1,7 @@
 import { derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { BASE_COLORS, GOLDEN_RATIO } from "../@common/constants";
+import { vibrateOnTap } from "../@common/utils";
 
 type ColorDotProps = {
   classNames?: string;
@@ -51,7 +52,7 @@ export const ColorDot = component<ColorDotProps>(
     return m.Span({
       class: dstring`br-100 relative ${() =>
         level.value < 0 ? "transparent" : "bg-near-white"} ${classNames}`,
-      onclick: () => onClick && level.value >= 0 && onClick(),
+      onclick: vibrateOnTap(() => onClick && level.value >= 0 && onClick()),
       children: [
         m.Span({
           class: dstring`flex items-center justify-around absolute absolute--fill br-100 pt05`,

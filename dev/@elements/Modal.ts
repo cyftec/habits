@@ -1,5 +1,6 @@
 import { dstring, effect } from "@cyftech/signal";
 import { type Children, component, m } from "@mufw/maya";
+import { vibrateOnTap } from "../@common/utils";
 
 type ModalProps = {
   classNames?: string;
@@ -18,12 +19,12 @@ export const Modal = component<ModalProps>(
             else dialogElem.close();
           })
         ),
-      onclick: onTapOutside,
+      onclick: vibrateOnTap(onTapOutside),
       class: dstring`pa0 br3 ${classNames}`,
       children: [
         m.Div({
           class: dstring``,
-          onclick: (e: Event) => e.stopPropagation(),
+          onclick: vibrateOnTap((e: Event) => e.stopPropagation()),
           children: content,
         }),
       ],

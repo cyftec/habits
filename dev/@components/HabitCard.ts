@@ -1,7 +1,7 @@
 import { component, m } from "@mufw/maya";
 import { Habit } from "../@common/types";
 import { derive, dobject, dstring } from "@cyftech/signal";
-import { getMilestone, getMonthsStatus } from "../@common/utils";
+import { getMilestone, getMonthsStatus, vibrateOnTap } from "../@common/utils";
 import { MonthMap } from "./MonthMap";
 import { MONTHS } from "../@common/constants";
 import { Icon } from "../@elements";
@@ -30,7 +30,7 @@ export const HabitCard = component<HabitCardProps>(
 
     return m.Div({
       class: dstring`bg-white br4 pa3 ${classNames}`,
-      onclick: onClick,
+      onclick: vibrateOnTap(onClick),
       children: [
         m.Div({
           class: "flex items-center justify-between nt1 mb2",

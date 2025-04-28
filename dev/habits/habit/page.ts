@@ -11,6 +11,7 @@ import {
   getCompletionPercentage,
   getDaysDifference,
   getMilestone,
+  vibrateOnTap,
 } from "../../@common/utils";
 import { Section } from "../../@components";
 import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
@@ -213,7 +214,7 @@ export default Page({
 
                     return m.Div({
                       class: optionCSS,
-                      onclick: () => updateLevel(levelIndex),
+                      onclick: vibrateOnTap(() => updateLevel(levelIndex)),
                       children: [m.Span(level)],
                     });
                   },
