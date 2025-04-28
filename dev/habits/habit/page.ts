@@ -247,6 +247,7 @@ export default Page({
                     ]),
                   }),
                   Section({
+                    classNames: "pb3",
                     title: "Acheivment",
                     child: m.Div({
                       children: m.For({
@@ -279,7 +280,7 @@ export default Page({
                         }),
                         map: (acheievemnt, i) =>
                           m.Div({
-                            class: "flex items-center justify-between mb1",
+                            class: "flex items-center justify-between mb2",
                             children: [
                               m.Div(derive(() => `${acheievemnt.level}`)),
                               m.Div(
@@ -318,14 +319,20 @@ export default Page({
                             "mxh5 mxh6-ns nt2 bb bw1 b--near-white mh2 overflow-y-scroll",
                           children: [
                             m.Div({
-                              class:
-                                "h3 absolute left-0 right-0 bg-to-top-white z-999",
+                              class: dstring`absolute left-0 right-0 bg-to-top-white z-999 ${() =>
+                                weekwiseTracker.value.length > 4 ? "h3" : ""}`,
                             }),
                             m.Div({
                               children: m.For({
                                 subject: weekwiseTracker,
                                 n: 0,
-                                nthChild: m.Div({ class: "pv4" }),
+                                nthChild: m.Div({
+                                  class: derive(() =>
+                                    weekwiseTracker.value.length > 4
+                                      ? "pv3 mt2"
+                                      : "pv2"
+                                  ),
+                                }),
                                 map: (week) =>
                                   m.Div({
                                     class: "flex items-center h-60",
