@@ -21,7 +21,7 @@ export const TabBar = component<TabBarProps>(
     onTabChange,
   }) => {
     return m.Div({
-      class: dstring`bg-near-white br3 ${classNames}`,
+      class: dstring`bg-white br3 ${classNames}`,
       children: m.Div({
         class: "flex items-center justify-between pa1",
         children: m.For({
@@ -30,7 +30,7 @@ export const TabBar = component<TabBarProps>(
             m.Span({
               class: dstring`w-100 br3 pa1 flex justify-center ${() =>
                 i === selectedTabIndex.value
-                  ? `bg-white black ${selectedTabClassNames?.value}`
+                  ? `bg-near-white black ${selectedTabClassNames?.value}`
                   : "bg-transparent silver pointer"} ${tabItemClassNames}`,
               onclick: vibrateOnTap(() => onTabChange(i)),
               children: tab,

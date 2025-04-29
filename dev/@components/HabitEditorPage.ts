@@ -20,7 +20,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
   const habit = signal<Habit>(getNewHabit());
   const initialLevels = signal<string[]>([]);
   const pageTitle = derive(() =>
-    isNew.value ? "New target habit" : `Edit '${habit.value.title}'`
+    isNew.value ? "Add new habit" : `Edit '${habit.value.title}'`
   );
 
   const saveHabit = () => {
@@ -244,7 +244,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
                     Link({
                       classNames: "db mb3 f6 gray",
                       children:
-                        "Stop this habit permanently and keep it for review in future",
+                        "Stop this habit permanently and keep it for future",
                       onClick: () => (stopActionModalOpen.value = true),
                     }),
                   ],
@@ -285,7 +285,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
               }),
               Button({
                 className: "w-100 pa3 ml3 b",
-                children: derive(() => (isNew.value ? "Save" : "Update")),
+                children: derive(() => (isNew.value ? "Add" : "Update")),
                 onTap: saveHabit,
               }),
             ],

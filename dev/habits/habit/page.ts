@@ -197,9 +197,8 @@ export default Page({
             children: [
               m.Div({
                 class: "f5 b tc pa3",
-                children: derive(() =>
-                  updateLevelModalData.value.date.toDateString()
-                ),
+                children: dstring`Change status for ${() =>
+                  updateLevelModalData.value.date.toDateString()}`,
               }),
               m.Div({
                 class: "f5 mb1",
@@ -286,7 +285,7 @@ export default Page({
                               m.Div(
                                 derive(
                                   () =>
-                                    `${acheievemnt.total} (${acheievemnt.percent}%)`
+                                    `${acheievemnt.total} times (${acheievemnt.percent}%)`
                                 )
                               ),
                             ],

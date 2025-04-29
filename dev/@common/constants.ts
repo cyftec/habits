@@ -17,9 +17,9 @@ export const INITIAL_SETTINGS: LocalSettings = {
 };
 
 export const HOMEPAGE_OVERVIEW_TABS = [
-  { label: "5 months", months: 5 },
-  { label: "2 months", months: 2 },
   { label: "This month", months: 1 },
+  { label: "2 months", months: 2 },
+  { label: "5 months", months: 5 },
 ] as const;
 
 export const HOMEPAGE_SORT_OPTIONS = [
@@ -54,7 +54,7 @@ export const BASE_WEEKDAY_FREQUENCY: WeekdayFrequency = [1, 1, 1, 1, 1, 1, 1];
 
 export const BASE_LEVELS = ["Not done", "Done"] as const satisfies string[];
 
-export const BASE_MILESTONES: MilestonesData = [90, 75, 50];
+export const BASE_MILESTONES: MilestonesData = [70, 60, 45];
 
 export const EMPTY_MONTH: MonthStatus = [
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -87,11 +87,9 @@ export const MONTHS = [
 ] as const satisfies string[];
 
 export const BASE_COLORS = [
-  `#e87b52`, //e87b52
-  `#F5B971`,
+  `#e87b52`,
   `#F5E06F`,
   `#A3BA64`,
-  `#679A9E`,
   `#7095C9`,
   `#A59EE3`,
   `#D89DBF`,

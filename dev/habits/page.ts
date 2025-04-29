@@ -56,14 +56,14 @@ const onPageMount = () => {
 };
 
 export default Page({
-  classNames: "bg-near-white",
+  classNames: "bg-white",
   onMount: onPageMount,
   body: Scaffold({
-    classNames: "bg-near-white ph3",
+    classNames: "bg-white",
     header: m.Div({
-      class: "flex items-start justify-between",
+      class: "flex items-start justify-between ph3 bg-white",
       children: [
-        "Daily habits",
+        "Habits",
         SortOptions({
           classNames: "mt2 mr2",
           iconSize: 22,
@@ -84,7 +84,7 @@ export default Page({
     content: m.Div({
       children: [
         TabBar({
-          classNames: "nl1 b f7 pb2 mb2 w-90",
+          classNames: "ml2 b f7 w-75",
           selectedTabClassNames: "pv3 br4",
           tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
           selectedTabIndex: selectedTabIndex,
@@ -113,7 +113,7 @@ export default Page({
             itemKey: "id",
             map: (activeHabit) =>
               HabitCard({
-                classNames: "mb3",
+                classNames: "mt3",
                 habit: activeHabit,
                 months: totalOverviewMonths,
                 onClick: () =>

@@ -17,8 +17,8 @@ export const MonthMap = component<MonthMapProps>(
       class: dstring`flex items-center ${classNames}`,
       children: [
         m.Div({
-          class: "f8 b w1 light-silver",
-          children: derive(() => month.value.charAt(0)),
+          class: "f8 b w2 light-silver",
+          children: derive(() => month.value.substring(0, 3)),
         }),
         m.Div({
           class: "w-100 flex items-center justify-between",

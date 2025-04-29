@@ -1,11 +1,16 @@
-import { derive, dobject, dstring, Signal } from "@cyftech/signal";
+import { derive, dobject, dstring, signal, Signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { Section } from ".";
 import { BASE_COLORS, DAYS_OF_WEEK } from "../@common/constants";
 import { WeekdayFrequency, Habit, MilestonesData } from "../@common/types";
-import { getDetailedMilestones, vibrateOnTap } from "../@common/utils";
+import {
+  getDetailedMilestones,
+  getMilestone,
+  vibrateOnTap,
+} from "../@common/utils";
 import {
   AddRemoveButton,
+  Button,
   ColorDot,
   Icon,
   NumberBox,
@@ -21,6 +26,7 @@ type HabitEditorProps = {
 
 export const HabitEditor = component<HabitEditorProps>(
   ({ classNames, habit, initialLevels, onChange }) => {
+    const moreDetails = signal(false);
     const { title, frequency, levels, milestones, colorIndex } =
       dobject(habit).props;
     const everyDay = derive(() => frequency.value.every((day) => !!day));
@@ -85,7 +91,7 @@ export const HabitEditor = component<HabitEditorProps>(
         Section({
           title: "Color",
           child: m.Div({
-            class: "mb1 flex items-center justify-between justify-start-ns",
+            class: "mb1 flex items-center",
             children: m.For({
               subject: BASE_COLORS,
               map: (colorOption, i) => {
@@ -94,7 +100,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 );
 
                 return m.Span({
-                  class: `pointer mb2 mr3-ns pa1 br-100 bw2 ba flex`,
+                  class: `pointer mb2 mr3 pa1 br-100 bw2 ba flex`,
                   style: dstring`border-color: ${borderColorCss}`,
                   onclick: vibrateOnTap(() => updateColor(i)),
                   children: m.Span({
@@ -108,17 +114,7 @@ export const HabitEditor = component<HabitEditorProps>(
         }),
         Section({
           classNames: "pb1",
-          title: "Title",
-          child: TextBox({
-            classNames: "ba bw1 b--light-silver br3 pa2 w-100",
-            placeholder: "title of target habit",
-            text: title,
-            onchange: updateTitle,
-          }),
-        }),
-        Section({
-          classNames: "pb1",
-          title: "Frequency",
+          title: "Schedule",
           child: m.Div({
             class: "mb3 f6 flex items-center justify-between justify-start-ns",
             children: m.For({
@@ -147,159 +143,208 @@ export const HabitEditor = component<HabitEditorProps>(
           }),
         }),
         Section({
-          classNames: "pb3",
-          title: "Levels",
-          child: m.Div({
-            children: m.For({
-              subject: levels,
-              map: (level, i) => {
-                const onlyTwoLeft = habit.value.levels.length < 3;
-                const oldLevel = !!(
-                  initialLevels.value.length &&
-                  initialLevels.value.includes(level)
-                );
-                const levelsLengthMismatch = !!(
-                  initialLevels.value.length &&
-                  initialLevels.value.length !== habit.value.levels.length
-                );
-                const levelsRemoved =
-                  habit.value.levels.length < initialLevels.value.length;
-                const levelsNamesMismatch =
-                  initialLevels.value.length &&
-                  !levelsLengthMismatch &&
-                  !initialLevels.value.every(
-                    (lvl, i) => lvl === habit.value.levels[i]
-                  );
-                const hideAddButton =
-                  levelsRemoved ||
-                  levelsNamesMismatch ||
-                  (levelsLengthMismatch && levelsRemoved && oldLevel);
-                const hideRemoveButton =
-                  onlyTwoLeft ||
-                  levelsRemoved ||
-                  levelsNamesMismatch ||
-                  (levelsLengthMismatch && !levelsRemoved && oldLevel);
-                const textboxDisabled =
-                  initialLevels.value.length !== habit.value.levels.length &&
-                  initialLevels.value.includes(level);
+          classNames: "pb1",
+          title: "Title",
+          child: TextBox({
+            classNames: "ba bw1 b--light-silver br3 pa2 w-100",
+            placeholder: "title of habit",
+            text: title,
+            onchange: updateTitle,
+          }),
+        }),
+        m.If({
+          subject: moreDetails,
+          isTruthy: m.Div([
+            Section({
+              classNames: "pb3",
+              title: "Levels",
+              description: `
+                  Our habits mostly have two levels 'Done' or 'Not done'.
+                  But sometimes they can have multiple levels as well, depending on their nature.
+                  For example, a habit 'Drink 2 litres water' can have three levels - '0 litre', '1 litre'
+                  and '2 litres' respectively.
+                  You can add level by clicking on + button. Click on textbox
+                  for editing the level name.
+                `,
+              showDescription: true,
+              child: m.Div({
+                children: m.For({
+                  subject: levels,
+                  map: (level, i) => {
+                    const onlyTwoLeft = habit.value.levels.length < 3;
+                    const oldLevel = !!(
+                      initialLevels.value.length &&
+                      initialLevels.value.includes(level)
+                    );
+                    const levelsLengthMismatch = !!(
+                      initialLevels.value.length &&
+                      initialLevels.value.length !== habit.value.levels.length
+                    );
+                    const levelsRemoved =
+                      habit.value.levels.length < initialLevels.value.length;
+                    const levelsNamesMismatch =
+                      initialLevels.value.length &&
+                      !levelsLengthMismatch &&
+                      !initialLevels.value.every(
+                        (lvl, i) => lvl === habit.value.levels[i]
+                      );
+                    const hideAddButton =
+                      levelsRemoved ||
+                      levelsNamesMismatch ||
+                      (levelsLengthMismatch && levelsRemoved && oldLevel);
+                    const hideRemoveButton =
+                      onlyTwoLeft ||
+                      levelsRemoved ||
+                      levelsNamesMismatch ||
+                      (levelsLengthMismatch && !levelsRemoved && oldLevel);
+                    const textboxDisabled =
+                      initialLevels.value.length !==
+                        habit.value.levels.length &&
+                      initialLevels.value.includes(level);
 
-                return m.Div({
-                  children: [
-                    m.Div({
-                      class: "flex items-center justify-between",
+                    return m.Div({
                       children: [
                         m.Div({
-                          class: "flex items-center w-80-ns",
+                          class: "flex items-center justify-between",
                           children: [
-                            ColorDot({
-                              classNames: "pa2 mr2",
-                              colorIndex,
-                              level: i,
-                              totalLevels: levels.value.length,
+                            m.Div({
+                              class:
+                                "flex items-center ba bw1 b--light-silver br3 w-70 w-80-ns",
+                              children: [
+                                ColorDot({
+                                  classNames: "w1dot5 h2 br3 br--left ml1px",
+                                  dotClassNames: "br3 br--left",
+                                  colorIndex,
+                                  level: i,
+                                  isRectangular: true,
+                                  totalLevels: levels.value.length,
+                                }),
+                                TextBox({
+                                  classNames: "bn pa2 br3 w-100 outline-0",
+                                  placeholder: `Level ${i}`,
+                                  disabled: textboxDisabled,
+                                  text: level,
+                                  onchange: (text) => updateLevel(text, i),
+                                }),
+                              ],
                             }),
-                            TextBox({
-                              classNames:
-                                "ba bw1 b--light-silver br3 pa2 w-100",
-                              placeholder: `Level ${i}`,
-                              disabled: textboxDisabled,
-                              text: level,
-                              onchange: (text) => updateLevel(text, i),
+                            AddRemoveButton({
+                              hideAdd: hideAddButton,
+                              hideRemove: hideRemoveButton,
+                              onAdd: () => addLevel(i + 1),
+                              onRemove: () => removeLevel(i),
                             }),
                           ],
                         }),
-                        AddRemoveButton({
-                          hideAdd: hideAddButton,
-                          hideRemove: hideRemoveButton,
-                          onAdd: () => addLevel(i + 1),
-                          onRemove: () => removeLevel(i),
+                        m.If({
+                          subject: i < levels.value.length - 1,
+                          isTruthy: m.Div({
+                            class: "pa2 ml2 pl1 bl bw1 b--light-gray",
+                          }),
                         }),
                       ],
-                    }),
-                    m.If({
-                      subject: i < levels.value.length - 1,
-                      isTruthy: m.Div({
-                        class: "pa2 ml2 bl bw1 b--light-gray",
-                      }),
-                    }),
-                  ],
-                });
-              },
+                    });
+                  },
+                }),
+              }),
             }),
-          }),
-        }),
-        Section({
-          title: "Milestones",
-          child: m.Div({
-            children: m.For({
-              subject: derive(() => getDetailedMilestones(milestones.value)),
-              n: 0,
-              nthChild: m.Div({
-                class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",
-                children: [
-                  m.Span({
-                    class: "lh-copy",
-                    children: "",
-                  }),
-                  m.Span({
-                    class:
-                      "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
+            Section({
+              title: "Milestones",
+              description: dstring`
+                  Miltestones are something long-term. Let's say after a month or two, you followed
+                  your habit for 67% of the times, then based on below table you reached the '${() =>
+                    getMilestone(habit.value.milestones, 67)
+                      .label}' milestone. You can set your own milestone levels depending
+                  on the difficulty level of the habit.
+                `,
+              showDescription: true,
+              child: m.Div({
+                children: m.For({
+                  subject: derive(() =>
+                    getDetailedMilestones(milestones.value)
+                  ),
+                  n: 0,
+                  nthChild: m.Div({
+                    class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",
                     children: [
                       m.Span({
-                        class:
-                          "w-100 bg-white bn bw1 pa2dot5 di f4 b light-silver mb1 nl1",
-                        children: "100",
+                        class: "lh-copy",
+                        children: "",
                       }),
                       m.Span({
-                        class: "ph2 bg-white light-silver b mr1",
-                        children: "%",
+                        class:
+                          "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
+                        children: [
+                          m.Span({
+                            class:
+                              "w-100 bg-white bn bw1 ph2dot5 di f4 b light-silver pb3 nl1",
+                            children: "100",
+                          }),
+                          m.Span({
+                            class: "ph2 bg-white light-silver b pb3 mr1",
+                            children: "%",
+                          }),
+                        ],
                       }),
                     ],
                   }),
-                ],
-              }),
-              map: (milestone, i) =>
-                m.Div({
-                  class: "mb1 ph4 pv4 ba br3 bw1 b--light-gray relative",
-                  children: [
-                    m.Span({
-                      class: "lh-copy flex items-center",
+                  map: (milestone, i) =>
+                    m.Div({
+                      class: "mb1 ph4 pv4 ba br3 bw1 b--light-gray relative",
                       children: [
-                        Icon({
-                          className: `mr2 ${milestone.color}`,
-                          size: 20,
-                          iconName: milestone.icon,
-                        }),
-                        milestone.label,
-                      ],
-                    }),
-                    m.Span({
-                      class:
-                        "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
-                      children: [
-                        m.If({
-                          subject: i === 3,
-                          isTruthy: m.Span({
-                            class:
-                              "w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1",
-                            children: "00",
-                          }),
-                          isFalsy: NumberBox({
-                            classNames:
-                              "w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray",
-                            num: milestone.percent,
-                            onchange: (value) => updateMilestone(value, i),
-                          }),
+                        m.Span({
+                          class: "lh-copy flex items-center",
+                          children: [
+                            Icon({
+                              className: `mr2 ${milestone.color}`,
+                              size: 20,
+                              iconName: milestone.icon,
+                            }),
+                            milestone.label,
+                          ],
                         }),
                         m.Span({
-                          class: "ph2 bg-white light-silver b",
-                          children: "%",
+                          class:
+                            "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
+                          children: [
+                            m.If({
+                              subject: i === 3,
+                              isTruthy: m.Span({
+                                class:
+                                  "w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1",
+                                children: "00",
+                              }),
+                              isFalsy: NumberBox({
+                                classNames:
+                                  "w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray",
+                                num: milestone.percent,
+                                onchange: (value) => updateMilestone(value, i),
+                              }),
+                            }),
+                            m.Span({
+                              class: "ph2 bg-white light-silver b",
+                              children: "%",
+                            }),
+                          ],
                         }),
                       ],
                     }),
-                  ],
                 }),
+              }),
             }),
-          }),
+          ]),
+        }),
+        Button({
+          className: "pv2 ph3 flex items-center",
+          onTap: () => (moreDetails.value = !moreDetails.value),
+          children: [
+            Icon({
+              className: "mr1",
+              // size: 20,
+              iconName: derive(() => (moreDetails.value ? "remove" : "add")),
+            }),
+            derive(() => (moreDetails.value ? "Less" : "More")),
+          ],
         }),
       ],
     });

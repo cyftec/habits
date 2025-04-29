@@ -1,9 +1,11 @@
 import {
+  BASE_COLORS,
   BASE_LEVELS,
   BASE_MILESTONES,
   BASE_WEEKDAY_FREQUENCY,
   DAY_IN_MS,
   EMPTY_MONTH,
+  GOLDEN_RATIO,
 } from "./constants";
 import { Habit, MilestonesData, MilestoneUI, MonthStatus } from "./types";
 
@@ -155,4 +157,30 @@ export const vibrateOnTap = (fn: ((...args: any[]) => any) | undefined) => {
     }
     return fn && fn(...args);
   };
+};
+
+export const getColorsForLevel = (
+  level: number,
+  totalLevels: number,
+  colorIndex: number,
+  showText = false
+) => {
+  const color = BASE_COLORS[colorIndex];
+
+  const opacityHexNum = Math.trunc(
+    Math.pow(level / (totalLevels - 1), GOLDEN_RATIO) * 255
+  );
+  const hex = opacityHexNum.toString(16);
+  const opacityHex = hex.length === 1 ? `0${hex}` : hex;
+  const backgroundColor =
+    level < 0 || opacityHex === "0" ? "transparent" : `${color}${opacityHex}`;
+  const fontColor = showText
+    ? level / (totalLevels - 1) > 0.5
+      ? "white"
+      : "black"
+    : level < 0
+    ? "lightgray"
+    : "transparent";
+
+  return { backgroundColor, fontColor };
 };
