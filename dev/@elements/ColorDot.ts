@@ -27,30 +27,38 @@ export const ColorDot = component<ColorDotProps>(
     isRectangular,
     onClick,
   }) => {
-    const colors = derive(() =>
-      getColorsForLevel(
-        level.value,
-        totalLevels.value,
-        colorIndex.value,
-        showText?.value
-      )
+    const outerBorder = derive(() => (isRectangular?.value ? "br0" : "br-100"));
+    const outerBg = derive(() =>
+      level.value < 0 ? "bg-transparent" : "bg-light-gray"
     );
-    const { backgroundColor, fontColor } = dobject(colors).props;
+    const { backgroundColor, fontColor } = dobject(
+      derive(() =>
+        getColorsForLevel(
+          level.value,
+          totalLevels.value,
+          colorIndex.value,
+          showText?.value
+        )
+      )
+    ).props;
+    const innerBR = derive(() => (isRectangular?.value ? "br0" : "br-100"));
+    const text = derive(() => textContent?.value || "·");
+
+    const onTap = () => {
+      if (onClick && level.value >= 0) onClick();
+    };
 
     return m.Span({
-      class: dstring`pointer relative ${() =>
-        isRectangular?.value ? "br0" : "br-100"} ${() =>
-        level.value < 0 ? "transparent" : "bg-light-gray"} ${classNames}`,
-      onclick: vibrateOnTap(() => onClick && level.value >= 0 && onClick()),
+      class: dstring`pointer relative ${outerBorder} ${outerBg} ${classNames}`,
+      onclick: vibrateOnTap(onTap),
       children: [
         m.Span({
-          class: dstring`flex items-center justify-around absolute absolute--fill ${() =>
-            isRectangular?.value ? "br0" : "br-100"} ${dotClassNames}`,
+          class: dstring`flex items-center justify-around absolute absolute--fill ${innerBR} ${dotClassNames}`,
           style: dstring`
             background-color: ${backgroundColor};
             color: ${fontColor};
           `,
-          children: derive(() => textContent?.value || "·"),
+          children: text,
         }),
       ],
     });

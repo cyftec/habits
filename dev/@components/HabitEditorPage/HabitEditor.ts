@@ -1,13 +1,13 @@
 import { derive, dobject, dstring, signal, Signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { Section } from ".";
-import { BASE_COLORS, DAYS_OF_WEEK } from "../@common/constants";
-import { WeekdayFrequency, Habit, MilestonesData } from "../@common/types";
+import { Section } from "..";
+import { BASE_COLORS, DAYS_OF_WEEK } from "../../@common/constants";
+import { WeekdayFrequency, Habit, MilestonesData } from "../../@common/types";
 import {
   getDetailedMilestones,
   getMilestone,
   vibrateOnTap,
-} from "../@common/utils";
+} from "../../@common/utils";
 import {
   AddRemoveButton,
   Button,
@@ -15,7 +15,7 @@ import {
   Icon,
   NumberBox,
   TextBox,
-} from "../@elements";
+} from "../../@elements";
 
 type HabitEditorProps = {
   classNames?: string;

@@ -55,9 +55,14 @@ const sortedStoppedHabits = derive(() =>
   sortedHabits.value.filter((hab) => hab.isStopped)
 );
 
+const triggerPageDataRefresh = () => {
+  habits.value = fetchHabits();
+};
+
 const onPageMount = () => {
   intializeTrackerEmptyDays();
-  habits.value = fetchHabits();
+  triggerPageDataRefresh();
+  window.addEventListener("pageshow", triggerPageDataRefresh);
 };
 
 export default Page({

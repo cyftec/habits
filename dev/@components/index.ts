@@ -1,6 +1,6 @@
 export * from "./AddHabitButton";
+export * from "./GoBackButton";
 export * from "./HabitCard";
-export * from "./HabitEditor";
 export * from "./HabitEditorPage";
 export * from "./HabitStatusEditModal";
 export * from "./MonthMap";

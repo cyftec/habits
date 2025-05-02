@@ -59,9 +59,14 @@ const transitionToHabitsPage = () => {
   }, 0);
 };
 
+const triggerPageDataRefresh = () => {
+  selectedDate.value = new Date();
+};
+
 const onPageMount = () => {
   intializeTrackerEmptyDays();
-  selectedDate.value = new Date();
+  triggerPageDataRefresh();
+  window.addEventListener("pageshow", triggerPageDataRefresh);
 };
 
 export default Page({

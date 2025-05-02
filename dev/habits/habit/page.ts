@@ -3,13 +3,11 @@ import { m } from "@mufw/maya";
 import { DAYS_OF_WEEK, MONTHS } from "../../@common/constants";
 import {
   intializeTrackerEmptyDays,
-  saveHabitInStore,
   tryFetchingHabitUsingParams,
 } from "../../@common/localstorage";
 import { Habit, StoreHabitID } from "../../@common/types";
 import {
   getCompletionPercentage,
-  getDaysDifference,
   getHabitUI,
   getMilestone,
   goToHabitEditPage,
@@ -17,7 +15,7 @@ import {
   updateHabitStatus,
   vibrateOnTap,
 } from "../../@common/utils";
-import { Section } from "../../@components";
+import { GoBackButton, Section } from "../../@components";
 import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
 
 const error = signal("");
@@ -90,6 +88,15 @@ const weekwiseTracker = derive(() => {
   return weeklyTracker;
 });
 
+const triggerPageDataRefresh = () => {
+  const [fetchedHabit, err] = tryFetchingHabitUsingParams();
+  if (err || !fetchedHabit) {
+    error.value = err || "Nohabit found for 'id' in query param";
+    return;
+  }
+  habit.value = fetchedHabit;
+};
+
 const updateLevel = (levelCode: number) => {
   if (!habit.value) return;
   updateHabitStatus(
@@ -98,16 +105,13 @@ const updateLevel = (levelCode: number) => {
     updateLevelModalData.value.date
   );
   updateLevelModalOpen.value = false;
+  triggerPageDataRefresh();
 };
 
 const onPageMount = () => {
   intializeTrackerEmptyDays();
-  const [fetchedHabit, err] = tryFetchingHabitUsingParams();
-  if (err || !fetchedHabit) {
-    error.value = err || "Nohabit found for 'id' in query param";
-    return;
-  }
-  habit.value = fetchedHabit;
+  triggerPageDataRefresh();
+  window.addEventListener("pageshow", triggerPageDataRefresh);
 };
 
 export default Page({
@@ -401,17 +405,7 @@ export default Page({
     }),
     bottombar: m.Div({
       class: "pb3",
-      children: Button({
-        className: "pa3 flex items-center",
-        children: [
-          Icon({ iconName: "arrow_back" }),
-          m.Span({
-            class: "ml1",
-            children: `Go Back`,
-          }),
-        ],
-        onTap: goToHabitsPage,
-      }),
+      children: GoBackButton({}),
     }),
   }),
 });

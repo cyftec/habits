@@ -1,19 +1,20 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
+import { GoBackButton, Section } from "..";
 import {
   deleteHabitFromStore,
   saveHabitInStore,
   tryFetchingHabitUsingParams,
-} from "../@common/localstorage";
-import { Habit, StoreHabitID } from "../@common/types";
+} from "../../@common/localstorage";
+import { Habit } from "../../@common/types";
 import {
   getHabitValidationError,
   getNewHabit,
   goToHabitPage,
   goToHabitsPage,
-} from "../@common/utils";
-import { HabitEditor, Section } from "../@components";
-import { Button, Icon, Link, Modal, Page, Scaffold } from "../@elements";
+} from "../../@common/utils";
+import { Button, Icon, Link, Modal, Page, Scaffold } from "../../@elements";
+import { HabitEditor } from "./HabitEditor";
 
 type HabitEditorPageProps = {
   isNew: boolean;
@@ -94,11 +95,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
       });
     }
     saveHabitInStore({ ...habit.value, tracker: updatedTracker });
-    goBack();
-  };
-
-  const goBack = () => {
-    isNew.value ? goToHabitsPage() : goToHabitPage(habit.value.id);
+    history.back();
   };
 
   const onPageMount = () => {
@@ -274,16 +271,8 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
           m.Div({
             class: "flex items-center justify-stretch",
             children: [
-              Button({
-                className: "w4dot50 w4dot25-ns pa3 flex items-center",
-                children: [
-                  Icon({ iconName: "arrow_back" }),
-                  m.Span({
-                    class: "ml1",
-                    children: `Go Back`,
-                  }),
-                ],
-                onTap: goBack,
+              GoBackButton({
+                classNames: "w4dot50 w4dot25-ns",
               }),
               Button({
                 className: "w-100 pa3 ml3 b",
