@@ -29,7 +29,7 @@ export const HabitCard = component<HabitCardProps>(
     );
 
     return m.Div({
-      class: dstring`pointer bg-white br4 pa3 ${classNames}`,
+      class: dstring`pointer bg-white ${classNames}`,
       onclick: vibrateOnTap(onClick),
       children: [
         m.Div({

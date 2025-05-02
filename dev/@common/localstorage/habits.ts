@@ -1,19 +1,30 @@
+import { phase } from "@mufw/maya/utils";
 import { Habit, StoreHabitID } from "../types";
-import { getDaysDifference, getUrlParams } from "../utils";
+import { getDaysDifference, getHabitUI, getUrlParams } from "../utils";
 
 export const fetchHabits = () => {
-  const updatedHabits: Habit[] = [];
+  if (!phase.currentIs("run")) return [];
+
+  const habits: Habit[] = [];
   for (let key in localStorage) {
     if (!key.startsWith("h.")) continue;
     const habit: Habit | string = JSON.parse(localStorage.getItem(key) || "");
     if (typeof habit !== "object") continue;
-    updatedHabits.push(habit as Habit);
+    habits.push(habit as Habit);
   }
 
-  return updatedHabits;
+  return habits;
 };
 
-export const fetchHabit = (habitID: string) => {
+export const getHabitsForDate = (date: Date) =>
+  fetchHabits()
+    .filter((hab) => {
+      return !hab.isStopped && hab.frequency[date.getDay()];
+    })
+    .map((hab) => getHabitUI(hab));
+
+export const fetchHabit = (habitId: number) => {
+  const habitID: StoreHabitID = `h.${habitId}`;
   const habitJSON = localStorage.getItem(habitID);
   const habitObj = JSON.parse(habitJSON || "");
 
@@ -47,8 +58,14 @@ export const intializeTrackerEmptyDays = () => {
   }
 };
 
-export const saveHabitInStore = (habitID: StoreHabitID, habit: Habit) => {
+export const saveHabitInStore = (habit: Habit) => {
+  const habitID: StoreHabitID = `h.${habit.id}`;
   localStorage.setItem(habitID, JSON.stringify(habit));
+};
+
+export const deleteHabitFromStore = (habitId: number) => {
+  const habitID: StoreHabitID = `h.${habitId}`;
+  localStorage.removeItem(habitID);
 };
 
 export const tryFetchingHabitUsingParams = (): readonly [
@@ -65,9 +82,8 @@ export const tryFetchingHabitUsingParams = (): readonly [
     const idString = param.split("id=").pop();
     const id = +(idString || "__");
     if (!id || isNaN(id)) continue;
-    const habitID: StoreHabitID = `h.${id}`;
     try {
-      habit = fetchHabit(habitID);
+      habit = fetchHabit(id);
     } catch (errMsg) {
       error = errMsg.toString();
     }

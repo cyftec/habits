@@ -78,3 +78,26 @@ export type Habit = {
   pauses: HabitPause[];
   isStopped: boolean;
 };
+
+export type LevelUI = {
+  name: string;
+  code: number;
+};
+
+export type DailyStatus = {
+  level: LevelUI;
+  date: Date;
+};
+
+export type HabitUI = {
+  id: number;
+  startDate: Date;
+  title: string;
+  frequency: WeekdayFrequency;
+  colorIndex: number;
+  levels: LevelUI[];
+  tracker: DailyStatus[];
+  milestones: MilestonesData;
+  pauses: HabitPause[];
+  isStopped: boolean;
+};

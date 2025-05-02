@@ -10,7 +10,11 @@ import { Habit, StoreHabitID } from "../../@common/types";
 import {
   getCompletionPercentage,
   getDaysDifference,
+  getHabitUI,
   getMilestone,
+  goToHabitEditPage,
+  goToHabitsPage,
+  updateHabitStatus,
   vibrateOnTap,
 } from "../../@common/utils";
 import { Section } from "../../@components";
@@ -86,17 +90,13 @@ const weekwiseTracker = derive(() => {
   return weeklyTracker;
 });
 
-const updateLevel = (levelIndex: number) => {
+const updateLevel = (levelCode: number) => {
   if (!habit.value) return;
-  const updatedTracker = [...habit.value.tracker];
-  const index = getDaysDifference(
-    new Date(habit.value.id),
+  updateHabitStatus(
+    getHabitUI(habit.value),
+    levelCode,
     updateLevelModalData.value.date
   );
-  updatedTracker[index] = levelIndex;
-  const habitID: StoreHabitID = `h.${habit.value.id}`;
-  habit.value = { ...habit.value, tracker: updatedTracker };
-  saveHabitInStore(habitID, habit.value);
   updateLevelModalOpen.value = false;
 };
 
@@ -129,7 +129,7 @@ export default Page({
             size: 18,
             iconName: "edit",
             onClick: () => {
-              if (habit.value) location.href = `edit/?id=${habit.value.id}`;
+              if (habit.value) goToHabitEditPage(habit.value.id);
             },
           }),
         }),
@@ -180,7 +180,7 @@ export default Page({
                       if (habitID in localStorage)
                         localStorage.removeItem(habitID);
                       deleteActionModalOpen.value = false;
-                      location.href = "/habits/";
+                      goToHabitsPage();
                     },
                   }),
                 ],
@@ -410,7 +410,7 @@ export default Page({
             children: `Go Back`,
           }),
         ],
-        onTap: () => (location.href = "/habits/"),
+        onTap: goToHabitsPage,
       }),
     }),
   }),

@@ -34,6 +34,7 @@ input::placeholder {
   font-style: italic;
 }
 
+.hide-scrollbar { scrollbar-color: transparent transparent; scrollbar-width: thin; }
 .app-theme-color { color: var(--themeColor); }
 .bg-app-theme-color { background-color: var(--themeColor); }
 .overflow-break-word { overflow-wrap: break-word; }
@@ -42,6 +43,7 @@ input::placeholder {
 .f8 { font-size: 0.65rem; }
 .bg-pale { background-color: #f6f6f6; }
 .bg-light-moon-gray { background-color: #e8e8e8; }
+.top-3 { top: 4.25rem; }
 .bottom--1dot5 { bottom: -1.75rem; }
 .pa2dot5 { padding: 0.75rem; }
 .ph2dot5 { padding-left: 0.75rem; padding-right: 0.75rem; }

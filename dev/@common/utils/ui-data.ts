@@ -4,10 +4,60 @@ import {
   BASE_MILESTONES,
   BASE_WEEKDAY_FREQUENCY,
   DAY_IN_MS,
-  EMPTY_MONTH,
   GOLDEN_RATIO,
-} from "./constants";
-import { Habit, MilestonesData, MilestoneUI, MonthStatus } from "./types";
+} from "../constants";
+import { fetchHabit, saveHabitInStore } from "../localstorage";
+import {
+  DailyStatus,
+  Habit,
+  HabitUI,
+  LevelUI,
+  MilestonesData,
+  MilestoneUI,
+  StoreHabitID,
+} from "../types";
+import {
+  getDaysDifference,
+  getMomentZero,
+  getMomentZeroDate,
+  getMonthsStatus,
+} from "./date-time";
+
+export const getLevelUI = (level: number, levels: string[]): LevelUI => ({
+  name: levels[level],
+  code: level,
+});
+
+export const getDailyStatus = (
+  level: number,
+  levels: string[],
+  date: Date
+): DailyStatus => ({
+  level: getLevelUI(level, levels),
+  date: date,
+});
+
+export const getDayStatus = (tracker: DailyStatus[], date: Date) =>
+  tracker.find((status) => getMomentZero(status.date) === getMomentZero(date));
+
+export const getHabitUI = (habit: Habit): HabitUI => {
+  const startDate = getMomentZeroDate(new Date(habit.id));
+  return {
+    ...habit,
+    startDate,
+    levels: habit.levels.map((levelName, index) => ({
+      name: levelName,
+      code: index,
+    })),
+    tracker: habit.tracker.map((status, i) =>
+      getDailyStatus(
+        status,
+        habit.levels,
+        new Date(startDate.getTime() + i * DAY_IN_MS)
+      )
+    ),
+  };
+};
 
 export const getNewHabit = (backDays?: number): Habit => {
   const now = new Date().getTime();
@@ -23,6 +73,7 @@ export const getNewHabit = (backDays?: number): Habit => {
     isStopped: false,
   };
 };
+
 export const getDetailedMilestones = (
   milestones: MilestonesData
 ): MilestoneUI[] => [
@@ -46,6 +97,7 @@ export const getDetailedMilestones = (
   },
   { label: "Unacceptable", percent: 0, icon: "close", color: "red" },
 ];
+
 export const getMilestone = (
   milestones: MilestonesData,
   completionPercentage: number
@@ -58,6 +110,7 @@ export const getMilestone = (
   }
   return milestone;
 };
+
 export const getHabitValidationError = (habit: Habit): string => {
   if (!habit.title) {
     return "Title should not be empty";
@@ -78,61 +131,6 @@ export const getHabitValidationError = (habit: Habit): string => {
   return "";
 };
 
-export const getUrlParams = () => {
-  if (!location) return [];
-  return location.href.split("?")[1].split("&");
-};
-
-export const getMomentZeroDate = (date: Date) => {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-};
-
-export const getMonthStatus = (habit: Habit, date: Date) => {
-  const habitCreationTime = habit.id;
-  const statusTrack = habit.tracker;
-  const year = date.getFullYear();
-  const monthIndex = date.getMonth();
-  const monthStatus: MonthStatus = [...EMPTY_MONTH];
-  const firstStatusDate = new Date(habitCreationTime);
-  const y = firstStatusDate.getFullYear();
-  const m = firstStatusDate.getMonth();
-  const d = firstStatusDate.getDate();
-  for (let i = 0; i < statusTrack.length; i++) {
-    const date = new Date(y, m, d + i);
-    const dateY = date.getFullYear();
-    const dateM = date.getMonth();
-    if (dateY > year) break;
-    if (dateY === year && dateM > monthIndex) break;
-
-    if (dateY === year && dateM === monthIndex) {
-      const dateD = date.getDate();
-      monthStatus[dateD - 1] = statusTrack[i];
-    }
-  }
-  return monthStatus;
-};
-
-export const getMonthsStatus = (habit: Habit, months: number) => {
-  const today = new Date();
-  const monthsFirstDateList = Array(months)
-    .fill(0)
-    .map((x, i) => new Date(today.getFullYear(), today.getMonth() - i, 1))
-    .reverse();
-
-  return monthsFirstDateList.map((monthFirstDayDate) => ({
-    monthIndex: monthFirstDayDate.getMonth(),
-    status: getMonthStatus(habit, monthFirstDayDate),
-  }));
-};
-
-export const getDaysDifference = (earlierDate: Date, laterDate: Date) => {
-  const earlierDateMZ = getMomentZeroDate(earlierDate);
-  const laterDateMZ = getMomentZeroDate(laterDate);
-  return Math.round(
-    (laterDateMZ.getTime() - earlierDateMZ.getTime()) / DAY_IN_MS
-  );
-};
-
 export const getCompletionPercentage = (habit: Habit, months: number) => {
   const monthsStatus = getMonthsStatus(habit, months);
   const levels = habit.levels.length - 1;
@@ -148,15 +146,6 @@ export const getCompletionPercentage = (habit: Habit, months: number) => {
     }
   }
   return Math.ceil((completion / (count * levels)) * 100);
-};
-
-export const vibrateOnTap = (fn: ((...args: any[]) => any) | undefined) => {
-  return (...args: any) => {
-    if (!!window.navigator?.vibrate) {
-      window.navigator.vibrate(3);
-    }
-    return fn && fn(...args);
-  };
 };
 
 export const getColorsForLevel = (
@@ -183,4 +172,17 @@ export const getColorsForLevel = (
     : "transparent";
 
   return { backgroundColor, fontColor };
+};
+
+export const updateHabitStatus = (
+  habit: HabitUI,
+  levelCode: number,
+  date: Date
+) => {
+  const habitData: Habit = fetchHabit(habit.id);
+  const updatedTracker = [...habitData.tracker];
+  const index = getDaysDifference(new Date(habitData.id), date);
+  updatedTracker[index] = levelCode;
+  const updatedHabitData = { ...habitData, tracker: updatedTracker };
+  saveHabitInStore(updatedHabitData);
 };

@@ -1,4 +1,4 @@
-import { derive, dstring, signal } from "@cyftech/signal";
+import { derive, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import {
   HOMEPAGE_OVERVIEW_TABS,
@@ -10,9 +10,14 @@ import {
   localSettings,
 } from "../@common/localstorage";
 import { Habit } from "../@common/types";
-import { getCompletionPercentage } from "../@common/utils";
-import { HabitCard, SortOptions } from "../@components";
-import { Button, Page, Scaffold, TabBar } from "../@elements";
+import { getCompletionPercentage, goToHabitPage } from "../@common/utils";
+import {
+  AddHabitButton,
+  HabitCard,
+  NavScaffold,
+  SortOptions,
+} from "../@components";
+import { Page, TabBar } from "../@elements";
 
 const selectedSortOptionIndex = derive(
   () => localSettings.value.habitsPage.sortOptionIndex
@@ -44,10 +49,10 @@ const sortedHabits = derive(() => {
   return sortedHabitsWithCompletion;
 });
 const sortedActiveHabits = derive(() =>
-  sortedHabits.value.filter((h) => !h.isStopped)
+  sortedHabits.value.filter((hab) => !hab.isStopped)
 );
 const sortedStoppedHabits = derive(() =>
-  sortedHabits.value.filter((h) => h.isStopped)
+  sortedHabits.value.filter((hab) => hab.isStopped)
 );
 
 const onPageMount = () => {
@@ -58,10 +63,11 @@ const onPageMount = () => {
 export default Page({
   classNames: "bg-white",
   onMount: onPageMount,
-  body: Scaffold({
-    classNames: "bg-white",
+  body: NavScaffold({
+    classNames: "ph3 bg-white",
+    route: "/habits/",
     header: m.Div({
-      class: "flex items-start justify-between ph3 bg-white",
+      class: "flex items-start justify-between bg-white",
       children: [
         "Habits",
         SortOptions({
@@ -84,7 +90,7 @@ export default Page({
     content: m.Div({
       children: [
         TabBar({
-          classNames: "ml2 b f7 w-75",
+          classNames: "nl1 b f7 w-75",
           selectedTabClassNames: "pv3 br4",
           tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
           selectedTabIndex: selectedTabIndex,
@@ -113,11 +119,10 @@ export default Page({
             itemKey: "id",
             map: (activeHabit) =>
               HabitCard({
-                classNames: "mt3",
+                classNames: "mt4",
                 habit: activeHabit,
                 months: totalOverviewMonths,
-                onClick: () =>
-                  (location.href = `/habits/habit/?id=${activeHabit.value.id}`),
+                onClick: () => goToHabitPage(activeHabit.value.id),
               }),
           }),
         }),
@@ -129,29 +134,21 @@ export default Page({
               itemKey: "id",
               n: 0,
               nthChild: m.Div({
-                class: "silver f6 ml3 mt5 mb3",
-                children: "OLD HABITS (DIE HARD)",
+                class: "silver f6 mt5 mb3",
+                children: "OLD HABITS (DIE HARD, LOL)",
               }),
               map: (stoppedHabit) =>
                 HabitCard({
                   classNames: "mb3",
                   habit: stoppedHabit,
                   months: totalOverviewMonths,
-                  onClick: () =>
-                    (location.href = `/habits/habit/?id=${stoppedHabit.value.id}`),
+                  onClick: () => goToHabitPage(stoppedHabit.value.id),
                 }),
             })
           ),
         }),
       ],
     }),
-    bottombar: m.Div({
-      class: "w-100 flex justify-around",
-      children: Button({
-        className: "pv3 ph4 mb3 shadow-4 b",
-        children: `Add new habit`,
-        onTap: () => (location.href = "/habits/new"),
-      }),
-    }),
+    navbarTop: AddHabitButton({}),
   }),
 });

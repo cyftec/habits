@@ -1,11 +1,17 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
+  deleteHabitFromStore,
   saveHabitInStore,
   tryFetchingHabitUsingParams,
 } from "../@common/localstorage";
 import { Habit, StoreHabitID } from "../@common/types";
-import { getHabitValidationError, getNewHabit } from "../@common/utils";
+import {
+  getHabitValidationError,
+  getNewHabit,
+  goToHabitPage,
+  goToHabitsPage,
+} from "../@common/utils";
 import { HabitEditor, Section } from "../@components";
 import { Button, Icon, Link, Modal, Page, Scaffold } from "../@elements";
 
@@ -29,7 +35,6 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
 
     const finalHabit = habit.value;
     const oldLevels = [...initialLevels.value];
-    const habitID: StoreHabitID = `h.${finalHabit.id}`;
     let updatedTracker = [...finalHabit.tracker];
 
     const levelsLengthMismatch = !!(
@@ -88,14 +93,12 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
         });
       });
     }
-    saveHabitInStore(habitID, { ...habit.value, tracker: updatedTracker });
+    saveHabitInStore({ ...habit.value, tracker: updatedTracker });
     goBack();
   };
 
   const goBack = () => {
-    location.href = isNew.value
-      ? "/habits/"
-      : `/habits/habit/?id=${habit.value.id}`;
+    isNew.value ? goToHabitsPage() : goToHabitPage(habit.value.id);
   };
 
   const onPageMount = () => {
@@ -169,10 +172,9 @@ export const HabitEditorPage = component<HabitEditorPageProps>(({ isNew }) => {
                                 className: "pv2 ph3 ml2 b red",
                                 children: "Yes, delete permanently",
                                 onTap: () => {
-                                  const habitID: StoreHabitID = `h.${habit.value.id}`;
-                                  localStorage.removeItem(habitID);
+                                  deleteHabitFromStore(habit.value.id);
                                   deleteActionModalOpen.value = false;
-                                  location.href = "/habits/";
+                                  goToHabitsPage();
                                 },
                               }),
                             ],
