@@ -68,6 +68,12 @@ export const deleteHabitFromStore = (habitId: number) => {
   localStorage.removeItem(habitID);
 };
 
+export const softDeleteHabitInStore = (habitId: number) => {
+  const habit = fetchHabit(habitId);
+  const softDeletedHabit: Habit = { ...habit, isStopped: true };
+  saveHabitInStore(softDeletedHabit);
+};
+
 export const tryFetchingHabitUsingParams = (): readonly [
   Habit | undefined,
   string

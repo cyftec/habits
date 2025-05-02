@@ -10,10 +10,9 @@ import { Habit } from "../../@common/types";
 import {
   getHabitValidationError,
   getNewHabit,
-  goToHabitPage,
   goToHabitsPage,
 } from "../../@common/utils";
-import { Button, Icon, Link, Modal, Page, Scaffold } from "../../@elements";
+import { Button, Link, Modal, Page, Scaffold } from "../../@elements";
 import { HabitEditor } from "./HabitEditor";
 
 type HabitEditorPageProps = {

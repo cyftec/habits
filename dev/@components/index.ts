@@ -2,7 +2,7 @@ export * from "./AddHabitButton";
 export * from "./GoBackButton";
 export * from "./HabitCard";
 export * from "./HabitEditorPage";
-export * from "./HabitStatusEditModal";
+export * from "./Modals";
 export * from "./MonthMap";
 export * from "./NavBar";
 export * from "./NavScaffold";

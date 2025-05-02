@@ -79,7 +79,7 @@ export default Page({
         showTitleInHeader: true,
         habit: editableHabit,
         date: selectedDate,
-        onTapOutside: () => {
+        onClose: () => {
           isStatusEditorOpen.value = false;
           statusEditableHabitIndex.value = 0;
         },

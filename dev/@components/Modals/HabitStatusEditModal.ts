@@ -1,24 +1,24 @@
 import { derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { HabitUI } from "../@common/types";
-import { getDayStatus, vibrateOnTap } from "../@common/utils";
-import { Modal } from "../@elements";
+import { HabitUI } from "../../@common/types";
+import { getDayStatus, vibrateOnTap } from "../../@common/utils";
+import { Modal } from "../../@elements";
 
 type HabitStatusEditModalProps = {
   isOpen: boolean;
   habit: HabitUI;
   date: Date;
   showTitleInHeader?: boolean;
-  onTapOutside?: () => void;
+  onClose?: () => void;
   onChange: (levelIndex: number) => void;
 };
 
 export const HabitStatusEditModal = component<HabitStatusEditModalProps>(
-  ({ isOpen, habit, date, showTitleInHeader, onTapOutside, onChange }) => {
+  ({ isOpen, habit, date, showTitleInHeader, onClose, onChange }) => {
     return Modal({
       classNames: "f5 normal ba bw0 outline-0",
       isOpen: isOpen,
-      onTapOutside: onTapOutside,
+      onTapOutside: onClose,
       content: m.Div({
         class: "mnw5",
         children: [
