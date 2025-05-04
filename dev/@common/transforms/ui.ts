@@ -429,16 +429,7 @@ export const getTrackerForLevelsChange = (
 };
 
 export const isLastInteractionLongBack = () => {
-  console.log(`CHECKING time to refresh`);
   const now = new Date().getTime();
   const lastIntrxn = getLastInteraction();
-
-  const isTrue = now - lastIntrxn > 5000;
-  console.log(`now: ${now}`);
-  console.log(`lastIntrxn: ${lastIntrxn}`);
-  console.log(`difference: ${now - lastIntrxn}`);
-
-  console.log(`so, it's time ${isTrue ? "" : "not "}to refresh`);
-
-  return isTrue;
+  return now - lastIntrxn > getMinutesInMS(1);
 };

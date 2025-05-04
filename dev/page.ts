@@ -18,13 +18,13 @@ import {
   updateHabitStatus,
 } from "./@common/transforms";
 import { DailyStatus } from "./@common/types";
-import { goToHabitPage, handleCTA } from "./@common/utils";
+import { goToHabitPage, goToNewHabitsPage, handleCTA } from "./@common/utils";
 import {
   AddHabitButton,
   HabitStatusEditModal,
   NavScaffold,
 } from "./@components";
-import { ColorDot, Page, ProgressBar } from "./@elements";
+import { ColorDot, Link, Page, ProgressBar } from "./@elements";
 
 const now = new Date();
 const progress = signal(0);
@@ -68,6 +68,7 @@ const transitionToHabitsPage = () => {
 };
 
 const triggerPageDataRefresh = () => {
+  intializeTrackerEmptyDays();
   selectedDate.value = new Date();
 };
 
@@ -181,11 +182,22 @@ export default Page({
                 class: "mt4",
                 children: m.For({
                   subject: habits,
+                  n: Infinity,
+                  nthChild: Link({
+                    classNames: "flex pl5 pr3 nl3 mt4",
+                    onClick: goToNewHabitsPage,
+                    children: derive(() =>
+                      habits.value.length < 5
+                        ? `Only ${habits.value.length} habits in a day! Add more.`
+                        : ``
+                    ),
+                  }),
                   map: (habit, i) => {
                     const status = getDayStatus(
                       habit.tracker,
                       selectedDate.value
                     ) as DailyStatus;
+
                     return m.Div({
                       class: "mt4 flex items-center",
                       children: [

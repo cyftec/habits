@@ -130,7 +130,7 @@ export const HabitEditor = component<HabitEditorProps>(
         }),
         Section({
           classNames: "pb2",
-          title: "Title of the habit",
+          title: "Title",
           child: TextBox({
             classNames: "ba bw1 b--light-silver br3 pa2 w-100",
             placeholder: `for example, "wake up at 5am"`,
