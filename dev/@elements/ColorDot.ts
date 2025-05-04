@@ -1,6 +1,6 @@
 import { derive, dobject, dstring, MaybeSignalObject } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { vibrateOnTap } from "../@common/utils";
+import { handleCTA } from "../@common/utils";
 import { getColorsForLevel } from "../@common/transforms";
 import { Icon } from "./Icon";
 
@@ -56,7 +56,7 @@ export const ColorDot = component<ColorDotProps>(
 
     return m.Span({
       class: dstring`pointer relative ${outerBorder} ${outerBg} ${classNames}`,
-      onclick: vibrateOnTap(onTap),
+      onclick: handleCTA(onTap),
       children: [
         m.Span({
           class: dstring`flex items-center justify-around absolute absolute--fill ${innerBR} ${dotClassNames}`,

@@ -1,6 +1,6 @@
 import { component, m } from "@mufw/maya";
 import { dstring } from "@cyftech/signal";
-import { vibrateOnTap } from "../@common/utils";
+import { handleCTA } from "../@common/utils";
 
 type IconProps = {
   className?: string;
@@ -16,7 +16,7 @@ export const Icon = component<IconProps>(
       class: dstring`material-symbols-outlined ${() =>
         !!onClick ? "pointer" : ""} ${className}`,
       style: dstring`font-size: ${() => size?.value || "16"}px`,
-      onclick: vibrateOnTap(onClick),
+      onclick: handleCTA(onClick),
       children: iconName,
       title: title,
     })

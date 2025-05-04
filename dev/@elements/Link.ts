@@ -1,6 +1,6 @@
 import { dstring } from "@cyftech/signal";
 import { Children, component, m } from "@mufw/maya";
-import { vibrateOnTap } from "../@common/utils";
+import { handleCTA } from "../@common/utils";
 
 type LinkProps = {
   classNames?: string;
@@ -17,7 +17,7 @@ export const Link = component<LinkProps>(
         !href && !onClick ? "" : "pointer underline"} ${classNames}`,
       href,
       target,
-      onclick: vibrateOnTap(onClick),
+      onclick: handleCTA(onClick),
       children,
     });
   }

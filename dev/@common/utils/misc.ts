@@ -1,10 +1,9 @@
-export const vibrateOnTap = (fn: ((...args: any[]) => any) | undefined) => {
-  return (...args: any) => {
-    if (!!window.navigator?.vibrate) {
-      window.navigator.vibrate(3);
-    }
-    return fn && fn(...args);
-  };
+import { updateInteractionTime } from "../localstorage";
+
+const vibrateOnTap = () => {
+  if (!!window.navigator?.vibrate) {
+    window.navigator.vibrate(3);
+  }
 };
 
 export const parseObjectJsonString = <T extends Object>(
@@ -21,4 +20,12 @@ export const parseObjectJsonString = <T extends Object>(
 
   if (!isObject || !matchesSignature) return;
   return obj;
+};
+
+export const handleCTA = (fn: ((...args: any[]) => any) | undefined) => {
+  return (...args: any) => {
+    vibrateOnTap();
+    updateInteractionTime(new Date());
+    return fn && fn(...args);
+  };
 };

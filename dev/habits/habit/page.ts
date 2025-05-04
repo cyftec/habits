@@ -12,7 +12,7 @@ import {
   updateHabitStatus,
 } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
-import { goToHabitEditPage, vibrateOnTap } from "../../@common/utils";
+import { goToHabitEditPage, handleCTA } from "../../@common/utils";
 import { GoBackButton, HabitDeleteModal, Section } from "../../@components";
 import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
 
@@ -152,7 +152,7 @@ export default Page({
 
                     return m.Div({
                       class: optionCSS,
-                      onclick: vibrateOnTap(() => updateLevel(level.code)),
+                      onclick: handleCTA(() => updateLevel(level.code)),
                       children: [m.Span(level.name)],
                     });
                   },

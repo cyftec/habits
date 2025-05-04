@@ -1,3 +1,4 @@
+const MINUTE_IN_MS = 1000 * 60;
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 const DAYS_OF_WEEK = [
   "Sunday",
@@ -22,6 +23,8 @@ const MONTHS = [
   "November",
   "December",
 ] as const satisfies string[];
+
+export const getMinutesInMS = (minutes: number) => minutes * MINUTE_IN_MS;
 
 export const getWeekdayName = (dayIndex: number, letters?: number) =>
   DAYS_OF_WEEK[dayIndex].substring(0, letters);

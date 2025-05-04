@@ -1,7 +1,7 @@
 import { Child, component, m } from "@mufw/maya";
 import { Icon } from "../@elements";
 import { dstring } from "@cyftech/signal";
-import { goToHref, vibrateOnTap } from "../@common/utils";
+import { goToHref, handleCTA } from "../@common/utils";
 
 type NavBarProps = {
   classNames?: string;
@@ -42,7 +42,7 @@ export const NavBarLink = component<NavBarLinkProps>(
     return m.Div({
       class: dstring`pointer flex flex-column items-center justify-center ${() =>
         isSelected.value ? "app-theme-color b" : "black"} ${classNames}`,
-      onclick: vibrateOnTap(() => goToHref(href.value)),
+      onclick: handleCTA(() => goToHref(href.value)),
       children: [
         Icon({
           size: 22,

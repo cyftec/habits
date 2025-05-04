@@ -10,7 +10,7 @@ import {
   levelTextboxDisability,
 } from "../../@common/transforms";
 import { HabitUI, MilestonesData, WeekdayFrequency } from "../../@common/types";
-import { vibrateOnTap } from "../../@common/utils";
+import { handleCTA } from "../../@common/utils";
 import {
   AddRemoveButton,
   Button,
@@ -110,7 +110,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 class: dstring`pointer flex items-center justify-center br-pill h2 ph2 mr3-ns ${() =>
                   everyDay.value ? selectedCss : unSelectedCss}`,
                 children: "Daily",
-                onclick: vibrateOnTap(() => updateFrequency(-1)),
+                onclick: handleCTA(() => updateFrequency(-1)),
               }),
               map: (_, dayIndex) => {
                 const colorCss = derive(() =>
@@ -122,7 +122,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 return m.Span({
                   class: dstring`pointer flex items-center justify-center br-100 h2 w2 mr3-ns ${colorCss}`,
                   children: getWeekdayName(dayIndex, 1),
-                  onclick: vibrateOnTap(() => updateFrequency(dayIndex)),
+                  onclick: handleCTA(() => updateFrequency(dayIndex)),
                 });
               },
             }),
@@ -156,7 +156,7 @@ export const HabitEditor = component<HabitEditorProps>(
                     return m.Span({
                       class: `pointer mb2 mr3 pa1 br-100 bw2 ba flex`,
                       style: dstring`border-color: ${borderColorCss}`,
-                      onclick: vibrateOnTap(() => updateColor(i)),
+                      onclick: handleCTA(() => updateColor(i)),
                       children: m.Span({
                         class: dstring`pa2 br-100`,
                         style: `background-color: ${colorOption}`,

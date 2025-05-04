@@ -1,6 +1,9 @@
 import { derive, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { intializeTrackerEmptyDays } from "./@common/localstorage";
+import {
+  intializeTrackerEmptyDays,
+  updateInteractionTime,
+} from "./@common/localstorage";
 import {
   areSameDates,
   getDayLabel,
@@ -8,15 +11,14 @@ import {
   getGapDate,
   getHabitsForDate,
   getLastNDays,
-  getLastTwoWeeks,
-  getMomentZeroDate,
   getNewHabit,
   getWeekdayName,
   isFutureDay,
+  isLastInteractionLongBack,
   updateHabitStatus,
 } from "./@common/transforms";
 import { DailyStatus } from "./@common/types";
-import { goToHabitPage, vibrateOnTap } from "./@common/utils";
+import { goToHabitPage, handleCTA } from "./@common/utils";
 import {
   AddHabitButton,
   HabitStatusEditModal,
@@ -26,6 +28,7 @@ import { ColorDot, Page, ProgressBar } from "./@elements";
 
 const now = new Date();
 const progress = signal(0);
+const itsTimeToRefresh = signal(false);
 const sevenDays = getLastNDays(getGapDate(now, 2), 7);
 const selectedDate = signal(now);
 const habits = derive(() => getHabitsForDate(selectedDate.value));
@@ -53,12 +56,15 @@ const editableHabit = derive(
   () => habits.value?.[statusEditableHabitIndex.value] || getNewHabit()
 );
 const transitionToHabitsPage = () => {
+  itsTimeToRefresh.value = isLastInteractionLongBack();
   const tickerID = setInterval(() => {
     progress.value += 1;
     if (progress.value >= 100) {
       clearInterval(tickerID);
+      itsTimeToRefresh.value = false;
+      updateInteractionTime(new Date());
     }
-  }, 0);
+  }, 30);
 };
 
 const triggerPageDataRefresh = () => {
@@ -94,8 +100,8 @@ export default Page({
         },
       }),
       m.If({
-        subject: derive(() => progress.value > 99),
-        isFalsy: m.Div({
+        subject: derive(() => itsTimeToRefresh.value && progress.value < 100),
+        isTruthy: m.Div({
           class: "flex flex-column justify-center items-center vh-100",
           children: [
             m.Img({
@@ -118,7 +124,7 @@ export default Page({
             }),
           ],
         }),
-        isTruthy: NavScaffold({
+        isFalsy: NavScaffold({
           classNames: "ph3 bg-white",
           route: "/",
           header: "Tasks for the day",
@@ -144,9 +150,11 @@ export default Page({
                           ? "light-gray b--transparent"
                           : "light-silver pointer b--transparent"
                       }`,
-                      onclick: () =>
-                        !(isSelectedDay || isFuture) &&
-                        (selectedDate.value = date),
+                      onclick: handleCTA(
+                        () =>
+                          !(isSelectedDay || isFuture) &&
+                          (selectedDate.value = date)
+                      ),
                       children: [
                         m.Div({
                           class: "f7 ",
@@ -200,7 +208,7 @@ export default Page({
                         }),
                         m.Div({
                           class: "pointer",
-                          onclick: vibrateOnTap(() => goToHabitPage(habit.id)),
+                          onclick: handleCTA(() => goToHabitPage(habit.id)),
                           children: [
                             m.Div({
                               class: "f5 fw6 f4-ns fw4-ns",

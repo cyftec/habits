@@ -6,7 +6,7 @@ import {
   getMonthFirstDates,
 } from "../@common/transforms";
 import { HabitUI } from "../@common/types";
-import { vibrateOnTap } from "../@common/utils";
+import { handleCTA } from "../@common/utils";
 import { Icon } from "../@elements";
 import { MonthMap } from "./MonthMap";
 
@@ -39,7 +39,7 @@ export const HabitCard = component<HabitCardProps>(
 
     return m.Div({
       class: dstring`pointer bg-white ${classNames}`,
-      onclick: vibrateOnTap(onClick),
+      onclick: handleCTA(onClick),
       children: [
         m.Div({
           class: "flex items-center justify-between nt1 mb2",

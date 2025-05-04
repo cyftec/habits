@@ -1,6 +1,6 @@
 import { dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { vibrateOnTap } from "../@common/utils";
+import { handleCTA } from "../@common/utils";
 
 type TabBarProps = {
   classNames?: string;
@@ -32,7 +32,7 @@ export const TabBar = component<TabBarProps>(
                 i === selectedTabIndex.value
                   ? `bg-near-white black ${selectedTabClassNames?.value}`
                   : "bg-transparent silver pointer"} ${tabItemClassNames}`,
-              onclick: vibrateOnTap(() => onTabChange(i)),
+              onclick: handleCTA(() => onTabChange(i)),
               children: tab,
             }),
         }),

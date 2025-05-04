@@ -1,6 +1,6 @@
 import { dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { vibrateOnTap } from "../@common/utils";
+import { handleCTA } from "../@common/utils";
 
 type AddRemoveButtonProps = {
   classNames?: string;
@@ -21,7 +21,7 @@ export const AddRemoveButton = component<AddRemoveButtonProps>(
           isFalsy: m.Span({
             class: dstring`pointer ph2 pb1 bw1 b--light-silver ${() =>
               hideAdd?.value ? "" : "br"}`,
-            onclick: vibrateOnTap(onRemove),
+            onclick: handleCTA(onRemove),
             children: "-",
           }),
         }),
@@ -29,7 +29,7 @@ export const AddRemoveButton = component<AddRemoveButtonProps>(
           subject: hideAdd,
           isFalsy: m.Span({
             class: "pointer ph2 pb1",
-            onclick: vibrateOnTap(onAdd),
+            onclick: handleCTA(onAdd),
             children: "+",
           }),
         }),

@@ -15,6 +15,32 @@ import {
 } from "./habits";
 import { fetchSettings, updateSettings } from "./settings";
 import { phase } from "@mufw/maya/utils";
+import { fetchAnalytics, updateAnalytics } from "./analytics";
+import { INITIAL_ANALYTICS } from "../constants";
+
+/**
+ *
+ *
+ *
+ *    ANALYTICS
+ */
+
+export const getLastInteraction = () => {
+  if (!phase.currentIs("run")) {
+    console.log(`current phase is not run`);
+    return INITIAL_ANALYTICS.lastInteraction;
+  }
+  const currentAnalytics = fetchAnalytics();
+  return currentAnalytics.lastInteraction;
+};
+
+export const updateInteractionTime = (date: Date) => {
+  const currentAnalytics = fetchAnalytics();
+  updateAnalytics({
+    ...currentAnalytics,
+    lastInteraction: date.getTime(),
+  });
+};
 
 /**
  *

@@ -1,4 +1,5 @@
 import {
+  Analytics,
   LevelUI,
   LocalSettings,
   MilestonesData,
@@ -33,6 +34,11 @@ export const SYSTEM_DEFINED_LEVELS: LevelUI[] = [
 export const BASE_LEVELS = ["Not done", "Done"] as const satisfies string[];
 
 export const BASE_MILESTONES: MilestonesData = [70, 60, 45];
+
+export const INITIAL_ANALYTICS: Analytics = {
+  id: "analytics",
+  lastInteraction: new Date().getTime(),
+};
 
 export const INITIAL_SETTINGS: LocalSettings = {
   id: "local-settings",

@@ -2,7 +2,7 @@ import { derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { getDayStatus } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
-import { vibrateOnTap } from "../../@common/utils";
+import { handleCTA } from "../../@common/utils";
 import { Modal } from "../../@elements";
 
 type HabitStatusEditModalProps = {
@@ -43,7 +43,7 @@ export const HabitStatusEditModal = component<HabitStatusEditModalProps>(
 
                 return m.Div({
                   class: optionCSS,
-                  onclick: vibrateOnTap(() => onChange(levelIndex)),
+                  onclick: handleCTA(() => onChange(levelIndex)),
                   children: [m.Span(level.name)],
                 });
               },

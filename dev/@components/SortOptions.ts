@@ -2,7 +2,7 @@ import { component, m } from "@mufw/maya";
 import { Icon, Modal } from "../@elements";
 import { derive, dstring, signal } from "@cyftech/signal";
 import { HOMEPAGE_SORT_OPTIONS } from "../@common/constants";
-import { vibrateOnTap } from "../@common/utils";
+import { handleCTA } from "../@common/utils";
 
 type SortOptionsProps = {
   classNames?: string;
@@ -55,7 +55,7 @@ export const SortOptions = component<SortOptionsProps>(
 
                     return m.Div({
                       class: optionCSS,
-                      onclick: vibrateOnTap(() => onOptionTap(optionIndex)),
+                      onclick: handleCTA(() => onOptionTap(optionIndex)),
                       children: [
                         SortIcon({
                           classNames: "ml1 mr2",
@@ -90,7 +90,7 @@ const SortIcon = component<SortIconProps>(
     return m.Span({
       class: dstring`flex items-center ${() =>
         onClick ? "pointer" : ""} ${classNames}`,
-      onclick: vibrateOnTap(onClick),
+      onclick: handleCTA(onClick),
       children: [
         Icon({
           className: "silver",

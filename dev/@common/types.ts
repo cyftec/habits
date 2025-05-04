@@ -6,6 +6,11 @@ export type LocalSettings = {
   };
 };
 
+export type Analytics = {
+  id: "analytics";
+  lastInteraction: number;
+};
+
 export type MonthStatus = [
   number,
   number,

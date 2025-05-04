@@ -5,7 +5,13 @@ import {
   BASE_WEEKDAY_FREQUENCY,
   SYSTEM_DEFINED_LEVELS,
 } from "../constants";
-import { fetchHabit, fetchHabits, findHabit, saveHabit } from "../localstorage";
+import {
+  fetchHabit,
+  fetchHabits,
+  findHabit,
+  getLastInteraction,
+  saveHabit,
+} from "../localstorage";
 import {
   DailyStatus,
   Habit,
@@ -20,6 +26,7 @@ import {
   getDatesArrayBetweenDates,
   getDaysGap,
   getGapDate,
+  getMinutesInMS,
   getMomentZero,
   getMomentZeroDate,
   getSaturday,
@@ -419,4 +426,19 @@ export const getTrackerForLevelsChange = (
   });
 
   return updatedTracker;
+};
+
+export const isLastInteractionLongBack = () => {
+  console.log(`CHECKING time to refresh`);
+  const now = new Date().getTime();
+  const lastIntrxn = getLastInteraction();
+
+  const isTrue = now - lastIntrxn > 5000;
+  console.log(`now: ${now}`);
+  console.log(`lastIntrxn: ${lastIntrxn}`);
+  console.log(`difference: ${now - lastIntrxn}`);
+
+  console.log(`so, it's time ${isTrue ? "" : "not "}to refresh`);
+
+  return isTrue;
 };
