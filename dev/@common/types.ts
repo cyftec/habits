@@ -1,5 +1,3 @@
-import { DAYS_OF_WEEK, MONTHS } from "./constants";
-
 export type LocalSettings = {
   id: "local-settings";
   habitsPage: {
@@ -7,10 +5,6 @@ export type LocalSettings = {
     sortOptionIndex: number;
   };
 };
-
-export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
-
-export type Month = (typeof MONTHS)[number];
 
 export type MonthStatus = [
   number,
@@ -66,7 +60,7 @@ export type MilestoneUI = {
   icon: string;
   color: string;
 };
-export type StoreHabitID = `h.${number}`;
+export type StoreHabitRecordKey = `h.${number}`;
 export type Habit = {
   id: number;
   title: string;

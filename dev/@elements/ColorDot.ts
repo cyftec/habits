@@ -1,6 +1,7 @@
 import { derive, dobject, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { getColorsForLevel, vibrateOnTap } from "../@common/utils";
+import { vibrateOnTap } from "../@common/utils";
+import { getColorsForLevel } from "../@common/transforms";
 
 type ColorDotProps = {
   classNames?: string;

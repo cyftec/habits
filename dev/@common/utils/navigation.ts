@@ -1,5 +1,31 @@
 import { phase } from "@mufw/maya/utils";
-import { ROUTES } from "../constants";
+
+const ROUTES = {
+  HOME: {
+    id: "home-page",
+    href: "/",
+  },
+  HABITS: {
+    id: "habits-page",
+    href: "/habits/",
+    NEW: {
+      id: "new-habit-page",
+      href: "/habits/new/",
+    },
+    HABIT: {
+      id: "habit-page",
+      href: "/habits/habit/",
+      EDIT: {
+        id: "edit-habit-page",
+        href: "/habits/habit/edit/",
+      },
+    },
+  },
+  SETTINGS: {
+    id: "settings-page",
+    href: "/",
+  },
+};
 
 export const goToHref = (href: string) => (location.href = href);
 export const goToHomePage = () => (location.href = ROUTES.HOME.href);

@@ -1,0 +1,361 @@
+import {
+  BASE_COLORS,
+  BASE_LEVELS,
+  BASE_MILESTONES,
+  BASE_WEEKDAY_FREQUENCY,
+  SYSTEM_DEFINED_LEVELS,
+} from "../constants";
+import { fetchHabit, fetchHabits, saveHabit } from "../localstorage";
+import {
+  DailyStatus,
+  Habit,
+  HabitUI,
+  LevelUI,
+  MilestonesData,
+  MilestoneUI,
+} from "../types";
+import { getQueryParamValue } from "../utils/navigation";
+import {
+  areSameDates,
+  getDatesArrayBetweenDates,
+  getGapDate,
+  getMomentZero,
+  getMomentZeroDate,
+  getSaturday,
+  getSunday,
+} from "./date-time";
+
+const GOLDEN_RATIO = 1.6181;
+
+export const getHabitFromUrl = (): HabitUI | undefined => {
+  const idString = getQueryParamValue("id");
+  const id = +idString;
+  if (isNaN(id) || !id) return;
+
+  try {
+    return fetchHabit(id);
+  } catch (errMsg) {
+    return;
+  }
+};
+
+export const getSystemDefinedLevel = (levelCode: number) =>
+  SYSTEM_DEFINED_LEVELS.find((sysLevel) => sysLevel.code === levelCode);
+
+export const getLevelUI = (level: number, levels: string[]): LevelUI => {
+  return level < 0
+    ? (getSystemDefinedLevel(-1) as LevelUI)
+    : {
+        name: levels[level],
+        code: level,
+      };
+};
+
+export const getEmptyDailyStatus = (date: Date): DailyStatus => ({
+  level: getLevelUI(-1, []),
+  date: date,
+});
+
+export const getDailyStatus = (
+  level: number,
+  levels: string[],
+  date: Date
+): DailyStatus => ({
+  level: getLevelUI(level, levels),
+  date: date,
+});
+
+export const getDayStatus = (tracker: DailyStatus[], date: Date) =>
+  tracker.find((status) => getMomentZero(status.date) === getMomentZero(date));
+
+export const getHabitsForDate = (date: Date): HabitUI[] =>
+  fetchHabits().filter((hab) => {
+    const isNotStopped = !hab.isStopped;
+    const weekdayScheduleMatches = hab.frequency[date.getDay()];
+    const dateNotOutsideExistence =
+      getMomentZero(date) >= getMomentZero(new Date(hab.id));
+    return isNotStopped && weekdayScheduleMatches && dateNotOutsideExistence;
+  });
+
+export const getHabitUI = (habit: Habit): HabitUI => {
+  const startDate = getMomentZeroDate(new Date(habit.id));
+  return {
+    ...habit,
+    startDate,
+    levels: habit.levels.map((levelName, index) => ({
+      name: levelName,
+      code: index,
+    })),
+    tracker: habit.tracker.map((status, i) =>
+      getDailyStatus(status, habit.levels, getGapDate(startDate, i))
+    ),
+  };
+};
+
+export const getHabitData = (uiHabit: HabitUI): Habit => {
+  return {
+    ...uiHabit,
+    levels: uiHabit.levels.map((level) => level.name),
+    tracker: uiHabit.tracker.map((status, i) => status.level.code),
+  };
+};
+
+export const getNewHabit = (): HabitUI => {
+  const now = new Date().getTime();
+  const habit: Habit = {
+    id: now,
+    title: "",
+    frequency: BASE_WEEKDAY_FREQUENCY,
+    colorIndex: 0,
+    levels: BASE_LEVELS,
+    tracker: [],
+    milestones: BASE_MILESTONES,
+    pauses: [],
+    isStopped: false,
+  };
+
+  return getHabitUI(habit);
+};
+
+export const getDetailedMilestones = (
+  milestones: MilestonesData
+): MilestoneUI[] => [
+  {
+    label: "Successful",
+    percent: milestones[0],
+    icon: "verified_user",
+    color: "green",
+  },
+  {
+    label: "Little more to go",
+    percent: milestones[1],
+    icon: "done_all",
+    color: "light-blue",
+  },
+  {
+    label: "Going good",
+    percent: milestones[2],
+    icon: "check",
+    color: "blue",
+  },
+  { label: "Unacceptable", percent: 0, icon: "close", color: "red" },
+];
+
+export const getMilestone = (
+  milestones: MilestonesData,
+  completionPercentage: number
+): MilestoneUI => {
+  const dms = getDetailedMilestones(milestones);
+  let milestone: MilestoneUI = dms[0];
+  for (let i = 0; i < dms.length; i++) {
+    milestone = dms[i];
+    if (milestone.percent < completionPercentage) break;
+  }
+  return milestone;
+};
+
+export const getHabitValidationError = (habit: HabitUI): string => {
+  if (!habit.title) {
+    return "Title should not be empty";
+  }
+  if (habit.frequency.every((day) => !day)) {
+    return "Select at least one day in a week";
+  }
+  if (!habit.levels.every((level) => !!level.name)) {
+    return "One of the levels is empty";
+  }
+  const duplicateLevel = habit.levels.some((level, i) => {
+    for (let j = i + 1; j < habit.levels.length; j++) {
+      if (habit.levels[j].name === level.name) return true;
+    }
+    return false;
+  });
+  if (duplicateLevel) {
+    return "Multiple levels have same name";
+  }
+  if (!habit.milestones.every((m) => m <= 100 && m >= 0)) {
+    return `The milestones should be between 0 and 100 percents`;
+  }
+  if (!habit.milestones.every((m, i, ms) => (i === 0 ? true : ms[i - 1] > m))) {
+    return `Milestones should be in order (from high to low)`;
+  }
+
+  return "";
+};
+
+export const getCompletion = (
+  habit: HabitUI,
+  startDate: Date,
+  endDate: Date
+) => {
+  const habitTracker = getHabitStatusBetweenDates(
+    habit.tracker,
+    startDate,
+    endDate
+  );
+
+  const totalStatusLevels = habit.levels.length - 1;
+  let totalDays = 0;
+  let workingDays = 0;
+  let completion = 0;
+
+  for (const status of habitTracker) {
+    totalDays++;
+    workingDays += status.level.code > 0 ? 1 : 0;
+    completion += status.level.code > 0 ? status.level.code : 0;
+  }
+
+  return {
+    totalDays,
+    workingDays,
+    percent: Math.ceil(100 * (completion / (totalDays * totalStatusLevels))),
+  };
+};
+
+export const getAddRemoveButtonsVisibility = (
+  oldLevels: LevelUI[],
+  updatedLevels: LevelUI[],
+  currentLevelIndex: number
+) => {
+  const oldLevelsExist = !!oldLevels.length;
+  if (!oldLevelsExist)
+    return {
+      hideAddButton: false,
+      hideRemoveButton: updatedLevels.length < 3,
+    };
+
+  const currentLevel = updatedLevels[currentLevelIndex];
+  const currentLevelIsOld = !!(
+    oldLevelsExist && oldLevels.find((ol) => ol.name === currentLevel.name)
+  );
+  const lengthMismatch = oldLevels.length !== updatedLevels.length;
+  const levelsRemoved = updatedLevels.length < oldLevels.length;
+  const levelsAdded = updatedLevels.length > oldLevels.length;
+  const levelsNamesMismatch =
+    !lengthMismatch &&
+    oldLevels.length &&
+    oldLevels.some((lvl, i) => lvl.name !== updatedLevels[i].name);
+
+  const hideAddButton =
+    levelsRemoved ||
+    levelsNamesMismatch ||
+    (currentLevelIsOld && levelsRemoved);
+  const hideRemoveButton =
+    levelsRemoved || levelsNamesMismatch || (currentLevelIsOld && levelsAdded);
+
+  return { hideAddButton, hideRemoveButton };
+};
+
+export const levelTextboxDisability = (
+  oldLevels: LevelUI[],
+  updatedLevels: LevelUI[],
+  currentLevelIndex: number
+) => {
+  const oldLevelsExist = !!oldLevels.length;
+  const currentLevel = updatedLevels[currentLevelIndex];
+  const currentLevelIsOld = !!(
+    oldLevelsExist && oldLevels.find((ol) => ol.name === currentLevel.name)
+  );
+  const lengthMismatch = oldLevels.length !== updatedLevels.length;
+  return currentLevelIsOld && lengthMismatch;
+};
+
+export const getColorsForLevel = (
+  level: number,
+  totalLevels: number,
+  colorIndex: number,
+  showText = false
+) => {
+  const color = BASE_COLORS[colorIndex];
+
+  const opacityHexNum = Math.trunc(
+    Math.pow(level / (totalLevels - 1), GOLDEN_RATIO) * 255
+  );
+  const hex = opacityHexNum.toString(16);
+  const opacityHex = hex.length === 1 ? `0${hex}` : hex;
+  const backgroundColor =
+    level < 0 || opacityHex === "0" ? "transparent" : `${color}${opacityHex}`;
+  const fontColor = showText
+    ? level / (totalLevels - 1) > 0.5
+      ? "white"
+      : "black"
+    : level < 0
+    ? "lightgray"
+    : "transparent";
+
+  return { backgroundColor, fontColor };
+};
+
+export const updateHabitStatus = (
+  habit: HabitUI,
+  levelCode: number,
+  date: Date
+) => {
+  const oldHabit = fetchHabit(habit.id);
+  const updatedTracker = oldHabit.tracker.map((status) => {
+    if (areSameDates(status.date, date)) {
+      return { ...status, level: { ...status.level, code: levelCode } };
+    }
+    return status;
+  });
+  const updatedHabit = { ...oldHabit, tracker: updatedTracker };
+  saveHabit(updatedHabit);
+};
+
+export const getHabitStatusForDates = (
+  habitTracker: DailyStatus[],
+  dates: Date[]
+): DailyStatus[] => {
+  const emptyFilledStatusTracker: DailyStatus[] = [];
+  /* Improve this 2D traversal and matching in future.
+   * It's just for the time being and is too heavy.
+   */
+  for (const date of dates) {
+    const statusExistsForDate = habitTracker.some((status) => {
+      const statusExists = areSameDates(status.date, date);
+      if (statusExists) {
+        emptyFilledStatusTracker.push(status);
+        return true;
+      }
+      return false;
+    });
+
+    if (!statusExistsForDate)
+      emptyFilledStatusTracker.push(getEmptyDailyStatus(date));
+  }
+
+  return emptyFilledStatusTracker;
+};
+
+export const getHabitStatusBetweenDates = (
+  habitTracker: DailyStatus[],
+  startDate: Date,
+  endDate: Date
+): DailyStatus[] => {
+  const dates = getDatesArrayBetweenDates(startDate, endDate);
+  return getHabitStatusForDates(habitTracker, dates);
+};
+
+export const getFullWeekStatusFilled = (habit: HabitUI) => {
+  const firstSunday = getSunday(new Date(habit.id));
+  const lastSaturday = getSaturday(new Date());
+  const fullWeekTracker = getHabitStatusBetweenDates(
+    habit.tracker,
+    firstSunday,
+    lastSaturday
+  );
+  return { ...habit, tracker: fullWeekTracker };
+};
+
+export const getWeekwiseStatus = (habit: HabitUI) => {
+  const fullWeekFilledStatusTracker = getFullWeekStatusFilled(habit);
+  const weeklyTracker: DailyStatus[][] = [];
+
+  for (let i = 0; i < fullWeekFilledStatusTracker.tracker.length; i++) {
+    const index = Math.floor(i / 7);
+    if (!weeklyTracker[index]) weeklyTracker[index] = [];
+    weeklyTracker[index][i % 7] = fullWeekFilledStatusTracker.tracker[i];
+  }
+
+  return weeklyTracker;
+};

@@ -1,25 +1,30 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { DAYS_OF_WEEK, MONTHS } from "../../@common/constants";
 import {
+  hardDeleteHabit,
   intializeTrackerEmptyDays,
-  tryFetchingHabitUsingParams,
 } from "../../@common/localstorage";
-import { Habit, StoreHabitID } from "../../@common/types";
 import {
-  getCompletionPercentage,
-  getHabitUI,
+  getCompletion,
+  getHabitFromUrl,
   getMilestone,
+  getMonthName,
+  getNewHabit,
+  getWeekdayName,
+  getWeekwiseStatus,
+  updateHabitStatus,
+} from "../../@common/transforms";
+import { HabitUI } from "../../@common/types";
+import {
   goToHabitEditPage,
   goToHabitsPage,
-  updateHabitStatus,
   vibrateOnTap,
 } from "../../@common/utils";
 import { GoBackButton, Section } from "../../@components";
 import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
 
 const error = signal("");
-const habit = signal<Habit | undefined>(undefined);
+const habit = signal<HabitUI>(getNewHabit());
 const deleteActionModalOpen = signal(false);
 const updateLevelModalOpen = signal(false);
 const updateLevelModalData = signal({
@@ -34,7 +39,10 @@ const acheievemnts = derive(() => {
   const initialAcheievments = currentHabit.levels.map((_) => 0);
 
   const acheievemntsList = currentHabit.tracker.reduce((arr, status) => {
-    if (status > -1) arr[status] = arr[status] ? arr[status] + 1 : 1;
+    if (status.level.code > -1)
+      arr[status.level.code] = arr[status.level.code]
+        ? arr[status.level.code] + 1
+        : 1;
     return arr;
   }, initialAcheievments);
   const achTotal = acheievemntsList.reduce((a, b) => a + b);
@@ -48,7 +56,9 @@ const acheievemnts = derive(() => {
 });
 
 const completion = derive(() =>
-  habit.value ? getCompletionPercentage(habit.value, 20) : 0
+  habit.value
+    ? getCompletion(habit.value, new Date(habit.value.id), new Date()).percent
+    : 0
 );
 const milestoneAchieved = derive(() => {
   const compl = completion.value;
@@ -59,39 +69,13 @@ const milestoneAchieved = derive(() => {
 const weekwiseTracker = derive(() => {
   const currentHabit = habit.value;
   if (!currentHabit) return [];
-  const firstDayTime = currentHabit.id;
-  const firstDay = new Date(firstDayTime);
-  const firstDayIndex = firstDay.getDay();
-  const tracker = currentHabit.tracker;
-  const trackerStartingSunday: (number | undefined)[] = [...tracker];
-  Array(firstDayIndex)
-    .fill(undefined)
-    .forEach((x) => trackerStartingSunday.unshift(x));
-  Array(7 - (trackerStartingSunday.length % 7))
-    .fill(undefined)
-    .forEach((x) => trackerStartingSunday.push(x));
-  const weeklyTracker: { level: number | undefined; date: Date }[][] = [];
-
-  for (let i = 0; i < trackerStartingSunday.length; i++) {
-    const index = Math.floor(i / 7);
-    if (!weeklyTracker[index]) weeklyTracker[index] = [];
-    weeklyTracker[index][i % 7] = {
-      level: trackerStartingSunday[i],
-      date: new Date(
-        firstDay.getFullYear(),
-        firstDay.getMonth(),
-        firstDay.getDate() - firstDayIndex + i
-      ),
-    };
-  }
-
-  return weeklyTracker;
+  return getWeekwiseStatus(currentHabit);
 });
 
 const triggerPageDataRefresh = () => {
-  const [fetchedHabit, err] = tryFetchingHabitUsingParams();
-  if (err || !fetchedHabit) {
-    error.value = err || "Nohabit found for 'id' in query param";
+  const fetchedHabit = getHabitFromUrl();
+  if (!fetchedHabit) {
+    error.value = "Incorrect habit ID provided in the query params.";
     return;
   }
   habit.value = fetchedHabit;
@@ -99,11 +83,7 @@ const triggerPageDataRefresh = () => {
 
 const updateLevel = (levelCode: number) => {
   if (!habit.value) return;
-  updateHabitStatus(
-    getHabitUI(habit.value),
-    levelCode,
-    updateLevelModalData.value.date
-  );
+  updateHabitStatus(habit.value, levelCode, updateLevelModalData.value.date);
   updateLevelModalOpen.value = false;
   triggerPageDataRefresh();
 };
@@ -178,11 +158,7 @@ export default Page({
                     className: "pv2 ph3 ml2 b red",
                     children: "Yes, delete permanently",
                     onTap: () => {
-                      const habitID: StoreHabitID = `h.${
-                        habit.value?.id || -1
-                      }`;
-                      if (habitID in localStorage)
-                        localStorage.removeItem(habitID);
+                      hardDeleteHabit(habit.value.id);
                       deleteActionModalOpen.value = false;
                       goToHabitsPage();
                     },
@@ -208,17 +184,17 @@ export default Page({
                 class: "f5 mb1",
                 children: m.For({
                   subject: derive(() => habit.value?.levels || []),
-                  map: (level, levelIndex) => {
+                  map: (level) => {
                     const optionCSS = dstring`pointer flex items-center pv3 pa3 bt b--moon-gray ${() =>
-                      levelIndex ===
+                      level.code ===
                       updateLevelModalData.value.selectedLevelIndex
                         ? "bg-near-white black"
                         : "gray"}`;
 
                     return m.Div({
                       class: optionCSS,
-                      onclick: vibrateOnTap(() => updateLevel(levelIndex)),
-                      children: [m.Span(level)],
+                      onclick: vibrateOnTap(() => updateLevel(level.code)),
+                      children: [m.Span(level.name)],
                     });
                   },
                 }),
@@ -285,7 +261,7 @@ export default Page({
                           m.Div({
                             class: "flex items-center justify-between mb2",
                             children: [
-                              m.Div(derive(() => `${acheievemnt.level}`)),
+                              m.Div(derive(() => `${acheievemnt.level.name}`)),
                               m.Div(
                                 derive(
                                   () =>
@@ -304,12 +280,12 @@ export default Page({
                         m.Div({
                           class: "mh2 flex items-center justify-between",
                           children: m.For({
-                            subject: DAYS_OF_WEEK,
-                            map: (day) =>
+                            subject: Array(7).fill(0),
+                            map: (_, dayIndex) =>
                               m.Div({
                                 class:
                                   "h2 w2 br-100 gray f7 flex items-center justify-center",
-                                children: day.charAt(0),
+                                children: getWeekdayName(dayIndex, 1),
                               }),
                           }),
                         }),
@@ -349,9 +325,10 @@ export default Page({
                                             const dateNum = day.date.getDate();
                                             const monthIndex =
                                               day.date.getMonth();
-                                            const monthName = MONTHS[
-                                              monthIndex
-                                            ].substring(0, 3);
+                                            const monthName = getMonthName(
+                                              monthIndex,
+                                              3
+                                            );
                                             const dateText = `${
                                               dateNum === 1
                                                 ? monthIndex === 0
@@ -367,7 +344,7 @@ export default Page({
                                                 "h2 w2 flex items-center justify-center f7",
                                               colorIndex:
                                                 habit.value?.colorIndex ?? 0,
-                                              level: day.level ?? -1,
+                                              level: day.level.code,
                                               totalLevels:
                                                 habit.value?.levels.length || 2,
                                               textContent: dateText,
@@ -380,7 +357,7 @@ export default Page({
                                                 updateLevelModalData.value = {
                                                   date: day.date,
                                                   selectedLevelIndex:
-                                                    day.level ?? 0,
+                                                    day.level.code,
                                                 };
                                               },
                                             });

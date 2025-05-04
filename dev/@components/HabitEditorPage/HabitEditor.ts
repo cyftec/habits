@@ -1,13 +1,16 @@
 import { derive, dobject, dstring, signal, Signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { Section } from "..";
-import { BASE_COLORS, DAYS_OF_WEEK } from "../../@common/constants";
-import { WeekdayFrequency, Habit, MilestonesData } from "../../@common/types";
+import { BASE_COLORS } from "../../@common/constants";
 import {
+  getAddRemoveButtonsVisibility,
   getDetailedMilestones,
   getMilestone,
-  vibrateOnTap,
-} from "../../@common/utils";
+  getWeekdayName,
+  levelTextboxDisability,
+} from "../../@common/transforms";
+import { HabitUI, MilestonesData, WeekdayFrequency } from "../../@common/types";
+import { vibrateOnTap } from "../../@common/utils";
 import {
   AddRemoveButton,
   Button,
@@ -19,33 +22,33 @@ import {
 
 type HabitEditorProps = {
   classNames?: string;
-  habit: Signal<Habit>;
-  initialLevels: string[];
-  onChange: (updatedHabit: Habit) => void;
+  editableHabit?: HabitUI;
+  editedHabit: Signal<HabitUI>;
+  onChange: (updatedHabit: HabitUI) => void;
 };
 
 export const HabitEditor = component<HabitEditorProps>(
-  ({ classNames, habit, initialLevels, onChange }) => {
+  ({ classNames, editableHabit, editedHabit, onChange }) => {
     const moreDetails = signal(false);
     const { title, frequency, levels, milestones, colorIndex } =
-      dobject(habit).props;
+      dobject(editedHabit).props;
     const everyDay = derive(() => frequency.value.every((day) => !!day));
     const selectedCss = "bg-mid-gray white";
     const unSelectedCss = "bg-near-white light-silver";
 
     const updateTitle = (title: string) => {
-      onChange({ ...habit.value, title });
+      onChange({ ...editedHabit.value, title });
     };
 
     const updateColor = (colorIndex: number) => {
-      onChange({ ...habit.value, colorIndex });
+      onChange({ ...editedHabit.value, colorIndex });
     };
 
     const updateFrequency = (dayIndex: number) => {
       if (dayIndex < -1 || dayIndex > 6) throw `Invalid day index`;
 
       if (dayIndex === -1) {
-        onChange({ ...habit.value, frequency: [1, 1, 1, 1, 1, 1, 1] });
+        onChange({ ...editedHabit.value, frequency: [1, 1, 1, 1, 1, 1, 1] });
         return;
       }
 
@@ -57,32 +60,39 @@ export const HabitEditor = component<HabitEditorProps>(
         : updatedFreq[dayIndex]
         ? 0
         : 1;
-      onChange({ ...habit.value, frequency: updatedFreq });
+      onChange({ ...editedHabit.value, frequency: updatedFreq });
     };
 
     const updateLevel = (levelText: string, levelIndex: number) => {
       const updatedLevels = levels.value;
-      updatedLevels[levelIndex] = levelText;
-      onChange({ ...habit.value, levels: updatedLevels });
+      updatedLevels[levelIndex] = {
+        ...updatedLevels[levelIndex],
+        name: levelText,
+      };
+      onChange({ ...editedHabit.value, levels: updatedLevels });
     };
-    const addOrRemoveLevel = (index: number, isAdd = true) => {
+
+    const addLevel = (atIndex: number) => {
       const updatedLevels = levels.value;
-      if (isAdd) updatedLevels.splice(index, 0, "");
-      else updatedLevels.splice(index, 1);
-      onChange({ ...habit.value, levels: updatedLevels });
+      updatedLevels.splice(atIndex, 0, { name: "", code: atIndex });
+      onChange({ ...editedHabit.value, levels: updatedLevels });
     };
-    const addLevel = (atIndex: number) => addOrRemoveLevel(atIndex);
+
     const removeLevel = (fromIndex: number) => {
-      if (levels.value.length < 3) return;
-      addOrRemoveLevel(fromIndex, false);
+      const updatedLevels = levels.value;
+      if (updatedLevels.length < 3) return;
+      updatedLevels.splice(fromIndex, 1);
+      onChange({ ...editedHabit.value, levels: updatedLevels });
     };
 
     const updateMilestone = (value: number, index: number) => {
       if (index < 0 || index > 2)
         throw `Incorrect index of milestone passed. Milestone values should not be more than 3.`;
-      const updatedMilestones: MilestonesData = [...habit.value.milestones];
+      const updatedMilestones: MilestonesData = [
+        ...editedHabit.value.milestones,
+      ];
       updatedMilestones[index] = value;
-      onChange({ ...habit.value, milestones: updatedMilestones });
+      onChange({ ...editedHabit.value, milestones: updatedMilestones });
     };
 
     return m.Div({
@@ -118,7 +128,7 @@ export const HabitEditor = component<HabitEditorProps>(
           child: m.Div({
             class: "mb3 f6 flex items-center justify-between justify-start-ns",
             children: m.For({
-              subject: DAYS_OF_WEEK,
+              subject: Array(7).fill(0),
               n: 0,
               nthChild: m.Span({
                 class: dstring`pointer flex items-center justify-center br-pill h2 ph2 mr3-ns ${() =>
@@ -126,7 +136,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 children: "Daily",
                 onclick: vibrateOnTap(() => updateFrequency(-1)),
               }),
-              map: (day, dayIndex) => {
+              map: (_, dayIndex) => {
                 const colorCss = derive(() =>
                   frequency.value[dayIndex] && !everyDay.value
                     ? selectedCss
@@ -135,7 +145,7 @@ export const HabitEditor = component<HabitEditorProps>(
 
                 return m.Span({
                   class: dstring`pointer flex items-center justify-center br-100 h2 w2 mr3-ns ${colorCss}`,
-                  children: day.charAt(0),
+                  children: getWeekdayName(dayIndex, 1),
                   onclick: vibrateOnTap(() => updateFrequency(dayIndex)),
                 });
               },
@@ -147,7 +157,7 @@ export const HabitEditor = component<HabitEditorProps>(
           title: "Title",
           child: TextBox({
             classNames: "ba bw1 b--light-silver br3 pa2 w-100",
-            placeholder: "title of habit",
+            placeholder: "title of editedHabit",
             text: title,
             onchange: updateTitle,
           }),
@@ -159,48 +169,25 @@ export const HabitEditor = component<HabitEditorProps>(
               classNames: "pb3",
               title: "Levels",
               description: `
-                  Our habits mostly have two levels 'Done' or 'Not done'.
-                  But sometimes they can have multiple levels as well, depending on their nature.
-                  For example, a habit 'Drink 2 litres water' can have three levels - '0 litre', '1 litre'
-                  and '2 litres' respectively.
-                  You can add level by clicking on + button. Click on textbox
+                  A habit can have more than 2 levels. Like the habit 'Drink 2 litres water'
+                  should have three levels - '0 litre', '1 litre' and '2 litres' respectively.
+                  You can add or remove level by clicking on + or - buttons. Click on textbox
                   for editing the level name.
                 `,
               showDescription: true,
               child: m.Div({
                 children: m.For({
                   subject: levels,
-                  map: (level, i) => {
-                    const onlyTwoLeft = habit.value.levels.length < 3;
-                    const oldLevel = !!(
-                      initialLevels.value.length &&
-                      initialLevels.value.includes(level)
+                  map: (currentLevel, i) => {
+                    const oldLevels = editableHabit?.value?.levels || [];
+                    const newLevels = levels.value;
+                    const { hideAddButton, hideRemoveButton } =
+                      getAddRemoveButtonsVisibility(oldLevels, newLevels, i);
+                    const textboxDisabled = levelTextboxDisability(
+                      oldLevels,
+                      newLevels,
+                      i
                     );
-                    const levelsLengthMismatch = !!(
-                      initialLevels.value.length &&
-                      initialLevels.value.length !== habit.value.levels.length
-                    );
-                    const levelsRemoved =
-                      habit.value.levels.length < initialLevels.value.length;
-                    const levelsNamesMismatch =
-                      initialLevels.value.length &&
-                      !levelsLengthMismatch &&
-                      !initialLevels.value.every(
-                        (lvl, i) => lvl === habit.value.levels[i]
-                      );
-                    const hideAddButton =
-                      levelsRemoved ||
-                      levelsNamesMismatch ||
-                      (levelsLengthMismatch && levelsRemoved && oldLevel);
-                    const hideRemoveButton =
-                      onlyTwoLeft ||
-                      levelsRemoved ||
-                      levelsNamesMismatch ||
-                      (levelsLengthMismatch && !levelsRemoved && oldLevel);
-                    const textboxDisabled =
-                      initialLevels.value.length !==
-                        habit.value.levels.length &&
-                      initialLevels.value.includes(level);
 
                     return m.Div({
                       children: [
@@ -223,7 +210,7 @@ export const HabitEditor = component<HabitEditorProps>(
                                   classNames: "bn pa2 br3 w-100 outline-0",
                                   placeholder: `Level ${i}`,
                                   disabled: textboxDisabled,
-                                  text: level,
+                                  text: currentLevel.name,
                                   onchange: (text) => updateLevel(text, i),
                                 }),
                               ],
@@ -253,7 +240,7 @@ export const HabitEditor = component<HabitEditorProps>(
               description: dstring`
                   Miltestones are something long-term. Let's say after a month or two, you followed
                   your habit for 67% of the times, then based on below table you reached the '${() =>
-                    getMilestone(habit.value.milestones, 67)
+                    getMilestone(editedHabit.value.milestones, 67)
                       .label}' milestone. You can set your own milestone levels depending
                   on the difficulty level of the habit.
                 `,

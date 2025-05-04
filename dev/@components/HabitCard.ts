@@ -1,26 +1,35 @@
-import { component, m } from "@mufw/maya";
-import { Habit } from "../@common/types";
 import { derive, dobject, dstring } from "@cyftech/signal";
-import { getMilestone, getMonthsStatus, vibrateOnTap } from "../@common/utils";
-import { MonthMap } from "./MonthMap";
-import { MONTHS } from "../@common/constants";
+import { component, m } from "@mufw/maya";
+import {
+  getCompletion,
+  getMilestone,
+  getMonthFirstDates,
+} from "../@common/transforms";
+import { HabitUI } from "../@common/types";
+import { vibrateOnTap } from "../@common/utils";
 import { Icon } from "../@elements";
+import { MonthMap } from "./MonthMap";
 
 type HabitCardProps = {
   classNames?: string;
-  habit: Habit & { completion: number };
+  habit: HabitUI;
   months: number;
   onClick: () => void;
 };
 
 export const HabitCard = component<HabitCardProps>(
   ({ classNames, habit, months, onClick }) => {
-    const { milestones, title, completion, colorIndex, levels } = dobject(
+    const { milestones, title, colorIndex, levels } = dobject(
       derive(() => habit.value)
     ).props;
-    const monthsTrackerList = derive(() =>
-      getMonthsStatus(habit.value, months.value)
-    );
+    const completion = derive(() => {
+      const now = new Date();
+      const thisYear = now.getFullYear();
+      const thisMonth = now.getMonth();
+      const firstDay = new Date(thisYear, thisMonth - months.value, 1);
+      const lastDay = new Date(thisYear, thisMonth + 1, 0);
+      return getCompletion(habit.value, firstDay, lastDay).percent;
+    });
     const milestoneIcon = derive(
       () => getMilestone(milestones.value, completion.value).icon
     );
@@ -54,12 +63,12 @@ export const HabitCard = component<HabitCardProps>(
         m.Div({
           class: "mt3 mb1",
           children: m.For({
-            subject: monthsTrackerList,
-            map: (tracker) =>
+            subject: getMonthFirstDates(months.value),
+            map: (monthFirstDay) =>
               MonthMap({
                 classNames: "mb1",
-                month: MONTHS[tracker.monthIndex],
-                status: tracker.status,
+                habit: habit,
+                date: monthFirstDay,
                 colorIndex: colorIndex,
                 totalLevels: levels.value.length,
               }),

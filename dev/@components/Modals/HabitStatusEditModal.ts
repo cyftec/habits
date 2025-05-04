@@ -1,7 +1,8 @@
 import { derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
+import { getDayStatus } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
-import { getDayStatus, vibrateOnTap } from "../../@common/utils";
+import { vibrateOnTap } from "../../@common/utils";
 import { Modal } from "../../@elements";
 
 type HabitStatusEditModalProps = {

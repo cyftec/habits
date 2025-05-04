@@ -1,11 +1,8 @@
 import { dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import {
-  deleteHabitFromStore,
-  softDeleteHabitInStore,
-} from "../../@common/localstorage";
 import { HabitUI } from "../../@common/types";
 import { Button, Modal } from "../../@elements";
+import { hardDeleteHabit, softDeleteHabit } from "../../@common/localstorage";
 
 type HabitDeleteModalProps = {
   isOpen: boolean;
@@ -54,9 +51,8 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
                 className: "pv2 ph3 ml2 b red",
                 children: "Yes, delete permanently",
                 onTap: () => {
-                  if (deletePermanently.value)
-                    deleteHabitFromStore(habit.value.id);
-                  else softDeleteHabitInStore(habit.value.id);
+                  if (deletePermanently.value) hardDeleteHabit(habit.value.id);
+                  else softDeleteHabit(habit.value.id);
                   onDone();
                 },
               }),

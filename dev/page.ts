@@ -1,21 +1,19 @@
 import { derive, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { DAY_IN_MS, DAYS_OF_WEEK } from "./@common/constants";
+import { intializeTrackerEmptyDays } from "./@common/localstorage";
 import {
-  getHabitsForDate,
-  intializeTrackerEmptyDays,
-} from "./@common/localstorage";
-import { DailyStatus } from "./@common/types";
-import {
+  areSameDates,
   getDayStatus,
-  getHabitUI,
+  getHabitsForDate,
   getLastTwoWeeks,
   getMomentZeroDate,
   getNewHabit,
-  goToHabitPage,
+  getWeekdayName,
+  isFutureDay,
   updateHabitStatus,
-  vibrateOnTap,
-} from "./@common/utils";
+} from "./@common/transforms";
+import { DailyStatus } from "./@common/types";
+import { goToHabitPage, vibrateOnTap } from "./@common/utils";
 import {
   AddHabitButton,
   HabitStatusEditModal,
@@ -47,8 +45,7 @@ const habitsStatusLabel = derive(() => {
 const isStatusEditorOpen = signal(false);
 const statusEditableHabitIndex = signal(0);
 const editableHabit = derive(
-  () =>
-    habits.value?.[statusEditableHabitIndex.value] || getHabitUI(getNewHabit())
+  () => habits.value?.[statusEditableHabitIndex.value] || getNewHabit()
 );
 const transitionToHabitsPage = () => {
   const tickerID = setInterval(() => {
@@ -128,15 +125,11 @@ export default Page({
                 children: m.For({
                   subject: getLastTwoWeeks(getMomentZeroDate(new Date())),
                   map: (date) => {
-                    const today = getMomentZeroDate(new Date());
-                    const futureTimeDiff = date.getTime() - today.getTime();
-                    const isFuture = futureTimeDiff >= DAY_IN_MS;
-                    const dateSelected = getMomentZeroDate(selectedDate.value);
-                    const selectedDayTimeDiff =
-                      date.getTime() - dateSelected.getTime();
-                    const isSelectedDay =
-                      selectedDayTimeDiff < DAY_IN_MS &&
-                      selectedDayTimeDiff >= 0;
+                    const isFuture = isFutureDay(date);
+                    const isSelectedDay = areSameDates(
+                      selectedDate.value,
+                      date
+                    );
                     return m.Div({
                       class: `mh1 mh0-ns bw1 ba br-pill pa2 tc ${
                         isSelectedDay || isFuture ? "" : "pointer"
@@ -153,7 +146,7 @@ export default Page({
                       children: [
                         m.Div({
                           class: "f7 ",
-                          children: DAYS_OF_WEEK[date.getDay()].substring(0, 3),
+                          children: getWeekdayName(date.getDay(), 3),
                         }),
                         m.Div({
                           class: "mt2 f4",

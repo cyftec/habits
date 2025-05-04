@@ -9,8 +9,9 @@ import {
   intializeTrackerEmptyDays,
   localSettings,
 } from "../@common/localstorage";
-import { Habit } from "../@common/types";
-import { getCompletionPercentage, goToHabitPage } from "../@common/utils";
+import { getCompletion, getDateWindow } from "../@common/transforms";
+import { HabitUI } from "../@common/types";
+import { goToHabitPage } from "../@common/utils";
 import {
   AddHabitButton,
   HabitCard,
@@ -27,14 +28,15 @@ const totalOverviewMonths = derive(
   () => HOMEPAGE_OVERVIEW_TABS[selectedTabIndex.value].months
 );
 
-const habits = signal<Habit[]>([]);
+const habits = signal<HabitUI[]>([]);
 const sortedHabits = derive(() => {
   const selectedOption = HOMEPAGE_SORT_OPTIONS[selectedSortOptionIndex.value];
   const totalMonths = totalOverviewMonths.value;
+  const { startDate, endDate } = getDateWindow(totalMonths);
   const optionLabel = selectedOption.label;
   const sortedHabitsWithCompletion = habits.value.map((habit) => ({
     ...habit,
-    completion: getCompletionPercentage(habit, totalMonths),
+    completion: getCompletion(habit, startDate, endDate).percent,
   }));
   sortedHabitsWithCompletion.sort((a, b) => {
     if (optionLabel === "Completion (Highest first)")
@@ -54,6 +56,25 @@ const sortedActiveHabits = derive(() =>
 const sortedStoppedHabits = derive(() =>
   sortedHabits.value.filter((hab) => hab.isStopped)
 );
+
+const onSortOptionChange = (optionIndex) => {
+  const settings = localSettings.value;
+  localSettings.value = {
+    ...settings,
+    habitsPage: {
+      ...settings.habitsPage,
+      sortOptionIndex: optionIndex,
+    },
+  };
+};
+
+const onTabChange = (tabIndex: number) => {
+  const settings = localSettings.value;
+  localSettings.value = {
+    ...settings,
+    habitsPage: { ...settings.habitsPage, tabIndex },
+  };
+};
 
 const triggerPageDataRefresh = () => {
   habits.value = fetchHabits();
@@ -79,16 +100,7 @@ export default Page({
           classNames: "mt2 mr2",
           iconSize: 22,
           selectedOptionIndex: selectedSortOptionIndex,
-          onChange: (optionIndex) => {
-            const settings = localSettings.value;
-            localSettings.value = {
-              ...settings,
-              habitsPage: {
-                ...settings.habitsPage,
-                sortOptionIndex: optionIndex,
-              },
-            };
-          },
+          onChange: onSortOptionChange,
         }),
       ],
     }),
@@ -99,14 +111,7 @@ export default Page({
           selectedTabClassNames: "pv3 br4",
           tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
           selectedTabIndex: selectedTabIndex,
-          onTabChange: (tabIndex) => {
-            const settings = localSettings.value;
-            localSettings.value = {
-              ...settings,
-              habitsPage: { ...settings.habitsPage, tabIndex },
-            };
-            // location.reload();
-          },
+          onTabChange: onTabChange,
         }),
         m.If({
           subject: derive(() => sortedHabits.value.length),
@@ -118,8 +123,8 @@ export default Page({
             }),
           }),
         }),
-        m.Div({
-          children: m.For({
+        m.Div(
+          m.For({
             subject: sortedActiveHabits,
             itemKey: "id",
             map: (activeHabit) =>
@@ -129,29 +134,26 @@ export default Page({
                 months: totalOverviewMonths,
                 onClick: () => goToHabitPage(activeHabit.value.id),
               }),
-          }),
-        }),
-        m.If({
-          subject: derive(() => sortedStoppedHabits.value.length),
-          isTruthy: m.Div(
-            m.For({
-              subject: sortedStoppedHabits,
-              itemKey: "id",
-              n: 0,
-              nthChild: m.Div({
-                class: "silver f6 mt5 mb3",
-                children: "OLD HABITS (DIE HARD, LOL)",
+          })
+        ),
+        m.Div(
+          m.For({
+            subject: sortedStoppedHabits,
+            itemKey: "id",
+            n: 0,
+            nthChild: m.Div({
+              class: "silver f6 mt5 mb3",
+              children: "OLD HABITS (DIE HARD, LOL)",
+            }),
+            map: (stoppedHabit) =>
+              HabitCard({
+                classNames: "mb3",
+                habit: stoppedHabit,
+                months: totalOverviewMonths,
+                onClick: () => goToHabitPage(stoppedHabit.value.id),
               }),
-              map: (stoppedHabit) =>
-                HabitCard({
-                  classNames: "mb3",
-                  habit: stoppedHabit,
-                  months: totalOverviewMonths,
-                  onClick: () => goToHabitPage(stoppedHabit.value.id),
-                }),
-            })
-          ),
-        }),
+          })
+        ),
       ],
     }),
     navbarTop: AddHabitButton({}),

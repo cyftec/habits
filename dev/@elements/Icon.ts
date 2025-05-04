@@ -13,7 +13,7 @@ type IconProps = {
 export const Icon = component<IconProps>(
   ({ className, size, onClick, iconName, title }) =>
     m.Span({
-      class: dstring`material-symbols-rounded ${() =>
+      class: dstring`material-symbols-outlined ${() =>
         !!onClick ? "pointer" : ""} ${className}`,
       style: dstring`font-size: ${() => size?.value || "16"}px`,
       onclick: vibrateOnTap(onClick),

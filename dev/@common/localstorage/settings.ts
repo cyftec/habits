@@ -1,31 +1,29 @@
-import { effect, signal } from "@cyftech/signal";
-import { LocalSettings } from "../types";
+import { phase } from "@mufw/maya/utils";
 import { INITIAL_SETTINGS } from "../constants";
+import { LocalSettings } from "../types";
+import { parseObjectJsonString } from "../utils";
 
-const initializeSettings = () => {
-  localStorage.setItem("settings", JSON.stringify(INITIAL_SETTINGS));
+export const updateSettings = (settings: LocalSettings) => {
+  localStorage.setItem("settings", JSON.stringify(settings));
 };
 
-const fetchSettings = () => {
-  if (!globalThis.localStorage) return INITIAL_SETTINGS;
-  const settingsString = localStorage.getItem("settings") || "{}";
-  const settingsObject = JSON.parse(settingsString) as LocalSettings;
-  const validSettings =
-    typeof settingsObject === "object" &&
-    settingsObject["id"] === "local-settings";
+export const fetchSettings = () => {
+  if (!phase.currentIs("run")) return INITIAL_SETTINGS;
 
-  if (!validSettings) initializeSettings();
-  const settings = JSON.parse(
-    localStorage.getItem("settings") as string
-  ) as LocalSettings;
+  const getSettingsFromStore = () => {
+    const settingsString = localStorage.getItem("settings");
+    const settingsObject = parseObjectJsonString<LocalSettings>(
+      settingsString,
+      "id",
+      "local-settings"
+    );
+    return settingsObject;
+  };
+
+  const settingsObject = getSettingsFromStore();
+  if (!settingsObject) updateSettings(INITIAL_SETTINGS);
+  const settings = getSettingsFromStore();
+  if (!settings) throw `Error fetching settings`;
 
   return settings;
 };
-
-export const localSettings = signal(fetchSettings());
-
-effect(() => {
-  const currentSetting = localSettings.value;
-  if (globalThis.localStorage)
-    localStorage.setItem("settings", JSON.stringify(currentSetting));
-});

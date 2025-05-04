@@ -1,2 +1,1 @@
-export * from "./habits";
-export * from "./settings";
+export * from "./ui-actions";
