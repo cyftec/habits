@@ -134,7 +134,7 @@ export default Page({
               m.Div({
                 onmount: (el) => (el.scrollLeft = el.scrollWidth),
                 class:
-                  "sticky top-3 bg-white mt3 pb2 flex items-center justify-between z-999 w-100",
+                  "sticky top-3 bg-white mt2 pb2 flex items-center justify-between z-999 w-100",
                 children: m.For({
                   subject: sevenDays,
                   map: (date) => {
@@ -227,7 +227,7 @@ export default Page({
                               children: habit.title,
                             }),
                             m.Div({
-                              class: "f6 light-silver",
+                              class: "f6 light-silver pt05",
                               children: "7 days in a row. Well done!!",
                             }),
                           ],

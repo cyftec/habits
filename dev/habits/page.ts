@@ -143,7 +143,11 @@ export default Page({
             n: 0,
             nthChild: m.Div({
               class: "silver f6 mt5 mb3",
-              children: "OLD HABITS (DIE HARD, LOL)",
+              children: derive(() =>
+                sortedStoppedHabits.value.length
+                  ? "OLD HABITS (DIE HARD, LOL)"
+                  : ""
+              ),
             }),
             map: (stoppedHabit) =>
               HabitCard({

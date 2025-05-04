@@ -40,7 +40,7 @@ type NavBarLinkProps = {
 export const NavBarLink = component<NavBarLinkProps>(
   ({ classNames, label, icon, isSelected, href }) => {
     return m.Div({
-      class: dstring`pointer flex flex-column items-center justify-center ${() =>
+      class: dstring`pointer noselect flex flex-column items-center justify-center ${() =>
         isSelected.value ? "app-theme-color b" : "black"} ${classNames}`,
       onclick: handleCTA(() => goToHref(href.value)),
       children: [
