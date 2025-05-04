@@ -13,7 +13,7 @@ type LinkProps = {
 export const Link = component<LinkProps>(
   ({ classNames, href, target, onClick, children }) => {
     return m.A({
-      class: dstring`${() =>
+      class: dstring`noselect ${() =>
         !href && !onClick ? "" : "pointer underline"} ${classNames}`,
       href,
       target,

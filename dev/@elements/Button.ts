@@ -10,7 +10,7 @@ type ButtonProps = {
 
 export const Button = component<ButtonProps>(({ className, onTap, children }) =>
   m.Button({
-    class: dstring`pointer br-pill ba bw1 b--light-silver b--hover-black bg-white black ${className}`,
+    class: dstring`pointer noselect br-pill ba bw1 b--light-silver b--hover-black bg-white black ${className}`,
     onclick: handleCTA(() => onTap()),
     children: children,
   })
