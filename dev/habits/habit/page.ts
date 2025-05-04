@@ -1,9 +1,6 @@
 import { derive, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import {
-  hardDeleteHabit,
-  intializeTrackerEmptyDays,
-} from "../../@common/localstorage";
+import { intializeTrackerEmptyDays } from "../../@common/localstorage";
 import {
   getCompletion,
   getHabitFromUrl,
@@ -15,12 +12,8 @@ import {
   updateHabitStatus,
 } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
-import {
-  goToHabitEditPage,
-  goToHabitsPage,
-  vibrateOnTap,
-} from "../../@common/utils";
-import { GoBackButton, Section } from "../../@components";
+import { goToHabitEditPage, vibrateOnTap } from "../../@common/utils";
+import { GoBackButton, HabitDeleteModal, Section } from "../../@components";
 import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
 
 const error = signal("");
@@ -81,6 +74,13 @@ const triggerPageDataRefresh = () => {
   habit.value = fetchedHabit;
 };
 
+const openDeleteModal = () => (deleteActionModalOpen.value = true);
+const closeDeleteModal = () => (deleteActionModalOpen.value = false);
+const onHabitDelete = () => {
+  closeDeleteModal();
+  history.back();
+};
+
 const updateLevel = (levelCode: number) => {
   if (!habit.value) return;
   updateHabitStatus(habit.value, levelCode, updateLevelModalData.value.date);
@@ -121,52 +121,11 @@ export default Page({
     }),
     content: m.Div({
       children: [
-        Modal({
-          classNames: "bn",
+        HabitDeleteModal({
           isOpen: deleteActionModalOpen,
-          onTapOutside: () => (deleteActionModalOpen.value = false),
-          content: m.Div({
-            class: "pa3 f5",
-            children: [
-              m.Div({
-                class: "mb3 b f4",
-                children: dstring`Delete '${() => habit.value?.title}'?`,
-              }),
-              m.Div({
-                class: "mb4",
-                children: [
-                  `
-                  All the data and the acheivements associated with this habit will be lost forever
-                  with this action, and cannot be reversed.
-                  `,
-                  m.Br({}),
-                  m.Br({}),
-                  `
-                  Are you sure, you want to DELETE this habit permanently?
-                  `,
-                ],
-              }),
-              m.Div({
-                class: "flex items-center justify-between f6",
-                children: [
-                  Button({
-                    className: "w-25 pv2 ph3 mr1 b",
-                    children: "No",
-                    onTap: () => (deleteActionModalOpen.value = false),
-                  }),
-                  Button({
-                    className: "pv2 ph3 ml2 b red",
-                    children: "Yes, delete permanently",
-                    onTap: () => {
-                      hardDeleteHabit(habit.value.id);
-                      deleteActionModalOpen.value = false;
-                      goToHabitsPage();
-                    },
-                  }),
-                ],
-              }),
-            ],
-          }),
+          habit: habit,
+          onClose: closeDeleteModal,
+          onDone: onHabitDelete,
         }),
         Modal({
           classNames: "f5 normal ba bw0 outline-0",
@@ -220,7 +179,7 @@ export default Page({
                       }),
                       Button({
                         className: "pv2 ph3 nt2 mb4 red",
-                        onTap: () => (deleteActionModalOpen.value = true),
+                        onTap: openDeleteModal,
                         children: "Delete Permanently",
                       }),
                     ]),

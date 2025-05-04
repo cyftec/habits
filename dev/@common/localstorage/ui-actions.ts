@@ -36,6 +36,15 @@ export const fetchHabits = (): HabitUI[] => {
   return habits.map((habit) => getHabitUI(habit));
 };
 
+export const findHabit = (habitTitle: string): HabitUI | undefined => {
+  const habits: Habit[] = fetchHabitsFromStore();
+  const foundHabit = habits.find(
+    (habit) => habit.title.trim() === habitTitle.trim()
+  );
+
+  return foundHabit ? getHabitUI(foundHabit) : undefined;
+};
+
 export const intializeTrackerEmptyDays = () => {
   console.log(`initialization called`);
   const habits = fetchHabitsFromStore();
@@ -89,13 +98,13 @@ export const saveHabit = (habit: HabitUI) => {
   const habitData: Habit = getHabitData(habit);
   saveHabitInStore(habitData);
 };
-export const softDeleteHabit = (habitId: number) => {
+export const stopHabit = (habitId: number) => {
   const habit = fetchHabit(habitId);
   const habitData = getHabitData(habit);
   const updatedHabit: Habit = { ...habitData, isStopped: true };
   saveHabitInStore(updatedHabit);
 };
-export const hardDeleteHabit = (habitId: number) =>
+export const deleteHabit = (habitId: number) =>
   hardDeleteHabitFromStore(habitId);
 
 /**

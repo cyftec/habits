@@ -99,30 +99,6 @@ export const HabitEditor = component<HabitEditorProps>(
       class: classNames,
       children: [
         Section({
-          title: "Color",
-          child: m.Div({
-            class: "mb1 flex items-center",
-            children: m.For({
-              subject: BASE_COLORS,
-              map: (colorOption, i) => {
-                const borderColorCss = derive(() =>
-                  i === colorIndex.value ? "#999" : "#f4f4f4"
-                );
-
-                return m.Span({
-                  class: `pointer mb2 mr3 pa1 br-100 bw2 ba flex`,
-                  style: dstring`border-color: ${borderColorCss}`,
-                  onclick: vibrateOnTap(() => updateColor(i)),
-                  children: m.Span({
-                    class: dstring`pa2 br-100`,
-                    style: `background-color: ${colorOption}`,
-                  }),
-                });
-              },
-            }),
-          }),
-        }),
-        Section({
           classNames: "pb1",
           title: "Schedule",
           child: m.Div({
@@ -153,11 +129,11 @@ export const HabitEditor = component<HabitEditorProps>(
           }),
         }),
         Section({
-          classNames: "pb1",
-          title: "Title",
+          classNames: "pb2",
+          title: "Title of the habit",
           child: TextBox({
             classNames: "ba bw1 b--light-silver br3 pa2 w-100",
-            placeholder: "title of editedHabit",
+            placeholder: `for example, "wake up at 5am"`,
             text: title,
             onchange: updateTitle,
           }),
@@ -165,6 +141,31 @@ export const HabitEditor = component<HabitEditorProps>(
         m.If({
           subject: moreDetails,
           isTruthy: m.Div([
+            Section({
+              classNames: "pb1",
+              title: "Color",
+              child: m.Div({
+                class: "mb1 flex items-center",
+                children: m.For({
+                  subject: BASE_COLORS,
+                  map: (colorOption, i) => {
+                    const borderColorCss = derive(() =>
+                      i === colorIndex.value ? "#999" : "#f4f4f4"
+                    );
+
+                    return m.Span({
+                      class: `pointer mb2 mr3 pa1 br-100 bw2 ba flex`,
+                      style: dstring`border-color: ${borderColorCss}`,
+                      onclick: vibrateOnTap(() => updateColor(i)),
+                      children: m.Span({
+                        class: dstring`pa2 br-100`,
+                        style: `background-color: ${colorOption}`,
+                      }),
+                    });
+                  },
+                }),
+              }),
+            }),
             Section({
               classNames: "pb3",
               title: "Levels",
@@ -330,7 +331,8 @@ export const HabitEditor = component<HabitEditorProps>(
               // size: 20,
               iconName: derive(() => (moreDetails.value ? "remove" : "add")),
             }),
-            derive(() => (moreDetails.value ? "Less" : "More Customization")),
+            dstring`Show ${() =>
+              moreDetails.value ? "Less" : "More"} Customization`,
           ],
         }),
       ],

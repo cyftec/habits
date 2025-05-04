@@ -5,7 +5,7 @@ import {
   BASE_WEEKDAY_FREQUENCY,
   SYSTEM_DEFINED_LEVELS,
 } from "../constants";
-import { fetchHabit, fetchHabits, saveHabit } from "../localstorage";
+import { fetchHabit, fetchHabits, findHabit, saveHabit } from "../localstorage";
 import {
   DailyStatus,
   Habit,
@@ -155,9 +155,15 @@ export const getMilestone = (
   return milestone;
 };
 
-export const getHabitValidationError = (habit: HabitUI): string => {
+export const getHabitValidationError = (
+  habit: HabitUI,
+  editingNewHabit?: boolean
+): string => {
   if (!habit.title) {
     return "Title should not be empty";
+  }
+  if (editingNewHabit && findHabit(habit.title)) {
+    return `A habit with same name already exists`;
   }
   if (habit.frequency.every((day) => !day)) {
     return "Select at least one day in a week";
@@ -373,4 +379,44 @@ export const getDayLabel = (date: Date) => {
   if (daysGap === 2) return `Day after tomorrow`;
 
   return `${daysGap} days after`;
+};
+
+export const getTrackerForLevelsChange = (
+  oldLevels: LevelUI[],
+  newLevels: LevelUI[],
+  tracker: DailyStatus[]
+) => {
+  if (!oldLevels.length || oldLevels.length === newLevels.length)
+    return tracker;
+
+  const updatedTracker = [...tracker];
+  const updates: { indices: number[]; newLevel: LevelUI }[] = [];
+  oldLevels.forEach((oldLevel) => {
+    const newLevel = newLevels.find((l) => l.name === oldLevel.name);
+    const oldLevelRemoved = !newLevel;
+    // the status for the day in old tracker should remain the same
+    if (oldLevelRemoved) return;
+    const levelPositionChanged = newLevel.code !== oldLevel.code;
+    if (!levelPositionChanged) return;
+
+    const indices: number[] = [];
+    tracker.forEach((status, i) => {
+      if (status.level.code === oldLevel.code) indices.push(i);
+    });
+    updates.push({
+      indices: indices,
+      newLevel: newLevel,
+    });
+  });
+
+  updates.forEach((update) => {
+    update.indices.forEach((index) => {
+      updatedTracker[index] = {
+        ...updatedTracker[index],
+        level: update.newLevel,
+      };
+    });
+  });
+
+  return updatedTracker;
 };
