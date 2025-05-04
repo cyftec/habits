@@ -1,7 +1,8 @@
-import { derive, dobject, dstring } from "@cyftech/signal";
+import { derive, dobject, dstring, MaybeSignalObject } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { vibrateOnTap } from "../@common/utils";
 import { getColorsForLevel } from "../@common/transforms";
+import { Icon } from "./Icon";
 
 type ColorDotProps = {
   classNames?: string;
@@ -9,9 +10,11 @@ type ColorDotProps = {
   colorIndex: number;
   level: number;
   totalLevels: number;
-  textContent?: string;
   textColor?: string;
   showText?: boolean;
+  textContent?: string;
+  icon?: string;
+  iconSize?: number;
   isRectangular?: boolean;
   onClick?: () => void;
 };
@@ -23,8 +26,10 @@ export const ColorDot = component<ColorDotProps>(
     colorIndex,
     level,
     totalLevels,
-    textContent,
     showText,
+    textContent,
+    icon,
+    iconSize,
     isRectangular,
     onClick,
   }) => {
@@ -59,7 +64,14 @@ export const ColorDot = component<ColorDotProps>(
             background-color: ${backgroundColor};
             color: ${fontColor};
           `,
-          children: text,
+          children: m.If({
+            subject: icon,
+            isTruthy: Icon({
+              iconName: icon as MaybeSignalObject<string>,
+              size: iconSize,
+            }),
+            isFalsy: m.Span(text),
+          }),
         }),
       ],
     });

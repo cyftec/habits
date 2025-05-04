@@ -239,10 +239,10 @@ export const HabitEditor = component<HabitEditorProps>(
               title: "Milestones",
               description: dstring`
                   Miltestones are something long-term. Let's say after a month or two, you followed
-                  your habit for 67% of the times, then based on below table you reached the '${() =>
+                  your habit for 67% of the times, then based on below table you crossed the '${() =>
                     getMilestone(editedHabit.value.milestones, 67)
                       .label}' milestone. You can set your own milestone levels depending
-                  on the difficulty level of the habit.
+                  on the difficulty of the habit.
                 `,
               showDescription: true,
               child: m.Div({
@@ -330,7 +330,7 @@ export const HabitEditor = component<HabitEditorProps>(
               // size: 20,
               iconName: derive(() => (moreDetails.value ? "remove" : "add")),
             }),
-            derive(() => (moreDetails.value ? "Less" : "More")),
+            derive(() => (moreDetails.value ? "Less" : "More Customization")),
           ],
         }),
       ],

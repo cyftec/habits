@@ -1,7 +1,7 @@
 import { effect, signal } from "@cyftech/signal";
 import {
   areSameDates,
-  getDaysDifference,
+  getDaysGap,
   getHabitData,
   getHabitUI,
 } from "../transforms";
@@ -42,7 +42,7 @@ export const intializeTrackerEmptyDays = () => {
   for (let habit of habits) {
     const day1 = new Date(habit.id);
     const today = new Date();
-    const daysGap = getDaysDifference(day1, today);
+    const daysGap = getDaysGap(day1, today);
     const updatedTracker = [...habit.tracker];
     if (daysGap + 2 <= updatedTracker.length) continue;
 

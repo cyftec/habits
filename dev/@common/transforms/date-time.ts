@@ -44,15 +44,13 @@ export const isFutureDay = (date: Date, referenceDate?: Date) => {
   return getMomentZero(date) > getMomentZero(refDate);
 };
 
-export const getDaysDifference = (earlierDate: Date, laterDate: Date) => {
-  const earlierDateMZ = getMomentZeroDate(earlierDate);
-  const laterDateMZ = getMomentZeroDate(laterDate);
-  return Math.round(
-    (laterDateMZ.getTime() - earlierDateMZ.getTime()) / DAY_IN_MS
-  );
+export const getDaysGap = (earlierDate: Date, laterDate: Date): number => {
+  const earlierDateMZ = getMomentZero(earlierDate);
+  const laterDateMZ = getMomentZero(laterDate);
+  return Math.round((laterDateMZ - earlierDateMZ) / DAY_IN_MS);
 };
 
-export const getGapDate = (baseDate: Date, daysGap: number) =>
+export const getGapDate = (baseDate: Date, daysGap: number): Date =>
   new Date(
     baseDate.getFullYear(),
     baseDate.getMonth(),

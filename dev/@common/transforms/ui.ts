@@ -18,6 +18,7 @@ import { getQueryParamValue } from "../utils/navigation";
 import {
   areSameDates,
   getDatesArrayBetweenDates,
+  getDaysGap,
   getGapDate,
   getMomentZero,
   getMomentZeroDate,
@@ -358,4 +359,18 @@ export const getWeekwiseStatus = (habit: HabitUI) => {
   }
 
   return weeklyTracker;
+};
+
+export const getDayLabel = (date: Date) => {
+  const today = new Date();
+  const daysGap = getDaysGap(today, date);
+
+  if (daysGap < -2) return `${-daysGap} days back`;
+  if (daysGap === -2) return "Day before yesterday";
+  if (daysGap === -1) return "Yesterday";
+  if (daysGap === 0) return "Today";
+  if (daysGap === 1) return "Tomorrow";
+  if (daysGap === 2) return `Day after tomorrow`;
+
+  return `${daysGap} days after`;
 };

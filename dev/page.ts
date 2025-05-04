@@ -3,8 +3,11 @@ import { m } from "@mufw/maya";
 import { intializeTrackerEmptyDays } from "./@common/localstorage";
 import {
   areSameDates,
+  getDayLabel,
   getDayStatus,
+  getGapDate,
   getHabitsForDate,
+  getLastNDays,
   getLastTwoWeeks,
   getMomentZeroDate,
   getNewHabit,
@@ -21,8 +24,10 @@ import {
 } from "./@components";
 import { ColorDot, Page, ProgressBar } from "./@elements";
 
-const progress = signal(100);
-const selectedDate = signal(new Date());
+const now = new Date();
+const progress = signal(0);
+const sevenDays = getLastNDays(getGapDate(now, 2), 7);
+const selectedDate = signal(now);
 const habits = derive(() => getHabitsForDate(selectedDate.value));
 const habitsStatusLabel = derive(() => {
   const statuses = habits.value.map(
@@ -61,6 +66,7 @@ const triggerPageDataRefresh = () => {
 };
 
 const onPageMount = () => {
+  transitionToHabitsPage();
   intializeTrackerEmptyDays();
   triggerPageDataRefresh();
   window.addEventListener("pageshow", triggerPageDataRefresh);
@@ -115,15 +121,15 @@ export default Page({
         isTruthy: NavScaffold({
           classNames: "ph3 bg-white",
           route: "/",
-          header: "Todos in a day",
+          header: "Tasks for the day",
           content: m.Div({
             children: [
               m.Div({
                 onmount: (el) => (el.scrollLeft = el.scrollWidth),
                 class:
-                  "sticky top-3 bg-white mt3 pb2 flex items-center justify-between-ns overflow-x-scroll z-999 w-100 hide-scrollbar",
+                  "sticky top-3 bg-white mt3 pb2 flex items-center justify-between z-999 w-100",
                 children: m.For({
-                  subject: getLastTwoWeeks(getMomentZeroDate(new Date())),
+                  subject: sevenDays,
                   map: (date) => {
                     const isFuture = isFutureDay(date);
                     const isSelectedDay = areSameDates(
@@ -131,15 +137,13 @@ export default Page({
                       date
                     );
                     return m.Div({
-                      class: `mh1 mh0-ns bw1 ba br-pill pa2 tc ${
-                        isSelectedDay || isFuture ? "" : "pointer"
-                      } ${
-                        isFuture
-                          ? "light-gray"
-                          : isSelectedDay
-                          ? "black b"
-                          : "light-silver"
-                      } ${isSelectedDay ? "b--silver" : "b--transparent"}`,
+                      class: `bw1 ba br-pill pa2 tc ${
+                        isSelectedDay
+                          ? "black b b--silver"
+                          : isFuture
+                          ? "light-gray b--transparent"
+                          : "light-silver pointer b--transparent"
+                      }`,
                       onclick: () =>
                         !(isSelectedDay || isFuture) &&
                         (selectedDate.value = date),
@@ -159,7 +163,7 @@ export default Page({
               }),
               m.Div({
                 class: "mt3 mb2 f4 b",
-                children: "Today",
+                children: derive(() => getDayLabel(selectedDate.value)),
               }),
               m.Div({
                 class: "mb4 pb2 silver",
@@ -178,7 +182,7 @@ export default Page({
                       class: "mt4 flex items-center",
                       children: [
                         ColorDot({
-                          classNames: `pa3 mr3 ba ${
+                          classNames: `pa3 mr3 ba b ${
                             status.level.code < 1
                               ? "b--light-silver"
                               : "b--transparent"
@@ -186,7 +190,8 @@ export default Page({
                           colorIndex: habit.colorIndex,
                           level: status.level.code,
                           totalLevels: habit.levels.length,
-                          textContent: "✓",
+                          icon: "check",
+                          iconSize: 22,
                           showText: status.level.code > 0,
                           onClick: () => {
                             isStatusEditorOpen.value = true;
