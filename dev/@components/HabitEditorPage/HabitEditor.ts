@@ -101,7 +101,7 @@ export const HabitEditor = component<HabitEditorProps>(
         Section({
           classNames: "pb1",
           title: "Schedule",
-          child: m.Div({
+          children: m.Div({
             class: "mb3 f6 flex items-center justify-between justify-start-ns",
             children: m.For({
               subject: Array(7).fill(0),
@@ -131,7 +131,7 @@ export const HabitEditor = component<HabitEditorProps>(
         Section({
           classNames: "pb2",
           title: "Title",
-          child: TextBox({
+          children: TextBox({
             classNames: "ba bw1 b--light-silver br3 pa2 w-100",
             placeholder: `for example, "wake up at 5am"`,
             text: title,
@@ -144,7 +144,7 @@ export const HabitEditor = component<HabitEditorProps>(
             Section({
               classNames: "pb1",
               title: "Color",
-              child: m.Div({
+              children: m.Div({
                 class: "mb1 flex items-center",
                 children: m.For({
                   subject: BASE_COLORS,
@@ -175,65 +175,62 @@ export const HabitEditor = component<HabitEditorProps>(
                   You can add or remove level by clicking on + or - buttons. Click on textbox
                   for editing the level name.
                 `,
-              showDescription: true,
-              child: m.Div({
-                children: m.For({
-                  subject: levels,
-                  map: (currentLevel, i) => {
-                    const oldLevels = editableHabit?.value?.levels || [];
-                    const newLevels = levels.value;
-                    const { hideAddButton, hideRemoveButton } =
-                      getAddRemoveButtonsVisibility(oldLevels, newLevels, i);
-                    const textboxDisabled = levelTextboxDisability(
-                      oldLevels,
-                      newLevels,
-                      i
-                    );
+              children: m.For({
+                subject: levels,
+                map: (currentLevel, i) => {
+                  const oldLevels = editableHabit?.value?.levels || [];
+                  const newLevels = levels.value;
+                  const { hideAddButton, hideRemoveButton } =
+                    getAddRemoveButtonsVisibility(oldLevels, newLevels, i);
+                  const textboxDisabled = levelTextboxDisability(
+                    oldLevels,
+                    newLevels,
+                    i
+                  );
 
-                    return m.Div({
-                      children: [
-                        m.Div({
-                          class: "flex items-center justify-between",
-                          children: [
-                            m.Div({
-                              class:
-                                "flex items-center ba bw1 b--light-silver br3 w-70 w-80-ns",
-                              children: [
-                                ColorDot({
-                                  classNames: "w1dot5 h2 br3 br--left ml1px",
-                                  dotClassNames: "br3 br--left",
-                                  colorIndex,
-                                  level: i,
-                                  isRectangular: true,
-                                  totalLevels: levels.value.length,
-                                }),
-                                TextBox({
-                                  classNames: "bn pa2 br3 w-100 outline-0",
-                                  placeholder: `Level ${i}`,
-                                  disabled: textboxDisabled,
-                                  text: currentLevel.name,
-                                  onchange: (text) => updateLevel(text, i),
-                                }),
-                              ],
-                            }),
-                            AddRemoveButton({
-                              hideAdd: hideAddButton,
-                              hideRemove: hideRemoveButton,
-                              onAdd: () => addLevel(i + 1),
-                              onRemove: () => removeLevel(i),
-                            }),
-                          ],
-                        }),
-                        m.If({
-                          subject: i < levels.value.length - 1,
-                          isTruthy: m.Div({
-                            class: "pa2 ml2 pl1 bl bw1 b--light-gray",
+                  return m.Div({
+                    children: [
+                      m.Div({
+                        class: "flex items-center justify-between",
+                        children: [
+                          m.Div({
+                            class:
+                              "flex items-center ba bw1 b--light-silver br3 w-70 w-80-ns",
+                            children: [
+                              ColorDot({
+                                classNames: "w1dot5 h2 br3 br--left ml1px",
+                                dotClassNames: "br3 br--left",
+                                colorIndex,
+                                level: i,
+                                isRectangular: true,
+                                totalLevels: levels.value.length,
+                              }),
+                              TextBox({
+                                classNames: "bn pa2 br3 w-100 outline-0",
+                                placeholder: `Level ${i}`,
+                                disabled: textboxDisabled,
+                                text: currentLevel.name,
+                                onchange: (text) => updateLevel(text, i),
+                              }),
+                            ],
                           }),
+                          AddRemoveButton({
+                            hideAdd: hideAddButton,
+                            hideRemove: hideRemoveButton,
+                            onAdd: () => addLevel(i + 1),
+                            onRemove: () => removeLevel(i),
+                          }),
+                        ],
+                      }),
+                      m.If({
+                        subject: i < levels.value.length - 1,
+                        isTruthy: m.Div({
+                          class: "pa2 ml2 pl1 bl bw1 b--light-gray",
                         }),
-                      ],
-                    });
-                  },
-                }),
+                      }),
+                    ],
+                  });
+                },
               }),
             }),
             Section({
@@ -245,79 +242,74 @@ export const HabitEditor = component<HabitEditorProps>(
                       .label}' milestone. You can set your own milestone levels depending
                   on the difficulty of the habit.
                 `,
-              showDescription: true,
-              child: m.Div({
-                children: m.For({
-                  subject: derive(() =>
-                    getDetailedMilestones(milestones.value)
-                  ),
-                  n: 0,
-                  nthChild: m.Div({
-                    class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",
+              children: m.For({
+                subject: derive(() => getDetailedMilestones(milestones.value)),
+                n: 0,
+                nthChild: m.Div({
+                  class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",
+                  children: [
+                    m.Span({
+                      class: "lh-copy",
+                      children: "",
+                    }),
+                    m.Span({
+                      class:
+                        "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
+                      children: [
+                        m.Span({
+                          class:
+                            "w-100 bg-white bn bw1 ph2dot5 di f4 b light-silver pb3 nl1",
+                          children: "100",
+                        }),
+                        m.Span({
+                          class: "ph2 bg-white light-silver b pb3 mr1",
+                          children: "%",
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+                map: (milestone, i) =>
+                  m.Div({
+                    class: "mb1 ph4 pv4 ba br3 bw1 b--light-gray relative",
                     children: [
                       m.Span({
-                        class: "lh-copy",
-                        children: "",
+                        class: "lh-copy flex items-center",
+                        children: [
+                          Icon({
+                            className: `mr2 ${milestone.color}`,
+                            size: 20,
+                            iconName: milestone.icon,
+                          }),
+                          milestone.label,
+                        ],
                       }),
                       m.Span({
                         class:
                           "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
                         children: [
-                          m.Span({
-                            class:
-                              "w-100 bg-white bn bw1 ph2dot5 di f4 b light-silver pb3 nl1",
-                            children: "100",
+                          m.If({
+                            subject: i === 3,
+                            isTruthy: m.Span({
+                              class:
+                                "w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1",
+                              children: "00",
+                            }),
+                            isFalsy: NumberBox({
+                              classNames:
+                                "w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray",
+                              num: milestone.percent,
+                              onchange: (value) => updateMilestone(value, i),
+                            }),
                           }),
                           m.Span({
-                            class: "ph2 bg-white light-silver b pb3 mr1",
+                            class: "ph2 bg-white light-silver b",
                             children: "%",
                           }),
                         ],
                       }),
                     ],
                   }),
-                  map: (milestone, i) =>
-                    m.Div({
-                      class: "mb1 ph4 pv4 ba br3 bw1 b--light-gray relative",
-                      children: [
-                        m.Span({
-                          class: "lh-copy flex items-center",
-                          children: [
-                            Icon({
-                              className: `mr2 ${milestone.color}`,
-                              size: 20,
-                              iconName: milestone.icon,
-                            }),
-                            milestone.label,
-                          ],
-                        }),
-                        m.Span({
-                          class:
-                            "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
-                          children: [
-                            m.If({
-                              subject: i === 3,
-                              isTruthy: m.Span({
-                                class:
-                                  "w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1",
-                                children: "00",
-                              }),
-                              isFalsy: NumberBox({
-                                classNames:
-                                  "w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray",
-                                num: milestone.percent,
-                                onchange: (value) => updateMilestone(value, i),
-                              }),
-                            }),
-                            m.Span({
-                              class: "ph2 bg-white light-silver b",
-                              children: "%",
-                            }),
-                          ],
-                        }),
-                      ],
-                    }),
-                }),
               }),
             }),
           ]),

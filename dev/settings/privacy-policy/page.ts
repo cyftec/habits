@@ -1,0 +1,59 @@
+import { Child, m } from "@mufw/maya";
+import { Page, Scaffold } from "../../@elements";
+import { GoBackButton } from "../../@components";
+import { PRIVACY_POLICY } from "./@lib/constants";
+
+export default Page({
+  classNames: "bg-white ph3",
+  body: Scaffold({
+    classNames: "bg-white",
+    header: "Privacy Policy",
+    content: m.Div({
+      class: "gray pt4",
+      children: [
+        m.Div([
+          m.Span({
+            class: "b dark-gray",
+            children: "Effective date: ",
+          }),
+          PRIVACY_POLICY.date.toDateString(),
+        ]),
+        m.Div(
+          m.For({
+            subject: PRIVACY_POLICY.policies,
+            n: 0,
+            nthChild: m.Div({
+              class: "mv3",
+              children: PRIVACY_POLICY.description,
+            }),
+            map: (policy, i) =>
+              m.Div({
+                class: "mv4",
+                children: [
+                  m.Div({
+                    class: "b f4 mid-gray mb2",
+                    children: `${i + 1}. ${policy.title}`,
+                  }),
+                  policy.description,
+                  m.If({
+                    subject: policy.bullets.length,
+                    isTruthy: m.Ul(
+                      m.For({
+                        subject: policy.bullets,
+                        map: (bulletPoint) =>
+                          m.Li({
+                            class: "",
+                            children: bulletPoint,
+                          }),
+                      })
+                    ),
+                  }),
+                ],
+              }),
+          })
+        ),
+      ],
+    }),
+    bottombar: GoBackButton({}),
+  }),
+});

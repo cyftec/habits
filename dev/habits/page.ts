@@ -95,7 +95,7 @@ export default Page({
     header: m.Div({
       class: "flex items-start justify-between bg-white",
       children: [
-        "Habits",
+        "All habits",
         SortOptions({
           classNames: "mt2 mr2",
           iconSize: 22,

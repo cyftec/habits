@@ -187,150 +187,143 @@ export default Page({
                   Section({
                     classNames: "pb3",
                     title: "Acheivment",
-                    child: m.Div({
-                      children: m.For({
-                        subject: acheievemnts,
-                        n: Infinity,
-                        nthChild: m.Div({
-                          class:
-                            "flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray",
-                          children: [
-                            m.Div(`Overall`),
-                            m.Div({
-                              class: "flex items-center",
-                              children: [
-                                Icon({
-                                  className: dstring`mr2 ${() =>
-                                    milestoneAchieved.value?.color}`,
-                                  size: 20,
-                                  iconName: derive(
-                                    () => `${milestoneAchieved.value?.icon}`
-                                  ),
-                                }),
-                                derive(
-                                  () => `${milestoneAchieved.value?.label}`
-                                ),
-                                m.Span({ class: "ml1" }),
-                                m.Div(derive(() => ` (${completion.value}%)`)),
-                              ],
-                            }),
-                          ],
-                        }),
-                        map: (acheievemnt, i) =>
+                    children: m.For({
+                      subject: acheievemnts,
+                      n: Infinity,
+                      nthChild: m.Div({
+                        class:
+                          "flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray",
+                        children: [
+                          m.Div(`Overall`),
                           m.Div({
-                            class: "flex items-center justify-between mb2",
+                            class: "flex items-center",
                             children: [
-                              m.Div(derive(() => `${acheievemnt.level.name}`)),
-                              m.Div(
-                                derive(
-                                  () =>
-                                    `${acheievemnt.total} times (${acheievemnt.percent}%)`
-                                )
-                              ),
+                              Icon({
+                                className: dstring`mr2 ${() =>
+                                  milestoneAchieved.value?.color}`,
+                                size: 20,
+                                iconName: derive(
+                                  () => `${milestoneAchieved.value?.icon}`
+                                ),
+                              }),
+                              derive(() => `${milestoneAchieved.value?.label}`),
+                              m.Span({ class: "ml1" }),
+                              m.Div(derive(() => ` (${completion.value}%)`)),
                             ],
                           }),
+                        ],
                       }),
+                      map: (acheievemnt, i) =>
+                        m.Div({
+                          class: "flex items-center justify-between mb2",
+                          children: [
+                            m.Div(derive(() => `${acheievemnt.level.name}`)),
+                            m.Div(
+                              derive(
+                                () =>
+                                  `${acheievemnt.total} times (${acheievemnt.percent}%)`
+                              )
+                            ),
+                          ],
+                        }),
                     }),
                   }),
                   Section({
                     title: "Tracker",
-                    child: m.Div({
-                      children: [
-                        m.Div({
-                          class: "mh2 flex items-center justify-between",
-                          children: m.For({
-                            subject: Array(7).fill(0),
-                            map: (_, dayIndex) =>
-                              m.Div({
-                                class:
-                                  "h2 w2 br-100 gray f7 flex items-center justify-center",
-                                children: getWeekdayName(dayIndex, 1),
-                              }),
+                    children: [
+                      m.Div({
+                        class: "mh2 flex items-center justify-between",
+                        children: m.For({
+                          subject: Array(7).fill(0),
+                          map: (_, dayIndex) =>
+                            m.Div({
+                              class:
+                                "h2 w2 br-100 gray f7 flex items-center justify-center",
+                              children: getWeekdayName(dayIndex, 1),
+                            }),
+                        }),
+                      }),
+                      m.Div({
+                        onmount: (el) =>
+                          el.scroll({
+                            top: el.scrollHeight - el.clientHeight,
                           }),
-                        }),
-                        m.Div({
-                          onmount: (el) =>
-                            el.scroll({
-                              top: el.scrollHeight - el.clientHeight,
-                            }),
-                          class:
-                            "mxh5 mxh6-ns nt2 bb bw1 b--near-white mh2 overflow-y-scroll",
-                          children: [
-                            m.Div({
-                              class: dstring`absolute left-0 right-0 bg-to-top-white z-999 ${() =>
-                                weekwiseTracker.value.length > 4 ? "h3" : ""}`,
-                            }),
-                            m.Div({
-                              children: m.For({
-                                subject: weekwiseTracker,
-                                n: 0,
-                                nthChild: m.Div({
-                                  class: derive(() =>
-                                    weekwiseTracker.value.length > 4
-                                      ? "pv3 mt2"
-                                      : "pv2"
-                                  ),
-                                }),
-                                map: (week) =>
-                                  m.Div({
-                                    class: "flex items-center h-60",
-                                    children: [
-                                      m.Div({
-                                        class:
-                                          "w-100 mb3 flex items-center justify-between",
-                                        children: m.For({
-                                          subject: week,
-                                          map: (day) => {
-                                            const dateNum = day.date.getDate();
-                                            const monthIndex =
-                                              day.date.getMonth();
-                                            const monthName = getMonthName(
-                                              monthIndex,
-                                              3
-                                            );
-                                            const dateText = `${
-                                              dateNum === 1
-                                                ? monthIndex === 0
-                                                  ? day.date
-                                                      .getFullYear()
-                                                      .toString()
-                                                  : monthName
-                                                : dateNum
-                                            }`;
-
-                                            return ColorDot({
-                                              classNames:
-                                                "h2 w2 flex items-center justify-center f7",
-                                              colorIndex:
-                                                habit.value?.colorIndex ?? 0,
-                                              level: day.level.code,
-                                              totalLevels:
-                                                habit.value?.levels.length || 2,
-                                              textContent: dateText,
-                                              showText: day.level !== undefined,
-                                              onClick: () => {
-                                                if (habit.value?.isStopped)
-                                                  return;
-                                                updateLevelModalOpen.value =
-                                                  true;
-                                                updateLevelModalData.value = {
-                                                  date: day.date,
-                                                  selectedLevelIndex:
-                                                    day.level.code,
-                                                };
-                                              },
-                                            });
-                                          },
-                                        }),
-                                      }),
-                                    ],
-                                  }),
+                        class:
+                          "mxh5 mxh6-ns nt2 bb bw1 b--near-white mh2 overflow-y-scroll",
+                        children: [
+                          m.Div({
+                            class: dstring`absolute left-0 right-0 bg-to-top-white z-999 ${() =>
+                              weekwiseTracker.value.length > 4 ? "h3" : ""}`,
+                          }),
+                          m.Div({
+                            children: m.For({
+                              subject: weekwiseTracker,
+                              n: 0,
+                              nthChild: m.Div({
+                                class: derive(() =>
+                                  weekwiseTracker.value.length > 4
+                                    ? "pv3 mt2"
+                                    : "pv2"
+                                ),
                               }),
+                              map: (week) =>
+                                m.Div({
+                                  class: "flex items-center h-60",
+                                  children: [
+                                    m.Div({
+                                      class:
+                                        "w-100 mb3 flex items-center justify-between",
+                                      children: m.For({
+                                        subject: week,
+                                        map: (day) => {
+                                          const dateNum = day.date.getDate();
+                                          const monthIndex =
+                                            day.date.getMonth();
+                                          const monthName = getMonthName(
+                                            monthIndex,
+                                            3
+                                          );
+                                          const dateText = `${
+                                            dateNum === 1
+                                              ? monthIndex === 0
+                                                ? day.date
+                                                    .getFullYear()
+                                                    .toString()
+                                                : monthName
+                                              : dateNum
+                                          }`;
+
+                                          return ColorDot({
+                                            classNames:
+                                              "h2 w2 flex items-center justify-center f7",
+                                            colorIndex:
+                                              habit.value?.colorIndex ?? 0,
+                                            level: day.level.code,
+                                            totalLevels:
+                                              habit.value?.levels.length || 2,
+                                            textContent: dateText,
+                                            showText: day.level !== undefined,
+                                            onClick: () => {
+                                              if (habit.value?.isStopped)
+                                                return;
+                                              updateLevelModalOpen.value = true;
+                                              updateLevelModalData.value = {
+                                                date: day.date,
+                                                selectedLevelIndex:
+                                                  day.level.code,
+                                              };
+                                            },
+                                          });
+                                        },
+                                      }),
+                                    }),
+                                  ],
+                                }),
                             }),
-                          ],
-                        }),
-                      ],
-                    }),
+                          }),
+                        ],
+                      }),
+                    ],
                   }),
                 ],
               }),

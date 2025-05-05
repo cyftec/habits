@@ -77,80 +77,77 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
               Section({
                 classNames: "pb2",
                 title: "Actions",
-                child: m.Div({
-                  children: [
-                    HabitDeleteModal({
-                      isOpen: deleteActionModalOpen,
-                      habit: editedHabit,
-                      onClose: closeDeleteModal,
-                      onDone: onHabitDelete,
+                children: [
+                  HabitDeleteModal({
+                    isOpen: deleteActionModalOpen,
+                    habit: editedHabit,
+                    onClose: closeDeleteModal,
+                    onDone: onHabitDelete,
+                  }),
+                  Link({
+                    classNames: "db mb3 f6 red",
+                    children:
+                      "Delete this habit permanently along with its data",
+                    onClick: openDeleteModal,
+                  }),
+                  Modal({
+                    classNames: "bn",
+                    isOpen: stopActionModalOpen,
+                    onTapOutside: () => (stopActionModalOpen.value = false),
+                    content: m.Div({
+                      class: "pa3 f5",
+                      children: [
+                        m.Div({
+                          class: "mb3 b f4",
+                          children: dstring`Stop '${() =>
+                            editedHabit.value.title}'?`,
+                        }),
+                        m.Div({
+                          class: "mb4",
+                          children: [
+                            `
+                          This action is not reversible. You will not be able to resume it again.`,
+                            // USE BELOW LINE WHEN HABIT PAUSE ACTION IS IMPLEMENTED
+                            // `
+                            // This action is not reversible. You will not be able to resume it again.
+                            // If you're unsure about resuming it later, you can close this dialog and
+                            // trying pausing this habit with the other link.`,
+                            m.Br({}),
+                            m.Br({}),
+                            `
+                          Are you sure, you want to STOP this habit permanently?
+                          `,
+                          ],
+                        }),
+                        m.Div({
+                          class: "flex items-center justify-between f6",
+                          children: [
+                            Button({
+                              className: "w-100 pv2 ph3 mr2",
+                              children: "No, go back",
+                              onTap: () => (stopActionModalOpen.value = false),
+                            }),
+                            Button({
+                              className: "w-100 pv2 ph3 ml2 b",
+                              children: "Yes, stop this",
+                              onTap: () => {
+                                stopHabit(editedHabit.value.id);
+                                stopActionModalOpen.value = false;
+                                history.back();
+                              },
+                            }),
+                          ],
+                        }),
+                      ],
                     }),
-                    Link({
-                      classNames: "db mb3 f6 red",
-                      children:
-                        "Delete this habit permanently along with its data",
-                      onClick: openDeleteModal,
-                    }),
-                    Modal({
-                      classNames: "bn",
-                      isOpen: stopActionModalOpen,
-                      onTapOutside: () => (stopActionModalOpen.value = false),
-                      content: m.Div({
-                        class: "pa3 f5",
-                        children: [
-                          m.Div({
-                            class: "mb3 b f4",
-                            children: dstring`Stop '${() =>
-                              editedHabit.value.title}'?`,
-                          }),
-                          m.Div({
-                            class: "mb4",
-                            children: [
-                              `
-                            This action is not reversible. You will not be able to resume it again.`,
-                              // USE BELOW LINE WHEN HABIT PAUSE ACTION IS IMPLEMENTED
-                              // `
-                              // This action is not reversible. You will not be able to resume it again.
-                              // If you're unsure about resuming it later, you can close this dialog and
-                              // trying pausing this habit with the other link.`,
-                              m.Br({}),
-                              m.Br({}),
-                              `
-                            Are you sure, you want to STOP this habit permanently?
-                            `,
-                            ],
-                          }),
-                          m.Div({
-                            class: "flex items-center justify-between f6",
-                            children: [
-                              Button({
-                                className: "w-100 pv2 ph3 mr2",
-                                children: "No, go back",
-                                onTap: () =>
-                                  (stopActionModalOpen.value = false),
-                              }),
-                              Button({
-                                className: "w-100 pv2 ph3 ml2 b",
-                                children: "Yes, stop this",
-                                onTap: () => {
-                                  stopHabit(editedHabit.value.id);
-                                  stopActionModalOpen.value = false;
-                                  history.back();
-                                },
-                              }),
-                            ],
-                          }),
-                        ],
-                      }),
-                    }),
-                    Link({
-                      classNames: "db mb3 f6 gray",
-                      children:
-                        "Stop this habit permanently and keep it for future",
-                      onClick: () => (stopActionModalOpen.value = true),
-                    }),
-                  ],
-                }),
+                  }),
+                  Link({
+                    classNames: "db mb3 f6 gray",
+                    children:
+                      "Stop this habit permanently and keep it for future",
+                    onClick: () => (stopActionModalOpen.value = true),
+                  }),
+                ],
               }),
             ]),
           }),
