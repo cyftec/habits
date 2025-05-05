@@ -53,6 +53,9 @@ export const getDaysGap = (earlierDate: Date, laterDate: Date): number => {
   return Math.round((laterDateMZ - earlierDateMZ) / DAY_IN_MS);
 };
 
+export const getDateGapFromToday = (date: Date): number =>
+  getDaysGap(new Date(), date);
+
 export const getGapDate = (baseDate: Date, daysGap: number): Date =>
   new Date(
     baseDate.getFullYear(),

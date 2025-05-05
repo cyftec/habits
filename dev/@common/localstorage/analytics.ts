@@ -33,8 +33,6 @@ export const fetchAnalytics = (): Analytics => {
     updateAnalytics(INITIAL_ANALYTICS);
   }
   const analytics = getAnalyticsFromStore();
-  console.log(analytics);
-
   if (!analytics) throw `Error fetching analytics`;
 
   return analytics;

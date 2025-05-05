@@ -9,6 +9,7 @@ import {
   getDayLabel,
   getDayStatus,
   getGapDate,
+  getHabitInfoLabel,
   getHabitsForDate,
   getLastNDays,
   getNewHabit,
@@ -130,13 +131,13 @@ export default Page({
         isFalsy: NavScaffold({
           classNames: "ph3 bg-white",
           route: "/",
-          header: "Tasks for the day",
+          header: "Tasks in a day",
           content: m.Div({
             children: [
               m.Div({
                 onmount: (el) => (el.scrollLeft = el.scrollWidth),
                 class:
-                  "sticky top-3 bg-white mt2 pb2 flex items-center justify-between z-999 w-100",
+                  "sticky top-3 bg-white pb2 flex items-center justify-between z-999 w-100",
                 children: m.For({
                   subject: sevenDays,
                   map: (date) => {
@@ -146,7 +147,7 @@ export default Page({
                       date
                     );
                     return m.Div({
-                      class: `bw1 ba br-pill pa2 tc ${
+                      class: `bw1 ba br-pill ph2 pv3 pb2 tc ${
                         isSelectedDay
                           ? "black b b--silver"
                           : isFuture
@@ -173,7 +174,7 @@ export default Page({
                 }),
               }),
               m.Div({
-                class: "mt3 mb2 f4 b",
+                class: "mt2 mb2 f4 b",
                 children: derive(() => getDayLabel(selectedDate.value)),
               }),
               m.Div({
@@ -232,7 +233,9 @@ export default Page({
                             }),
                             m.Div({
                               class: "f6 light-silver pt05",
-                              children: "7 days in a row. Well done!!",
+                              children: derive(() =>
+                                getHabitInfoLabel(habit.id)
+                              ),
                             }),
                           ],
                         }),

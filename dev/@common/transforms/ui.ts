@@ -23,6 +23,7 @@ import {
 import { getQueryParamValue } from "../utils/navigation";
 import {
   areSameDates,
+  getDateGapFromToday,
   getDatesArrayBetweenDates,
   getDaysGap,
   getGapDate,
@@ -212,17 +213,37 @@ export const getCompletion = (
   let totalDays = 0;
   let workingDays = 0;
   let completion = 0;
+  let aceStreak = 0;
+  let followStreak = 0;
+  let missed = 0;
 
-  for (const status of habitTracker) {
+  habitTracker.forEach((status, i) => {
     totalDays++;
     workingDays += status.level.code > 0 ? 1 : 0;
     completion += status.level.code > 0 ? status.level.code : 0;
-  }
+
+    const isLastEntry = i === habitTracker.length - 1;
+    if (isLastEntry) return;
+
+    const streakBroken = status.level.code < 1;
+    missed = streakBroken ? missed + 1 : 0;
+
+    const effectiveStatusCode = status.level.code > 0 ? status.level.code : 0;
+    const statusGoodnessPercent =
+      100 * (effectiveStatusCode / (habit.levels.length - 1));
+    const goodWork = Math.round(statusGoodnessPercent) > 50;
+    aceStreak = goodWork ? aceStreak + 1 : 0;
+    followStreak = streakBroken ? 0 : followStreak + 1;
+  });
 
   return {
+    title: habit.title,
+    aceStreak,
+    followStreak,
+    missed,
+    percent: Math.ceil(100 * (completion / (totalDays * totalStatusLevels))),
     totalDays,
     workingDays,
-    percent: Math.ceil(100 * (completion / (totalDays * totalStatusLevels))),
   };
 };
 
@@ -386,6 +407,35 @@ export const getDayLabel = (date: Date) => {
   if (daysGap === 2) return `Day after tomorrow`;
 
   return `${daysGap} days after`;
+};
+
+export const getHabitInfoLabel = (habitId: number) => {
+  const today = new Date();
+  const habitStartDate = new Date(habitId);
+  const daysBefore = -getDateGapFromToday(habitStartDate);
+
+  if (daysBefore === 0) return `Just created this habit today`;
+  if (daysBefore === 1) return `This habit started from yesterday`;
+  if (daysBefore > 1 && daysBefore < 5)
+    return `Started following this ${daysBefore} back`;
+
+  const { aceStreak, followStreak, missed } = getCompletion(
+    fetchHabit(habitId),
+    getGapDate(today, -daysBefore),
+    today
+  );
+
+  if (aceStreak >= 12)
+    return `Nailed ${aceStreak} days in a row. Woah! Don't stop.`;
+  if (aceStreak >= 4)
+    return `Doing good for ${aceStreak} days straight! Keep it up.`;
+  if (followStreak >= 15)
+    return `Didn't miss for ${followStreak} days in a row. Kudos!`;
+  if (followStreak >= 4)
+    return `${followStreak} days in a row! Hmm, keep going.`;
+  if (missed) `Missed ${missed} days. Impossible is I M Possible.`;
+
+  return "Just stick to it. Patience is the key.";
 };
 
 export const getTrackerForLevelsChange = (

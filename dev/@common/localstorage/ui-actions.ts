@@ -72,7 +72,6 @@ export const findHabit = (habitTitle: string): HabitUI | undefined => {
 };
 
 export const intializeTrackerEmptyDays = () => {
-  console.log(`initialization called`);
   const habits = fetchHabitsFromStore();
   for (let habit of habits) {
     const day1 = new Date(habit.id);
