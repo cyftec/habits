@@ -12,7 +12,7 @@ export const Page = component<PageProps>(({ classNames, body, onMount }) => {
     children: [
       m.Head({
         children: [
-          m.Title("Maya App"),
+          m.Title("Habits (by Cyfer)"),
           m.Meta({ charset: "UTF-8" }),
           m.Meta({
             "http-equiv": "X-UA-Compatible",
@@ -25,6 +25,10 @@ export const Page = component<PageProps>(({ classNames, body, onMount }) => {
           m.Link({
             rel: "stylesheet",
             href: "/assets/styles.css",
+          }),
+          m.Link({
+            rel: "manifest",
+            href: "/manifest.json",
           }),
         ],
       }),

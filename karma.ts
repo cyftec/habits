@@ -45,13 +45,14 @@ export const config: KarmaConfig = {
     },
   },
   maya: {
-    mode: "web",
+    mode: "pwa",
     sourceDirName: projectFileNames.static.sourceDir,
     packageJson: {
       dependencies: {
         "@mufw/maya": "0.1.18",
         "@cyftech/immutjs": "0.1.0",
         "@cyftech/signal": "0.1.7",
+        "@types/web-app-manifest": "1.0.8",
       },
     },
   },
@@ -81,7 +82,6 @@ export const config: KarmaConfig = {
       projectFileNames.generated.nodeModulesDir,
       projectFileNames.generated.packageJsonFile,
       `/${projectFileNames.generated.stagingDir}`,
-      `/${projectFileNames.generated.publishDir}`,
     ],
   },
 };

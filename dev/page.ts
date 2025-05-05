@@ -110,7 +110,7 @@ export default Page({
           children: [
             m.Img({
               class: "mt6 br4",
-              src: "/assets/habits-logo.png",
+              src: "/assets/images/habits-logo.png",
               height: "100",
               width: "100",
             }),
