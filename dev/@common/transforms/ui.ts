@@ -218,7 +218,7 @@ export const getCompletion = (
   let missed = 0;
 
   habitTracker.forEach((status, i) => {
-    totalDays++;
+    totalDays += status.level.code > -1 ? 1 : 0;
     workingDays += status.level.code > 0 ? 1 : 0;
     completion += status.level.code > 0 ? status.level.code : 0;
 

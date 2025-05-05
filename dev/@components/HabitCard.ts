@@ -26,7 +26,7 @@ export const HabitCard = component<HabitCardProps>(
       const now = new Date();
       const thisYear = now.getFullYear();
       const thisMonth = now.getMonth();
-      const firstDay = new Date(thisYear, thisMonth - (months.value + 1), 1);
+      const firstDay = new Date(thisYear, thisMonth - months.value, 1);
       const lastDay = new Date(thisYear, thisMonth + 1, 0);
       return getCompletion(habit.value, firstDay, lastDay).percent;
     });
