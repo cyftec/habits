@@ -4,6 +4,10 @@ export type LocalSettings = {
     tabIndex: number;
     sortOptionIndex: number;
   };
+  editPage: {
+    showHints: boolean;
+    showFullCustomisation: boolean;
+  };
 };
 
 export type Analytics = {

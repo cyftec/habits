@@ -1,15 +1,19 @@
-import { dstring, signal } from "@cyftech/signal";
+import { dobject, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { phase } from "@mufw/maya/utils";
 import { goToPrivacyPolicyPage } from "../@common/utils";
 import { NavScaffold, Section } from "../@components";
 import { Icon, Link, Page, Toggle } from "../@elements";
+import { INITIAL_SETTINGS } from "../@common/constants";
+import {
+  getEditPageSettings,
+  updateEditPageSettings,
+} from "../@common/localstorage";
 
-const space = signal<Record<string, number>>({});
-const showHintsOnEditPageToggle = signal(true);
-const showDefaultCustomizationLengthToggle = signal(false);
+const storageSpace = signal<Record<string, number>>({});
+const editPageSettings = signal(INITIAL_SETTINGS.editPage);
 
-const getStorage = () => {
+const updateStorageData = () => {
   if (!phase.currentIs("run")) return;
   const BYTES_PER_KB = 1024;
   let totalBytes = 0;
@@ -31,12 +35,33 @@ const getStorage = () => {
   collections["spaceLeft"] =
     (100 * (5 * 1024 * 1024 - totalBytes)) / (5 * 1024 * 1024);
   console.log(collections);
-  space.value = collections;
+  storageSpace.value = collections;
+};
+
+const onEditPageHintsSettingToggle = () => {
+  updateEditPageSettings({
+    ...editPageSettings.value,
+    showHints: !editPageSettings.value.showHints,
+  });
+  editPageSettings.value = getEditPageSettings();
+};
+
+const onEditPageCustomisationsSettingToggle = () => {
+  updateEditPageSettings({
+    ...editPageSettings.value,
+    showFullCustomisation: !editPageSettings.value.showFullCustomisation,
+  });
+  editPageSettings.value = getEditPageSettings();
+};
+
+const onPageMount = () => {
+  updateStorageData();
+  editPageSettings.value = getEditPageSettings();
 };
 
 export default Page({
   classNames: "bg-white",
-  onMount: getStorage,
+  onMount: onPageMount,
   body: NavScaffold({
     classNames: "ph3 bg-white",
     route: "/settings/",
@@ -47,8 +72,9 @@ export default Page({
           classNames: "pb3",
           title: "Storage space",
           children: [
-            dstring`${() => space.value.total?.toFixed(2)} KB used (${() =>
-              space.value.spaceLeft?.toFixed(2)}% left)`,
+            dstring`${() =>
+              storageSpace.value.total?.toFixed(2)} KB used (${() =>
+              storageSpace.value.spaceLeft?.toFixed(2)}% left)`,
           ],
         }),
         Section({
@@ -61,10 +87,8 @@ export default Page({
               children: [
                 m.Div("Show hints on Edit page"),
                 Toggle({
-                  isOn: showHintsOnEditPageToggle,
-                  onToggle: () =>
-                    (showHintsOnEditPageToggle.value =
-                      !showHintsOnEditPageToggle.value),
+                  isOn: dobject(editPageSettings).prop("showHints"),
+                  onToggle: onEditPageHintsSettingToggle,
                 }),
               ],
             }),
@@ -74,10 +98,8 @@ export default Page({
               children: [
                 m.Div("Always show more customisations on Edit page"),
                 Toggle({
-                  isOn: showDefaultCustomizationLengthToggle,
-                  onToggle: () =>
-                    (showDefaultCustomizationLengthToggle.value =
-                      !showDefaultCustomizationLengthToggle.value),
+                  isOn: dobject(editPageSettings).prop("showFullCustomisation"),
+                  onToggle: onEditPageCustomisationsSettingToggle,
                 }),
               ],
             }),

@@ -1,13 +1,15 @@
-import { derive, signal } from "@cyftech/signal";
+import { derive, dobject, effect, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import {
   HOMEPAGE_OVERVIEW_TABS,
   HOMEPAGE_SORT_OPTIONS,
+  INITIAL_SETTINGS,
 } from "../@common/constants";
 import {
   fetchHabits,
+  getHabitsPageSettings,
   intializeTrackerEmptyDays,
-  localSettings,
+  updateHabitsPageSettings,
 } from "../@common/localstorage";
 import { getCompletion, getDateWindow } from "../@common/transforms";
 import { HabitUI } from "../@common/types";
@@ -20,17 +22,18 @@ import {
 } from "../@components";
 import { Page, TabBar } from "../@elements";
 
-const selectedSortOptionIndex = derive(
-  () => localSettings.value.habitsPage.sortOptionIndex
-);
-const selectedTabIndex = derive(() => localSettings.value.habitsPage.tabIndex);
+const pageSettings = signal(INITIAL_SETTINGS.habitsPage);
 const totalOverviewMonths = derive(
-  () => HOMEPAGE_OVERVIEW_TABS[selectedTabIndex.value].months
+  () => HOMEPAGE_OVERVIEW_TABS[pageSettings.value.tabIndex].months
 );
-
+effect(() => console.log(pageSettings.value.sortOptionIndex));
+effect(() => console.log(totalOverviewMonths.value));
 const habits = signal<HabitUI[]>([]);
 const sortedHabits = derive(() => {
-  const selectedOption = HOMEPAGE_SORT_OPTIONS[selectedSortOptionIndex.value];
+  console.log(`updating SORTED HABITS`);
+
+  const selectedOption =
+    HOMEPAGE_SORT_OPTIONS[pageSettings.value.sortOptionIndex];
   const totalMonths = totalOverviewMonths.value;
   const { startDate, endDate } = getDateWindow(totalMonths);
   const optionLabel = selectedOption.label;
@@ -47,6 +50,7 @@ const sortedHabits = derive(() => {
 
     return b.id - a.id;
   });
+  console.log(sortedHabitsWithCompletion);
 
   return sortedHabitsWithCompletion;
 });
@@ -58,26 +62,23 @@ const sortedStoppedHabits = derive(() =>
 );
 
 const onSortOptionChange = (optionIndex) => {
-  const settings = localSettings.value;
-  localSettings.value = {
-    ...settings,
-    habitsPage: {
-      ...settings.habitsPage,
-      sortOptionIndex: optionIndex,
-    },
-  };
+  updateHabitsPageSettings({
+    ...pageSettings.value,
+    sortOptionIndex: optionIndex,
+  });
+  pageSettings.value = getHabitsPageSettings();
 };
 
 const onTabChange = (tabIndex: number) => {
-  const settings = localSettings.value;
-  localSettings.value = {
-    ...settings,
-    habitsPage: { ...settings.habitsPage, tabIndex },
-  };
+  updateHabitsPageSettings({ ...pageSettings.value, tabIndex });
+  pageSettings.value = getHabitsPageSettings();
 };
 
 const triggerPageDataRefresh = () => {
+  console.log(`triggering refresh`);
+
   habits.value = fetchHabits();
+  pageSettings.value = getHabitsPageSettings();
 };
 
 const onPageMount = () => {
@@ -99,7 +100,7 @@ export default Page({
         SortOptions({
           classNames: "mt2 mr2",
           iconSize: 22,
-          selectedOptionIndex: selectedSortOptionIndex,
+          selectedOptionIndex: dobject(pageSettings).prop("sortOptionIndex"),
           onChange: onSortOptionChange,
         }),
       ],
@@ -109,7 +110,7 @@ export default Page({
         TabBar({
           classNames: "nl1 f6",
           tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
-          selectedTabIndex: selectedTabIndex,
+          selectedTabIndex: dobject(pageSettings).prop("tabIndex"),
           onTabChange: onTabChange,
         }),
         m.If({

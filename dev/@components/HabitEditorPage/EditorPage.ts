@@ -1,7 +1,11 @@
-import { derive, dstring, signal } from "@cyftech/signal";
+import { derive, dobject, dstring, effect, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { GoBackButton, HabitDeleteModal, Section } from "..";
-import { saveHabit, stopHabit } from "../../@common/localstorage";
+import {
+  getEditPageSettings,
+  saveHabit,
+  stopHabit,
+} from "../../@common/localstorage";
 import {
   getHabitValidationError,
   getNewHabit,
@@ -10,6 +14,7 @@ import {
 import { HabitUI } from "../../@common/types";
 import { Button, Link, Modal, Page, Scaffold } from "../../@elements";
 import { HabitEditor } from "./HabitEditor";
+import { INITIAL_SETTINGS } from "../../@common/constants";
 
 type HabitEditorPageProps = {
   editableHabit?: HabitUI;
@@ -18,6 +23,7 @@ type HabitEditorPageProps = {
 
 export const HabitEditorPage = component<HabitEditorPageProps>(
   ({ editableHabit, onMount }) => {
+    const editPageSettings = signal(INITIAL_SETTINGS.editPage);
     const deleteActionModalOpen = signal(false);
     const stopActionModalOpen = signal(false);
     const error = signal("");
@@ -27,6 +33,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
         ? `Edit '${editableHabit.value.title}'`
         : "Add new habit"
     );
+    effect(() => console.log(editPageSettings.value.showHints));
 
     const openDeleteModal = () => (deleteActionModalOpen.value = true);
     const closeDeleteModal = () => (deleteActionModalOpen.value = false);
@@ -59,6 +66,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
         // After onMount in parent, 'editableHabit' gets loaded
         editedHabit.value = editableHabit?.value as HabitUI;
       }
+      editPageSettings.value = getEditPageSettings();
     };
 
     return Page({
@@ -154,6 +162,10 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
           HabitEditor({
             editableHabit: editableHabit,
             editedHabit: editedHabit,
+            hideDescriptions: derive(() => !editPageSettings.value.showHints),
+            showFullCustomisations: dobject(editPageSettings).prop(
+              "showFullCustomisation"
+            ),
             onChange: (updatedHabit) => (editedHabit.value = updatedHabit),
           }),
         ]),

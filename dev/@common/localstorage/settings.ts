@@ -28,6 +28,23 @@ export const fetchSettings = (): LocalSettings => {
   if (!settingsObject) updateSettings(INITIAL_SETTINGS);
   const settings = getSettingsFromStore();
   if (!settings) throw `Error fetching settings`;
+  addFutureUpgradesIfMissing(settings);
 
-  return settings;
+  return getSettingsFromStore() as LocalSettings;
+};
+
+export const addFutureUpgradesIfMissing = (settings: LocalSettings) => {
+  // v1 upgrade
+  if (!settings.editPage) {
+    console.log(`settings.editPage is missing`);
+    console.log(`adding `, {
+      ...settings,
+      editPage: INITIAL_SETTINGS.editPage,
+    });
+
+    updateSettings({
+      ...settings,
+      editPage: INITIAL_SETTINGS.editPage,
+    });
+  }
 };

@@ -1,4 +1,11 @@
-import { derive, dobject, dstring, signal, Signal } from "@cyftech/signal";
+import {
+  derive,
+  dobject,
+  dstring,
+  effect,
+  signal,
+  Signal,
+} from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { Section } from "..";
 import { BASE_COLORS } from "../../@common/constants";
@@ -24,12 +31,27 @@ type HabitEditorProps = {
   classNames?: string;
   editableHabit?: HabitUI;
   editedHabit: Signal<HabitUI>;
+  hideDescriptions?: boolean;
+  showFullCustomisations?: boolean;
   onChange: (updatedHabit: HabitUI) => void;
 };
 
 export const HabitEditor = component<HabitEditorProps>(
-  ({ classNames, editableHabit, editedHabit, onChange }) => {
+  ({
+    classNames,
+    editableHabit,
+    editedHabit,
+    hideDescriptions,
+    showFullCustomisations,
+    onChange,
+  }) => {
+    effect(() => console.log(hideDescriptions?.value));
     const moreDetails = signal(false);
+    const customisationsVisible = derive(() => {
+      const moreDetailsValue = moreDetails.value;
+      const overridingOption = showFullCustomisations?.value;
+      return overridingOption || moreDetailsValue;
+    });
     const { title, frequency, levels, milestones, colorIndex } =
       dobject(editedHabit).props;
     const everyDay = derive(() => frequency.value.every((day) => !!day));
@@ -139,7 +161,7 @@ export const HabitEditor = component<HabitEditorProps>(
           }),
         }),
         m.If({
-          subject: moreDetails,
+          subject: customisationsVisible,
           isTruthy: m.Div([
             Section({
               classNames: "pb1",
@@ -169,6 +191,7 @@ export const HabitEditor = component<HabitEditorProps>(
             Section({
               classNames: "pb3",
               title: "Levels",
+              hideDescription: hideDescriptions,
               description: `
                   A habit can have more than 2 levels. Like the habit 'Drink 2 litres water'
                   should have three levels - '0 litre', '1 litre' and '2 litres' respectively.
@@ -235,6 +258,7 @@ export const HabitEditor = component<HabitEditorProps>(
             }),
             Section({
               title: "Milestones",
+              hideDescription: hideDescriptions,
               description: dstring`
                   Miltestones are something long-term. Let's say after a month or two, you followed
                   your habit for 67% of the times, then based on below table you crossed the '${() =>
@@ -314,18 +338,21 @@ export const HabitEditor = component<HabitEditorProps>(
             }),
           ]),
         }),
-        Button({
-          className: "pv2 ph3 flex items-center",
-          onTap: () => (moreDetails.value = !moreDetails.value),
-          children: [
-            Icon({
-              className: "mr1",
-              // size: 20,
-              iconName: derive(() => (moreDetails.value ? "remove" : "add")),
-            }),
-            dstring`Show ${() =>
-              moreDetails.value ? "Less" : "More"} Customization`,
-          ],
+        m.If({
+          subject: showFullCustomisations,
+          isFalsy: Button({
+            className: "pv2 ph3 flex items-center",
+            onTap: () => (moreDetails.value = !moreDetails.value),
+            children: [
+              Icon({
+                className: "mr1",
+                // size: 20,
+                iconName: derive(() => (moreDetails.value ? "remove" : "add")),
+              }),
+              dstring`Show ${() =>
+                moreDetails.value ? "Less" : "More"} Customisations`,
+            ],
+          }),
         }),
       ],
     });

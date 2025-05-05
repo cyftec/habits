@@ -46,6 +46,10 @@ export const INITIAL_SETTINGS: LocalSettings = {
     tabIndex: 0,
     sortOptionIndex: 0,
   },
+  editPage: {
+    showHints: true,
+    showFullCustomisation: false,
+  },
 };
 
 export const HOMEPAGE_OVERVIEW_TABS = [

@@ -5,7 +5,7 @@ import {
   getHabitData,
   getHabitUI,
 } from "../transforms";
-import { Habit, HabitUI } from "../types";
+import { Habit, HabitUI, LocalSettings } from "../types";
 import {
   fetchHabitsFromStore,
   fetchHabitWithKey,
@@ -139,10 +139,32 @@ export const deleteHabit = (habitId: number) =>
  *    SETTINGS
  */
 
-export const localSettings = signal(fetchSettings());
+export const getHabitsPageSettings = (): LocalSettings["habitsPage"] => {
+  const settings = fetchSettings();
+  return settings.habitsPage;
+};
 
-effect(() => {
-  const currentSetting = localSettings.value;
-  if (!phase.currentIs("run")) return;
-  updateSettings(currentSetting);
-});
+export const updateHabitsPageSettings = (
+  habitsPageSettings: LocalSettings["habitsPage"]
+) => {
+  const settings = fetchSettings();
+  updateSettings({
+    ...settings,
+    habitsPage: habitsPageSettings,
+  });
+};
+
+export const getEditPageSettings = (): LocalSettings["editPage"] => {
+  const settings = fetchSettings();
+  return settings.editPage;
+};
+
+export const updateEditPageSettings = (
+  editPageSettings: LocalSettings["editPage"]
+) => {
+  const settings = fetchSettings();
+  updateSettings({
+    ...settings,
+    editPage: editPageSettings,
+  });
+};

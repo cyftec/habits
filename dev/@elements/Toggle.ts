@@ -11,7 +11,7 @@ type ToggleProps = {
 export const Toggle = component<ToggleProps>(
   ({ classNames, isOn, onToggle }) => {
     return m.Div({
-      class: dstring`flex items-center pointer noselect br-pill ba bw2 b--mid-gray b--hover-black bg-white pa05 black ${classNames}`,
+      class: dstring`flex items-center pointer noselect br-pill ba bw1dot5 b--mid-gray b--hover-black bg-white pa05 black ${classNames}`,
       onclick: handleCTA(onToggle),
       children: [
         m.Div({

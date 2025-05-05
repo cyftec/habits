@@ -424,6 +424,7 @@ export const getHabitInfoLabel = (habitId: number) => {
     getGapDate(today, -daysBefore),
     today
   );
+  console.log({ aceStreak, followStreak, missed });
 
   if (aceStreak >= 12)
     return `Nailed ${aceStreak} days in a row. Woah! Don't stop.`;
@@ -432,7 +433,7 @@ export const getHabitInfoLabel = (habitId: number) => {
   if (followStreak >= 15)
     return `Didn't miss for ${followStreak} days in a row. Kudos!`;
   if (followStreak >= 4)
-    return `${followStreak} days in a row! Hmm, keep going.`;
+    return `${followStreak} days in a row. Nice! keep going.`;
   if (missed) `Missed ${missed} days. Impossible is I M Possible.`;
 
   return "Just stick to it. Patience is the key.";
