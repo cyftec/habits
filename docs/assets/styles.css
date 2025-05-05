@@ -4,10 +4,15 @@ Tachyons CSS
 @import url("https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css");
 
 /*
+Google Font
+*/
+@import url('https://fonts.googleapis.com/css2?family=Livvic:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,900&display=swap');
+
+/*
 Google Icons
 */
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
-.material-symbols-rounded {
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+.material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,
   'wght' 400,
@@ -17,7 +22,8 @@ Google Icons
 
 :root { --themeColor: #e87b52; }
 body {
-  font-family: 'system-ui';
+  font-family: "Livvic", sans-serif;
+  font-weight: 500;
   scrollbar-color: #e8e8e8 #f2f1f0;
   scrollbar-width: thin;
 }
@@ -28,6 +34,7 @@ input::placeholder {
   font-style: italic;
 }
 
+.hide-scrollbar { scrollbar-color: transparent transparent; scrollbar-width: thin; }
 .app-theme-color { color: var(--themeColor); }
 .bg-app-theme-color { background-color: var(--themeColor); }
 .overflow-break-word { overflow-wrap: break-word; }
@@ -36,15 +43,21 @@ input::placeholder {
 .f8 { font-size: 0.65rem; }
 .bg-pale { background-color: #f6f6f6; }
 .bg-light-moon-gray { background-color: #e8e8e8; }
+.top-3 { top: 4.25rem; }
 .bottom--1dot5 { bottom: -1.75rem; }
 .pa2dot5 { padding: 0.75rem; }
+.ph2dot5 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.pa05 { padding: 0.125rem; }
 .pt05 { padding-top: 0.2rem; }
+.ml1px { margin-left: 1px; }
 .mt05 { margin-top: 0.1rem; }
 .mr05 { margin-right: 0.1rem; }
 .sticky { position: sticky; }
+.w1dot5 { width: 1.5rem; }
 .w4dot50 { width: 12rem; }
 .mnw5 { min-width: 16rem; }
 .mxh5 { max-height: 16rem; }
+.bw1dot5 { border-width: 0.1875rem; }
 
 @media screen and (min-width: 30em) {
   .w4dot25-ns { width: 10rem; }
