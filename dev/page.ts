@@ -44,9 +44,11 @@ const habitsStatusLabel = derive(() => {
     ),
   };
 
-  if (status.done === 0)
+  if (status.done === 0 && status.notDone === 0) return ``;
+  if (status.done === 0 && status.notDone > 0)
     return `Update below ${status.notDone} tsaks for the day.`;
-  if (status.notDone === 0) return `Great! All tasks updated.`;
+  if (status.done > 0 && status.notDone === 0)
+    return `Great! All tasks updated.`;
 
   return `${status.done} done. ${status.notDone} more to go.`;
 });
@@ -187,8 +189,10 @@ export default Page({
                     classNames: "flex pl5 pr3 nl3 mt4",
                     onClick: goToNewHabitsPage,
                     children: derive(() =>
-                      habits.value.length < 5
-                        ? `Only ${habits.value.length} habits in a day! Add more.`
+                      habits.value.length === 0
+                        ? "No habit for the day! Add one."
+                        : habits.value.length < 5
+                        ? `Only ${habits.value.length} habits a day! Add more.`
                         : ``
                     ),
                   }),
