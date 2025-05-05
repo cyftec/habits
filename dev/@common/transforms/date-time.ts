@@ -127,7 +127,7 @@ export const getDateWindow = (monthsCount: number) => {
   const now = new Date();
   const year = now.getFullYear();
   const monthIndex = now.getMonth();
-  const startDate = new Date(year, monthIndex - monthsCount, 1);
+  const startDate = new Date(year, monthIndex - (monthsCount - 1), 1);
   const endDate = new Date(year, monthIndex + 1, 0);
   return { startDate, endDate };
 };

@@ -36,6 +36,7 @@ export const HabitCard = component<HabitCardProps>(
     const milestoneIconColor = derive(
       () => getMilestone(milestones.value, completion.value).color
     );
+    const monthFirstDates = derive(() => getMonthFirstDates(months.value));
 
     return m.Div({
       class: dstring`pointer bg-white ${classNames}`,
@@ -63,7 +64,7 @@ export const HabitCard = component<HabitCardProps>(
         m.Div({
           class: "mt3 mb1",
           children: m.For({
-            subject: getMonthFirstDates(months.value),
+            subject: monthFirstDates,
             map: (monthFirstDay) =>
               MonthMap({
                 classNames: "mb1",

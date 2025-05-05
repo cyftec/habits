@@ -107,8 +107,7 @@ export default Page({
     content: m.Div({
       children: [
         TabBar({
-          classNames: "nl1 b f7 w-75",
-          selectedTabClassNames: "pv3 br4",
+          classNames: "nl1 f6",
           tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
           selectedTabIndex: selectedTabIndex,
           onTabChange: onTabChange,
