@@ -33,6 +33,7 @@ export const Page = component<PageProps>(({ classNames, body, onMount }) => {
         ],
       }),
       m.Body({
+        tabindex: "-1",
         class: classNames,
         onmount: onMount,
         children: [m.Script({ src: "main.js", defer: "true" }), body],
