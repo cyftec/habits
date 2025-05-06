@@ -46,7 +46,7 @@ export const HabitCard = component<HabitCardProps>(
           class: "flex items-center justify-between nt1 mb2",
           children: [
             m.Div({
-              class: "f4 dark-gray b",
+              class: "f5 dark-gray b",
               children: title,
             }),
             m.Div({
@@ -62,7 +62,7 @@ export const HabitCard = component<HabitCardProps>(
           ],
         }),
         m.Div({
-          class: "mt3 mb1",
+          class: "mt2 mb1",
           children: m.For({
             subject: monthFirstDates,
             map: (monthFirstDay) =>

@@ -15,12 +15,12 @@ export const Toggle = component<ToggleProps>(
       onclick: handleCTA(onToggle),
       children: [
         m.Div({
-          class: dstring`br-100 ba bw2 b--hover-black pa1 ${() =>
+          class: dstring`br-100 ba bw1 b--hover-black pa1 ${() =>
             isOn?.value ? "b--transparent" : "b--moon-gray bg-moon-gray"}`,
         }),
         m.Div({ class: "pa05" }),
         m.Div({
-          class: dstring`br-100 ba bw2 b--hover-black pa1 ${() =>
+          class: dstring`br-100 ba bw1 b--hover-black pa1 ${() =>
             isOn?.value ? "b--mid-gray bg-mid-gray" : "b--transparent"}`,
         }),
       ],

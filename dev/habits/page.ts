@@ -127,9 +127,20 @@ export default Page({
           m.For({
             subject: sortedActiveHabits,
             itemKey: "id",
+            n: 0,
+            nthChild: m.Div({
+              class: "silver f6 mt3 pt1 mb4",
+              children: [
+                "ACTIVE HABITS",
+                m.If({
+                  subject: derive(() => !!sortedActiveHabits.value.length),
+                  isFalsy: m.Div("None"),
+                }),
+              ],
+            }),
             map: (activeHabit) =>
               HabitCard({
-                classNames: "mt4",
+                classNames: "mb4",
                 habit: activeHabit,
                 months: totalOverviewMonths,
                 onClick: () => goToHabitPage(activeHabit.value.id),
@@ -142,16 +153,18 @@ export default Page({
             itemKey: "id",
             n: 0,
             nthChild: m.Div({
-              class: "silver f6 mt5 mb3",
-              children: derive(() =>
-                sortedStoppedHabits.value.length
-                  ? "OLD HABITS (DIE HARD, LOL)"
-                  : ""
-              ),
+              class: "silver f6 mt5 mb2",
+              children: [
+                "OLD HABITS (DIE HARD, LOL)",
+                m.If({
+                  subject: derive(() => !!sortedStoppedHabits.value.length),
+                  isFalsy: m.Div("None"),
+                }),
+              ],
             }),
             map: (stoppedHabit) =>
               HabitCard({
-                classNames: "mb3",
+                classNames: "mb4",
                 habit: stoppedHabit,
                 months: totalOverviewMonths,
                 onClick: () => goToHabitPage(stoppedHabit.value.id),

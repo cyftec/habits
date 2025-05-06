@@ -8,7 +8,7 @@ import {
 } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { Section } from "..";
-import { BASE_COLORS } from "../../@common/constants";
+import { BASE_COLORS, BASE_LEVELS } from "../../@common/constants";
 import {
   getAddRemoveButtonsVisibility,
   getDetailedMilestones,
@@ -122,7 +122,7 @@ export const HabitEditor = component<HabitEditorProps>(
       children: [
         Section({
           classNames: "pb1",
-          title: "Schedule",
+          title: "Weekdays",
           children: m.Div({
             class: "mb3 f6 flex items-center justify-between justify-start-ns",
             children: m.For({
@@ -152,7 +152,7 @@ export const HabitEditor = component<HabitEditorProps>(
         }),
         Section({
           classNames: "pb2",
-          title: "Title",
+          title: "Title of the habit",
           children: TextBox({
             classNames: "ba bw1 b--light-silver br3 pa2 w-100",
             placeholder: `for example, "wake up at 5am"`,
@@ -165,7 +165,7 @@ export const HabitEditor = component<HabitEditorProps>(
           isTruthy: m.Div([
             Section({
               classNames: "pb1",
-              title: "Color",
+              title: "Select a color tag",
               children: m.Div({
                 class: "mb1 flex items-center",
                 children: m.For({
@@ -190,13 +190,16 @@ export const HabitEditor = component<HabitEditorProps>(
             }),
             Section({
               classNames: "pb3",
-              title: "Levels",
+              title: "Status update levels",
               hideDescription: hideDescriptions,
               description: `
-                  A habit can have more than 2 levels. Like the habit 'Drink 2 litres water'
-                  should have three levels - '0 litre', '1 litre' and '2 litres' respectively.
-                  You can add or remove level by clicking on + or - buttons. Click on textbox
-                  for editing the level name.
+                  When updating a habit status in a day, we generally have only two levels - "${BASE_LEVELS[0]}"
+                  or "${BASE_LEVELS[1]}". But a habit can have more than 2 levels as well.
+                  Like for example, the habit of 'Drink 2 litres water daily'
+                  should ideally have three levels - '0 litre', '1 litre' and '2 litres', from low to high.
+                  You can add or remove levels by clicking on + or - buttons. Click on textbox
+                  for editing the status level name. The levels from top to bottom should go from lowest
+                  to the highest.
                 `,
               children: m.For({
                 subject: levels,
@@ -221,7 +224,7 @@ export const HabitEditor = component<HabitEditorProps>(
                               "flex items-center ba bw1 b--light-silver br3 w-70 w-80-ns",
                             children: [
                               ColorDot({
-                                classNames: "w1dot5 h2 br3 br--left ml1px",
+                                classNames: "w1 h2 br3 br--left ml1px",
                                 dotClassNames: "br3 br--left",
                                 colorIndex,
                                 level: i,
@@ -248,7 +251,7 @@ export const HabitEditor = component<HabitEditorProps>(
                       m.If({
                         subject: i < levels.value.length - 1,
                         isTruthy: m.Div({
-                          class: "pa2 ml2 pl1 bl bw1 b--light-gray",
+                          class: "pa2 ml2 pl1 bl bw1 b--silver",
                         }),
                       }),
                     ],
@@ -257,14 +260,15 @@ export const HabitEditor = component<HabitEditorProps>(
               }),
             }),
             Section({
-              title: "Milestones",
+              title: "Your goal",
               hideDescription: hideDescriptions,
               description: dstring`
-                  Miltestones are something long-term. Let's say after a month or two, you followed
-                  your habit for 67% of the times, then based on below table you crossed the '${() =>
+                  Goals are something for long-term. Let's say based on below table, after
+                  a month or two, you followed your habit for 67% of the times, then you
+                  just crossed the milestone - '${() =>
                     getMilestone(editedHabit.value.milestones, 67)
-                      .label}' milestone. You can set your own milestone levels depending
-                  on the difficulty of the habit.
+                      .label}'. For acheiving your goal (in %), you can set your
+                  own custom milestones depending on the difficulty of the habit.
                 `,
               children: m.For({
                 subject: derive(() => getDetailedMilestones(milestones.value)),

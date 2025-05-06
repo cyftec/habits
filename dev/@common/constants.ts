@@ -31,7 +31,10 @@ export const SYSTEM_DEFINED_LEVELS: LevelUI[] = [
     code: -3,
   },
 ];
-export const BASE_LEVELS = ["Not done", "Done"] as const satisfies string[];
+export const BASE_LEVELS = [
+  "Not started",
+  "Completed",
+] as const satisfies string[];
 
 export const BASE_MILESTONES: MilestonesData = [70, 60, 45];
 

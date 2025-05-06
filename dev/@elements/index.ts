@@ -1,6 +1,7 @@
 export * from "./AddRemoveButton";
 export * from "./Button";
 export * from "./ColorDot";
+export * from "./Divider";
 export * from "./Icon";
 export * from "./Link";
 export * from "./Modal";

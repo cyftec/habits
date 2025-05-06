@@ -1,14 +1,15 @@
 import { dobject, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { phase } from "@mufw/maya/utils";
-import { goToPrivacyPolicyPage } from "../@common/utils";
-import { NavScaffold, Section } from "../@components";
-import { Icon, Link, Page, Toggle } from "../@elements";
 import { INITIAL_SETTINGS } from "../@common/constants";
 import {
   getEditPageSettings,
   updateEditPageSettings,
 } from "../@common/localstorage";
+import { goToPrivacyPolicyPage } from "../@common/utils";
+import { NavScaffold, Section } from "../@components";
+import { Divider, Icon, Link, Page } from "../@elements";
+import { ToggleSetting } from "./@components/ToggleSetting";
 
 const storageSpace = signal<Record<string, number>>({});
 const editPageSettings = signal(INITIAL_SETTINGS.editPage);
@@ -81,29 +82,21 @@ export default Page({
           classNames: "pb3",
           title: "Preferences",
           children: [
-            m.Div({ class: "bb b--light-gray mv2" }),
-            m.Div({
-              class: "flex items-center justify-between",
-              children: [
-                m.Div("Show hints on Edit page"),
-                Toggle({
-                  isOn: dobject(editPageSettings).prop("showHints"),
-                  onToggle: onEditPageHintsSettingToggle,
-                }),
-              ],
+            Divider({ classNames: "mv2" }),
+            ToggleSetting({
+              label: "Show hints on Edit page",
+              isToggleOn: dobject(editPageSettings).prop("showHints"),
+              onToggle: onEditPageHintsSettingToggle,
             }),
-            m.Div({ class: "bb b--light-gray mv2" }),
-            m.Div({
-              class: "flex items-center justify-between",
-              children: [
-                m.Div("Always show more customisations on Edit page"),
-                Toggle({
-                  isOn: dobject(editPageSettings).prop("showFullCustomisation"),
-                  onToggle: onEditPageCustomisationsSettingToggle,
-                }),
-              ],
+            Divider({ classNames: "mv2" }),
+            ToggleSetting({
+              label: "Always show more customisations on Edit page",
+              isToggleOn: dobject(editPageSettings).prop(
+                "showFullCustomisation"
+              ),
+              onToggle: onEditPageCustomisationsSettingToggle,
             }),
-            m.Div({ class: "bb b--light-gray mv2" }),
+            Divider({ classNames: "mv2" }),
           ],
         }),
         Section({
