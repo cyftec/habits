@@ -1,6 +1,6 @@
-import { Child, m } from "@mufw/maya";
-import { Page, Scaffold } from "../../@elements";
+import { m } from "@mufw/maya";
 import { GoBackButton } from "../../@components";
+import { Page, Scaffold } from "../../@elements";
 import { PRIVACY_POLICY } from "./@lib/constants";
 
 export default Page({
@@ -9,7 +9,7 @@ export default Page({
     classNames: "bg-white",
     header: "Privacy Policy",
     content: m.Div({
-      class: "gray pt4",
+      class: "gray pt3",
       children: [
         m.Div([
           m.Span({

@@ -1,5 +1,5 @@
 export const PRIVACY_POLICY = {
-  date: new Date(2025, 4, 15),
+  date: new Date(2025, 4, 7),
   description: `This privacy policy applies to the use of 'Habits' Web App (will be referred as "the App" ahead). We value your privacy and are committed to providing a safe and transparent experience.`,
   policies: [
     {
