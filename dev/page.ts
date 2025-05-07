@@ -26,8 +26,10 @@ import {
   NavScaffold,
 } from "./@components";
 import { ColorDot, Link, Page, ProgressBar } from "./@elements";
+import { checkNoHabitsInStore } from "./@common/localstorage/habits";
 
 const now = new Date();
+const noHabitsInStore = signal(false);
 const progress = signal(0);
 const itsTimeToRefresh = signal(false);
 const sevenDays = getLastNDays(getGapDate(now, 2), 7);
@@ -73,6 +75,7 @@ const transitionToHabitsPage = () => {
 const triggerPageDataRefresh = () => {
   intializeTrackerEmptyDays();
   selectedDate.value = new Date();
+  noHabitsInStore.value = checkNoHabitsInStore();
 };
 
 const onPageMount = () => {
@@ -97,7 +100,6 @@ export default Page({
           statusEditableHabitIndex.value = 0;
         },
         onChange: function (levelCode: number): void {
-          console.log(levelCode);
           updateHabitStatus(editableHabit.value, levelCode, selectedDate.value);
           isStatusEditorOpen.value = false;
           selectedDate.value = new Date(selectedDate.value.getTime() + 1);
@@ -132,122 +134,148 @@ export default Page({
           classNames: "ph3 bg-white",
           route: "/",
           header: "Tasks in a day",
-          content: m.Div({
-            children: [
-              m.Div({
-                onmount: (el) => (el.scrollLeft = el.scrollWidth),
-                class:
-                  "sticky top-3 bg-white pb2 flex items-center justify-between z-999 w-100",
-                children: m.For({
-                  subject: sevenDays,
-                  map: (date) => {
-                    const isFuture = isFutureDay(date);
-                    const isSelectedDay = areSameDates(
-                      selectedDate.value,
-                      date
-                    );
-                    return m.Div({
-                      class: `bw1 ba br-pill ph2 pv3 pb2 tc ${
-                        isSelectedDay
-                          ? "black b b--silver"
-                          : isFuture
-                          ? "light-gray b--transparent"
-                          : "light-silver pointer b--transparent"
-                      }`,
-                      onclick: handleCTA(
-                        () =>
-                          !(isSelectedDay || isFuture) &&
-                          (selectedDate.value = date)
-                      ),
-                      children: [
-                        m.Div({
-                          class: "f7 ",
-                          children: getWeekdayName(date.getDay(), 3),
-                        }),
-                        m.Div({
-                          class: "mt2 f4",
-                          children: ("0" + date.getDate()).slice(-2),
-                        }),
-                      ],
-                    });
-                  },
-                }),
-              }),
-              m.Div({
-                class: "mt2 mb2 f4 b",
-                children: derive(() => getDayLabel(selectedDate.value)),
-              }),
-              m.Div({
-                class: "mb4 pb2 silver",
-                children: habitsStatusLabel,
-              }),
-              m.Div({
-                class: "mt4",
-                children: m.For({
-                  subject: habits,
-                  n: Infinity,
-                  nthChild: Link({
-                    classNames: "flex pl5 pr3 nl3 mt4",
-                    onClick: goToNewHabitsPage,
-                    children: derive(() =>
-                      habits.value.length === 0
-                        ? "No habit for the day! Add one."
-                        : habits.value.length < 5
-                        ? `Only ${habits.value.length} habits a day! Add more.`
-                        : ``
-                    ),
+          content: m.Div(
+            m.If({
+              subject: noHabitsInStore,
+              isTruthy: m.Div({
+                class: "flex flex-column items-center justify-around",
+                children: [
+                  m.Img({
+                    class: "mt3 pt4",
+                    src: "/assets/images/just_landed.png",
+                    height: "200",
                   }),
-                  map: (habit, i) => {
-                    const status = getDayStatus(
-                      habit.tracker,
-                      selectedDate.value
-                    ) as DailyStatus;
-
-                    return m.Div({
-                      class: "mt4 flex items-center",
-                      children: [
-                        ColorDot({
-                          classNames: `pa3 mr3 ba b ${
-                            status.level.code < 1
-                              ? "b--light-silver"
-                              : "b--transparent"
+                  m.Div("Looks like, you just landed here!"),
+                  AddHabitButton({
+                    classNames: "pt5",
+                    justifyClassNames: "justify-around",
+                    label: "Add your first habit",
+                  }),
+                ],
+              }),
+              isFalsy: m.Div({
+                children: [
+                  m.Div({
+                    onmount: (el) => (el.scrollLeft = el.scrollWidth),
+                    class:
+                      "sticky top-3 bg-white pb2 flex items-center justify-between z-999 w-100",
+                    children: m.For({
+                      subject: sevenDays,
+                      map: (date) => {
+                        const isFuture = isFutureDay(date);
+                        const isSelectedDay = areSameDates(
+                          selectedDate.value,
+                          date
+                        );
+                        return m.Div({
+                          class: `bw1 ba br-pill ph2 pv3 pb2 tc ${
+                            isSelectedDay
+                              ? "black b b--silver"
+                              : isFuture
+                              ? "light-gray b--transparent"
+                              : "light-silver pointer b--transparent"
                           }`,
-                          colorIndex: habit.colorIndex,
-                          level: status.level.code,
-                          totalLevels: habit.levels.length,
-                          icon: "check",
-                          iconSize: 22,
-                          showText: status.level.code > 0,
-                          onClick: () => {
-                            isStatusEditorOpen.value = true;
-                            statusEditableHabitIndex.value = i;
-                          },
-                        }),
-                        m.Div({
-                          class: "pointer",
-                          onclick: handleCTA(() => goToHabitPage(habit.id)),
+                          onclick: handleCTA(
+                            () =>
+                              !(isSelectedDay || isFuture) &&
+                              (selectedDate.value = date)
+                          ),
                           children: [
                             m.Div({
-                              class: "f5 fw6 f4-ns fw4-ns",
-                              children: habit.title,
+                              class: "f7 ",
+                              children: getWeekdayName(date.getDay(), 3),
                             }),
                             m.Div({
-                              class: "f6 light-silver pt05",
-                              children: derive(() =>
-                                getHabitInfoLabel(habit.id)
-                              ),
+                              class: "mt2 f4",
+                              children: ("0" + date.getDate()).slice(-2),
                             }),
                           ],
-                        }),
-                      ],
-                    });
-                  },
-                }),
+                        });
+                      },
+                    }),
+                  }),
+                  m.Div({
+                    class: "mt2 mb2 f4 b",
+                    children: derive(() => getDayLabel(selectedDate.value)),
+                  }),
+                  m.Div({
+                    class: "mb4 pb2 silver",
+                    children: habitsStatusLabel,
+                  }),
+                  m.Div({
+                    class: "mt4",
+                    children: m.For({
+                      subject: habits,
+                      n: Infinity,
+                      nthChild: Link({
+                        classNames: "flex pl5 pr3 nl3 mt4",
+                        onClick: goToNewHabitsPage,
+                        children: derive(() =>
+                          habits.value.length === 0
+                            ? "No habit for the day! Add one."
+                            : habits.value.length < 5
+                            ? `Only ${habits.value.length} habits a day! Add more.`
+                            : ``
+                        ),
+                      }),
+                      map: (habit, i) => {
+                        const status = getDayStatus(
+                          habit.tracker,
+                          selectedDate.value
+                        ) as DailyStatus;
+
+                        return m.Div({
+                          class: "mt4 flex items-center",
+                          children: [
+                            ColorDot({
+                              classNames: `pa3 mr3 ba b ${
+                                status.level.code < 1
+                                  ? "b--light-silver"
+                                  : "b--transparent"
+                              }`,
+                              colorIndex: habit.colorIndex,
+                              level: status.level.code,
+                              totalLevels: habit.levels.length,
+                              icon: "check",
+                              iconSize: 22,
+                              showText: status.level.code > 0,
+                              onClick: () => {
+                                isStatusEditorOpen.value = true;
+                                statusEditableHabitIndex.value = i;
+                              },
+                            }),
+                            m.Div({
+                              class: "pointer",
+                              onclick: handleCTA(() => goToHabitPage(habit.id)),
+                              children: [
+                                m.Div({
+                                  class: "f5 fw6 f4-ns fw4-ns",
+                                  children: habit.title,
+                                }),
+                                m.Div({
+                                  class: "f6 light-silver pt05",
+                                  children: derive(() =>
+                                    getHabitInfoLabel(habit.id)
+                                  ),
+                                }),
+                              ],
+                            }),
+                          ],
+                        });
+                      },
+                    }),
+                  }),
+                  m.Div({ class: "pv6" }),
+                ],
               }),
-              m.Div({ class: "pv6" }),
-            ],
-          }),
-          navbarTop: AddHabitButton({}),
+            })
+          ),
+          navbarTop: m.Div(
+            m.If({
+              subject: noHabitsInStore,
+              isFalsy: AddHabitButton({}),
+            })
+          ),
         }),
       }),
     ],

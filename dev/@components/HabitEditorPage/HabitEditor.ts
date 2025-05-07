@@ -45,7 +45,6 @@ export const HabitEditor = component<HabitEditorProps>(
     showFullCustomisations,
     onChange,
   }) => {
-    effect(() => console.log(hideDescriptions?.value));
     const moreDetails = signal(false);
     const customisationsVisible = derive(() => {
       const moreDetailsValue = moreDetails.value;

@@ -1,11 +1,13 @@
-import { effect, signal } from "@cyftech/signal";
+import { phase } from "@mufw/maya/utils";
+import { INITIAL_ANALYTICS } from "../constants";
 import {
   areSameDates,
   getDaysGap,
   getHabitData,
   getHabitUI,
 } from "../transforms";
-import { Habit, HabitUI, LocalSettings } from "../types";
+import { Habit, HabitUI, LocalSettings, StorageDetails } from "../types";
+import { fetchAnalytics, updateAnalytics } from "./analytics";
 import {
   fetchHabitsFromStore,
   fetchHabitWithKey,
@@ -13,10 +15,7 @@ import {
   hardDeleteHabitFromStore,
   saveHabitInStore,
 } from "./habits";
-import { fetchSettings, updateSettings } from "./settings";
-import { phase } from "@mufw/maya/utils";
-import { fetchAnalytics, updateAnalytics } from "./analytics";
-import { INITIAL_ANALYTICS } from "../constants";
+import { fetchSettings, getStorageSpaceData, updateSettings } from "./settings";
 
 /**
  *
@@ -27,7 +26,6 @@ import { INITIAL_ANALYTICS } from "../constants";
 
 export const getLastInteraction = () => {
   if (!phase.currentIs("run")) {
-    console.log(`current phase is not run`);
     return INITIAL_ANALYTICS.lastInteraction;
   }
   const currentAnalytics = fetchAnalytics();
@@ -168,3 +166,5 @@ export const updateEditPageSettings = (
     editPage: editPageSettings,
   });
 };
+
+export const getStorageData = (): StorageDetails => getStorageSpaceData();

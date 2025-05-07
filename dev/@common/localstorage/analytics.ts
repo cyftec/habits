@@ -13,7 +13,6 @@ export const updateAnalytics = (analytics: Analytics) => {
 
 export const fetchAnalytics = (): Analytics => {
   if (!phase.currentIs("run")) {
-    console.log(`return initial analytics`);
     return INITIAL_ANALYTICS;
   }
 
@@ -29,7 +28,6 @@ export const fetchAnalytics = (): Analytics => {
 
   const analyticsObject = getAnalyticsFromStore();
   if (!analyticsObject) {
-    console.log(`NO ANALYTICS FOUND`);
     updateAnalytics(INITIAL_ANALYTICS);
   }
   const analytics = getAnalyticsFromStore();

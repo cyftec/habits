@@ -424,7 +424,6 @@ export const getHabitInfoLabel = (habitId: number) => {
     getGapDate(today, -daysBefore),
     today
   );
-  console.log({ aceStreak, followStreak, missed });
 
   if (aceStreak >= 12)
     return `Nailed ${aceStreak} days in a row. Woah! Don't stop.`;

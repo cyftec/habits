@@ -3,6 +3,7 @@ import {
   LevelUI,
   LocalSettings,
   MilestonesData,
+  StorageDetails,
   WeekdayFrequency,
 } from "./types";
 
@@ -53,6 +54,12 @@ export const INITIAL_SETTINGS: LocalSettings = {
     showHints: true,
     showFullCustomisation: false,
   },
+};
+
+export const INITIAL_STORAGE_DATA: StorageDetails = {
+  total: 0,
+  spaceLeft: 100,
+  documents: {},
 };
 
 export const HOMEPAGE_OVERVIEW_TABS = [

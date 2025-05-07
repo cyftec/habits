@@ -21,17 +21,15 @@ import {
   SortOptions,
 } from "../@components";
 import { Page, TabBar } from "../@elements";
+import { checkNoHabitsInStore } from "../@common/localstorage/habits";
 
+const noHabitsInStore = signal(false);
 const pageSettings = signal(INITIAL_SETTINGS.habitsPage);
 const totalOverviewMonths = derive(
   () => HOMEPAGE_OVERVIEW_TABS[pageSettings.value.tabIndex].months
 );
-effect(() => console.log(pageSettings.value.sortOptionIndex));
-effect(() => console.log(totalOverviewMonths.value));
 const habits = signal<HabitUI[]>([]);
 const sortedHabits = derive(() => {
-  console.log(`updating SORTED HABITS`);
-
   const selectedOption =
     HOMEPAGE_SORT_OPTIONS[pageSettings.value.sortOptionIndex];
   const totalMonths = totalOverviewMonths.value;
@@ -50,7 +48,6 @@ const sortedHabits = derive(() => {
 
     return b.id - a.id;
   });
-  console.log(sortedHabitsWithCompletion);
 
   return sortedHabitsWithCompletion;
 });
@@ -75,10 +72,9 @@ const onTabChange = (tabIndex: number) => {
 };
 
 const triggerPageDataRefresh = () => {
-  console.log(`triggering refresh`);
-
   habits.value = fetchHabits();
   pageSettings.value = getHabitsPageSettings();
+  noHabitsInStore.value = checkNoHabitsInStore();
 };
 
 const onPageMount = () => {
@@ -105,74 +101,88 @@ export default Page({
         }),
       ],
     }),
-    content: m.Div({
-      children: [
-        TabBar({
-          classNames: "nl1 f6",
-          tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
-          selectedTabIndex: dobject(pageSettings).prop("tabIndex"),
-          onTabChange: onTabChange,
-        }),
-        m.If({
-          subject: derive(() => sortedHabits.value.length),
-          isFalsy: m.Div({
-            class: "flex justify-around",
-            children: m.Div({
-              class: "mt6 pt5",
-              children: "No habits added",
+    content: m.Div(
+      m.If({
+        subject: noHabitsInStore,
+        isTruthy: m.Div({
+          class: "flex flex-column items-center justify-around",
+          children: [
+            m.Img({
+              class: "mt3 pt4",
+              src: "/assets/images/empty.png",
+              height: "200",
             }),
+            m.Div("It's all empty here!"),
+            AddHabitButton({
+              classNames: "pt5",
+              justifyClassNames: "justify-around",
+              label: "Add your first habit",
+            }),
+          ],
+        }),
+        isFalsy: m.Div([
+          TabBar({
+            classNames: "nl1 f6",
+            tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
+            selectedTabIndex: dobject(pageSettings).prop("tabIndex"),
+            onTabChange: onTabChange,
           }),
-        }),
-        m.Div(
-          m.For({
-            subject: sortedActiveHabits,
-            itemKey: "id",
-            n: 0,
-            nthChild: m.Div({
-              class: "silver f6 mt3 pt1 mb4",
-              children: [
-                "ACTIVE HABITS",
-                m.If({
-                  subject: derive(() => !!sortedActiveHabits.value.length),
-                  isFalsy: m.Div("None"),
-                }),
-              ],
-            }),
-            map: (activeHabit) =>
-              HabitCard({
-                classNames: "mb4",
-                habit: activeHabit,
-                months: totalOverviewMonths,
-                onClick: () => goToHabitPage(activeHabit.value.id),
+          m.Div(
+            m.For({
+              subject: sortedActiveHabits,
+              itemKey: "id",
+              n: 0,
+              nthChild: m.Div({
+                class: "silver f6 mt3 pt1 mb4",
+                children: [
+                  "ACTIVE HABITS",
+                  m.If({
+                    subject: derive(() => !!sortedActiveHabits.value.length),
+                    isFalsy: m.Div("None"),
+                  }),
+                ],
               }),
-          })
-        ),
-        m.Div(
-          m.For({
-            subject: sortedStoppedHabits,
-            itemKey: "id",
-            n: 0,
-            nthChild: m.Div({
-              class: "silver f6 mt5 mb2",
-              children: [
-                "OLD HABITS (DIE HARD, LOL)",
-                m.If({
-                  subject: derive(() => !!sortedStoppedHabits.value.length),
-                  isFalsy: m.Div("None"),
+              map: (activeHabit) =>
+                HabitCard({
+                  classNames: "mb4",
+                  habit: activeHabit,
+                  months: totalOverviewMonths,
+                  onClick: () => goToHabitPage(activeHabit.value.id),
                 }),
-              ],
-            }),
-            map: (stoppedHabit) =>
-              HabitCard({
-                classNames: "mb4",
-                habit: stoppedHabit,
-                months: totalOverviewMonths,
-                onClick: () => goToHabitPage(stoppedHabit.value.id),
+            })
+          ),
+          m.Div(
+            m.For({
+              subject: sortedStoppedHabits,
+              itemKey: "id",
+              n: 0,
+              nthChild: m.Div({
+                class: "silver f6 mt5 mb2",
+                children: [
+                  "OLD HABITS (DIE HARD, LOL)",
+                  m.If({
+                    subject: derive(() => !!sortedStoppedHabits.value.length),
+                    isFalsy: m.Div("None"),
+                  }),
+                ],
               }),
-          })
-        ),
-      ],
-    }),
-    navbarTop: AddHabitButton({}),
+              map: (stoppedHabit) =>
+                HabitCard({
+                  classNames: "mb4",
+                  habit: stoppedHabit,
+                  months: totalOverviewMonths,
+                  onClick: () => goToHabitPage(stoppedHabit.value.id),
+                }),
+            })
+          ),
+        ]),
+      })
+    ),
+    navbarTop: m.Div(
+      m.If({
+        subject: noHabitsInStore,
+        isFalsy: AddHabitButton({}),
+      })
+    ),
   }),
 });

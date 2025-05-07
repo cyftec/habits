@@ -10,6 +10,12 @@ export type LocalSettings = {
   };
 };
 
+export type StorageDetails = {
+  total: number;
+  spaceLeft: number;
+  documents: Record<string, number>;
+};
+
 export type Analytics = {
   id: "analytics";
   lastInteraction: number;

@@ -1,7 +1,9 @@
 import { phase } from "@mufw/maya/utils";
-import { INITIAL_SETTINGS } from "../constants";
-import { LocalSettings } from "../types";
+import { INITIAL_SETTINGS, INITIAL_STORAGE_DATA } from "../constants";
+import { LocalSettings, StorageDetails } from "../types";
 import { parseObjectJsonString } from "../utils";
+import { validLocalStorageKeys } from "./core";
+import { validHabitRecordKey } from "./habits";
 
 const LS_SETTINGS_KEY = "settings";
 const LS_SETTINGS_ID_KEY = "id";
@@ -36,15 +38,34 @@ export const fetchSettings = (): LocalSettings => {
 export const addFutureUpgradesIfMissing = (settings: LocalSettings) => {
   // v1 upgrade
   if (!settings.editPage) {
-    console.log(`settings.editPage is missing`);
-    console.log(`adding `, {
-      ...settings,
-      editPage: INITIAL_SETTINGS.editPage,
-    });
-
     updateSettings({
       ...settings,
       editPage: INITIAL_SETTINGS.editPage,
     });
   }
+};
+
+export const getStorageSpaceData = (): StorageDetails => {
+  const storageData: StorageDetails = INITIAL_STORAGE_DATA;
+  if (!phase.currentIs("run")) return storageData;
+
+  const BYTES_PER_KB = 1024;
+  let totalBytes = 0;
+  const getKbFromBytes = (bytes: number) => bytes / BYTES_PER_KB;
+  for (const lsKey of validLocalStorageKeys()) {
+    const singleRecordBytes = (localStorage[lsKey].length + lsKey.length) * 2;
+    const documentKey = validHabitRecordKey(lsKey) ? "habits" : lsKey;
+
+    totalBytes += singleRecordBytes;
+    storageData.documents[documentKey] =
+      (storageData.documents[documentKey]
+        ? storageData.documents[documentKey]
+        : 0) + singleRecordBytes;
+  }
+
+  storageData.total = getKbFromBytes(totalBytes);
+  storageData.spaceLeft =
+    (100 * (5 * 1024 * 1024 - totalBytes)) / (5 * 1024 * 1024);
+
+  return storageData;
 };

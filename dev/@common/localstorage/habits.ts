@@ -1,8 +1,9 @@
 import { phase } from "@mufw/maya/utils";
 import { Habit, StoreHabitRecordKey } from "../types";
 import { parseObjectJsonString } from "../utils";
+import { validLocalStorageKeys } from "./core";
 
-const validHabitRecordKey = (localStorageKey: string) =>
+export const validHabitRecordKey = (localStorageKey: string) =>
   localStorageKey.startsWith("h.");
 
 export const getHabitStoreRecordKey = (habitId: number): StoreHabitRecordKey =>
@@ -18,12 +19,20 @@ export const fetchHabitWithKey = (
   return habit;
 };
 
+export const checkNoHabitsInStore = () => {
+  for (const lsKey of validLocalStorageKeys()) {
+    if (validHabitRecordKey(lsKey)) return false;
+  }
+
+  return true;
+};
+
 export const fetchHabitsFromStore = () => {
   if (!phase.currentIs("run")) return [];
 
   const habits: Habit[] = [];
-  for (let key in localStorage) {
-    const habit = fetchHabitWithKey(key);
+  for (const lsKey of validLocalStorageKeys()) {
+    const habit = fetchHabitWithKey(lsKey);
     if (!habit) continue;
     habits.push(habit);
   }

@@ -1,43 +1,19 @@
 import { dobject, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { phase } from "@mufw/maya/utils";
-import { INITIAL_SETTINGS } from "../@common/constants";
+import { INITIAL_SETTINGS, INITIAL_STORAGE_DATA } from "../@common/constants";
 import {
   getEditPageSettings,
+  getStorageData,
   updateEditPageSettings,
 } from "../@common/localstorage";
 import { goToPrivacyPolicyPage } from "../@common/utils";
 import { NavScaffold, Section } from "../@components";
 import { Divider, Icon, Link, Page } from "../@elements";
 import { ToggleSetting } from "./@components/ToggleSetting";
+import { StorageDetails } from "../@common/types";
 
-const storageSpace = signal<Record<string, number>>({});
+const storageSpace = signal<StorageDetails>(INITIAL_STORAGE_DATA);
 const editPageSettings = signal(INITIAL_SETTINGS.editPage);
-
-const updateStorageData = () => {
-  if (!phase.currentIs("run")) return;
-  const BYTES_PER_KB = 1024;
-  let totalBytes = 0;
-  const getKbFromBytes = (bytes: number) => bytes / BYTES_PER_KB;
-  const collections = {
-    total: 0,
-  };
-  for (const key in localStorage) {
-    if (!localStorage.hasOwnProperty(key)) {
-      continue;
-    }
-    const singleRecordBytes = (localStorage[key].length + key.length) * 2;
-    totalBytes += singleRecordBytes;
-    const recordKey = key.startsWith("h.") ? "habits" : key;
-    collections[recordKey] =
-      (collections[recordKey] ? collections[recordKey] : 0) + singleRecordBytes;
-  }
-  collections.total = getKbFromBytes(totalBytes);
-  collections["spaceLeft"] =
-    (100 * (5 * 1024 * 1024 - totalBytes)) / (5 * 1024 * 1024);
-  console.log(collections);
-  storageSpace.value = collections;
-};
 
 const onEditPageHintsSettingToggle = () => {
   updateEditPageSettings({
@@ -56,7 +32,7 @@ const onEditPageCustomisationsSettingToggle = () => {
 };
 
 const onPageMount = () => {
-  updateStorageData();
+  storageSpace.value = getStorageData();
   editPageSettings.value = getEditPageSettings();
 };
 
@@ -167,6 +143,5 @@ export default Page({
         }),
       ],
     }),
-    // navbarTop: AddHabitButton({}),
   }),
 });

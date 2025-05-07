@@ -33,7 +33,6 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
         ? `Edit '${editableHabit.value.title}'`
         : "Add new habit"
     );
-    effect(() => console.log(editPageSettings.value.showHints));
 
     const openDeleteModal = () => (deleteActionModalOpen.value = true);
     const closeDeleteModal = () => (deleteActionModalOpen.value = false);
