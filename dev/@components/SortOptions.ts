@@ -48,10 +48,10 @@ export const SortOptions = component<SortOptionsProps>(
                 children: m.For({
                   subject: HOMEPAGE_SORT_OPTIONS,
                   map: (option, optionIndex) => {
-                    const optionCSS = dstring`pointer flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
+                    const optionCSS = dstring`pointer flex items-center pv3 pl2 pr3 bt b--moon-gray black ${() =>
                       option.label === selectedOption.value.label
-                        ? "bg-near-white black"
-                        : "gray"}`;
+                        ? "bg-near-white fw7"
+                        : "fw5"}`;
 
                     return m.Div({
                       class: optionCSS,

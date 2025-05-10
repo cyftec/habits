@@ -1,4 +1,4 @@
-import { derive, dstring, signal } from "@cyftech/signal";
+import { derive, dobject, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { intializeTrackerEmptyDays } from "../../@common/localstorage";
 import {
@@ -12,9 +12,14 @@ import {
   updateHabitStatus,
 } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
-import { goToHabitEditPage, handleCTA } from "../../@common/utils";
-import { GoBackButton, HabitDeleteModal, Section } from "../../@components";
-import { Button, ColorDot, Icon, Modal, Page, Scaffold } from "../../@elements";
+import { goToHabitEditPage } from "../../@common/utils";
+import {
+  GoBackButton,
+  HabitDeleteModal,
+  HabitStatusEditModal,
+  Section,
+} from "../../@components";
+import { Button, ColorDot, Icon, Page, Scaffold } from "../../@elements";
 
 const error = signal("");
 const habit = signal<HabitUI>(getNewHabit());
@@ -127,39 +132,12 @@ export default Page({
           onClose: closeDeleteModal,
           onDone: onHabitDelete,
         }),
-        Modal({
-          classNames: "f5 normal ba bw0 outline-0",
+        HabitStatusEditModal({
           isOpen: updateLevelModalOpen,
-          onTapOutside: () => (updateLevelModalOpen.value = false),
-          content: m.Div({
-            class: "mnw5",
-            children: [
-              m.Div({
-                class: "f5 b tc pa3",
-                children: dstring`Change status for ${() =>
-                  updateLevelModalData.value.date.toDateString()}`,
-              }),
-              m.Div({
-                class: "f5 mb1",
-                children: m.For({
-                  subject: derive(() => habit.value?.levels || []),
-                  map: (level) => {
-                    const optionCSS = dstring`pointer flex items-center pv3 pa3 bt b--moon-gray ${() =>
-                      level.code ===
-                      updateLevelModalData.value.selectedLevelIndex
-                        ? "bg-near-white black"
-                        : "gray"}`;
-
-                    return m.Div({
-                      class: optionCSS,
-                      onclick: handleCTA(() => updateLevel(level.code)),
-                      children: [m.Span(level.name)],
-                    });
-                  },
-                }),
-              }),
-            ],
-          }),
+          habit: habit,
+          date: dobject(updateLevelModalData).prop("date"),
+          onClose: () => (updateLevelModalOpen.value = false),
+          onChange: updateLevel,
         }),
         m.If({
           subject: error,
