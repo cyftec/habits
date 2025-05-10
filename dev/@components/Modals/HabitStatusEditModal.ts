@@ -40,11 +40,11 @@ export const HabitStatusEditModal = component<HabitStatusEditModalProps>(
               subject: derive(() => levels.value.slice().reverse() || []),
               map: (level, levelIndex) => {
                 const levelCode = levels.value.length - 1 - levelIndex;
-                const optionCSS = dstring`pointer flex items-center pv3 pa3 bt b--moon-gray black ${() =>
+                const optionCSS = dstring`pointer flex items-center pv3 pa3 bt b--moon-gray ${() =>
                   getDayStatus(tracker.value, date.value)?.level.code ===
                   levelCode
-                    ? "bg-near-white fw7"
-                    : "fw5"}`;
+                    ? "bg-near-white black fw6"
+                    : "gray fw5"}`;
 
                 return m.Div({
                   class: optionCSS,
