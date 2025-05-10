@@ -16,6 +16,7 @@ type ColorDotProps = {
   icon?: string;
   iconSize?: number;
   isRectangular?: boolean;
+  showHeight?: boolean;
   onClick?: () => void;
 };
 
@@ -31,23 +32,24 @@ export const ColorDot = component<ColorDotProps>(
     icon,
     iconSize,
     isRectangular,
+    showHeight,
     onClick,
   }) => {
     const outerBorder = derive(() => (isRectangular?.value ? "br0" : "br-100"));
     const outerBg = derive(() =>
       level.value < 0 ? "bg-transparent" : "bg-light-gray"
     );
-    const { backgroundColor, fontColor } = dobject(
-      derive(() =>
-        getColorsForLevel(
-          level.value,
-          totalLevels.value,
-          colorIndex.value,
-          showText?.value
+    const { peakBackgroundColor, backgroundColor, fontColor, levelPercent } =
+      dobject(
+        derive(() =>
+          getColorsForLevel(
+            level.value,
+            totalLevels.value,
+            colorIndex.value,
+            showText?.value
+          )
         )
-      )
-    ).props;
-    const innerBR = derive(() => (isRectangular?.value ? "br0" : "br-100"));
+      ).props;
     const text = derive(() => textContent?.value || "·");
 
     const onTap = () => {
@@ -55,11 +57,19 @@ export const ColorDot = component<ColorDotProps>(
     };
 
     return m.Span({
-      class: dstring`pointer relative ${outerBorder} ${outerBg} ${classNames}`,
+      class: dstring`pointer relative overflow-hidden ${outerBorder} ${outerBg} ${classNames}`,
       onclick: handleCTA(onTap),
-      children: [
-        m.Span({
-          class: dstring`flex items-center justify-around absolute absolute--fill ${innerBR} ${dotClassNames}`,
+      children: m.If({
+        subject: showHeight,
+        isTruthy: m.Span({
+          class: dstring`absolute left-0 right-0 bottom-0 br0 ${dotClassNames}`,
+          style: dstring`
+            background-color: ${peakBackgroundColor};
+            height: ${levelPercent}%;
+          `,
+        }),
+        isFalsy: m.Span({
+          class: dstring`flex items-center justify-around absolute absolute--fill ${dotClassNames}`,
           style: dstring`
             background-color: ${backgroundColor};
             color: ${fontColor};
@@ -73,7 +83,7 @@ export const ColorDot = component<ColorDotProps>(
             isFalsy: m.Span(text),
           }),
         }),
-      ],
+      }),
     });
   }
 );

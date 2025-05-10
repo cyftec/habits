@@ -236,9 +236,7 @@ export default Page({
                               colorIndex: habit.colorIndex,
                               level: status.level.code,
                               totalLevels: habit.levels.length,
-                              icon: "check",
-                              iconSize: 22,
-                              showText: status.level.code > 0,
+                              showHeight: true,
                               onClick: () => {
                                 isStatusEditorOpen.value = true;
                                 statusEditableHabitIndex.value = i;

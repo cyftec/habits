@@ -302,10 +302,8 @@ export const getColorsForLevel = (
   showText = false
 ) => {
   const color = BASE_COLORS[colorIndex];
-
-  const opacityHexNum = Math.trunc(
-    Math.pow(level / (totalLevels - 1), GOLDEN_RATIO) * 255
-  );
+  const levelFraction = level / (totalLevels - 1);
+  const opacityHexNum = Math.trunc(Math.pow(levelFraction, GOLDEN_RATIO) * 255);
   const hex = opacityHexNum.toString(16);
   const opacityHex = hex.length === 1 ? `0${hex}` : hex;
   const backgroundColor =
@@ -318,7 +316,12 @@ export const getColorsForLevel = (
     ? "lightgray"
     : "transparent";
 
-  return { backgroundColor, fontColor };
+  return {
+    backgroundColor,
+    fontColor,
+    peakBackgroundColor: color,
+    levelPercent: Math.round(levelFraction * 100),
+  };
 };
 
 export const updateHabitStatus = (
