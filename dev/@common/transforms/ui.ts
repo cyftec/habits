@@ -55,6 +55,7 @@ export const getLevelUI = (level: number, levels: string[]): LevelUI => {
   return level < 0
     ? (getSystemDefinedLevel(-1) as LevelUI)
     : {
+        isMaxLevel: level === levels.length - 1,
         name: levels[level],
         code: level,
       };
@@ -75,7 +76,7 @@ export const getDailyStatus = (
 });
 
 export const getDayStatus = (tracker: DailyStatus[], date: Date) =>
-  tracker.find((status) => getMomentZero(status.date) === getMomentZero(date));
+  tracker.find((status) => areSameDates(status.date, date));
 
 export const getHabitsForDate = (date: Date): HabitUI[] =>
   fetchHabits().filter((hab) => {
@@ -92,6 +93,7 @@ export const getHabitUI = (habit: Habit): HabitUI => {
     ...habit,
     startDate,
     levels: habit.levels.map((levelName, index) => ({
+      isMaxLevel: index === habit.levels.length - 1,
       name: levelName,
       code: index,
     })),

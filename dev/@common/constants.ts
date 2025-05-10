@@ -22,14 +22,17 @@ export const SYSTEM_DEFINED_LEVELS: LevelUI[] = [
   {
     name: "Not Applicable",
     code: -1,
+    isMaxLevel: false,
   },
   {
     name: "Paused",
     code: -2,
+    isMaxLevel: false,
   },
   {
     name: "Stopped",
     code: -3,
+    isMaxLevel: false,
   },
 ];
 export const BASE_LEVELS = [

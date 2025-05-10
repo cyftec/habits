@@ -95,7 +95,12 @@ export const HabitEditor = component<HabitEditorProps>(
 
     const addLevel = (atIndex: number) => {
       const updatedLevels = levels.value;
-      updatedLevels.splice(atIndex, 0, { name: "", code: atIndex });
+      const addAfterLastIndex = atIndex >= updatedLevels.length;
+      updatedLevels.splice(atIndex, 0, {
+        isMaxLevel: addAfterLastIndex,
+        name: "",
+        code: atIndex,
+      });
       onChange({ ...editedHabit.value, levels: updatedLevels });
     };
 
@@ -103,6 +108,11 @@ export const HabitEditor = component<HabitEditorProps>(
       const updatedLevels = levels.value;
       if (updatedLevels.length < 3) return;
       updatedLevels.splice(fromIndex, 1);
+      const newMaxIndex = updatedLevels.length - 1;
+      updatedLevels[newMaxIndex] = {
+        ...updatedLevels[newMaxIndex],
+        isMaxLevel: true,
+      };
       onChange({ ...editedHabit.value, levels: updatedLevels });
     };
 

@@ -40,20 +40,29 @@ const habitsStatusLabel = derive(() => {
     (hab) => getDayStatus(hab.tracker, selectedDate.value) as DailyStatus
   );
   const status = {
-    done: statuses.reduce((sum, st) => sum + (st.level.code > 0 ? 1 : 0), 0),
+    done: statuses.reduce((sum, st) => sum + (st.level.isMaxLevel ? 1 : 0), 0),
+    started: statuses.reduce(
+      (sum, st) => sum + (st.level.code > 0 && !st.level.isMaxLevel ? 1 : 0),
+      0
+    ),
     notDone: statuses.reduce(
       (sum, st) => sum + (st.level.code === 0 ? 1 : 0),
       0
     ),
   };
 
-  if (status.done === 0 && status.notDone === 0) return ``;
-  if (status.done === 0 && status.notDone > 0)
+  if (status.done === 0 && status.started === 0 && status.notDone === 0)
+    return ``;
+  if (status.done === 0 && status.started === 0 && status.notDone > 0)
     return `Update below ${status.notDone} tsaks for the day.`;
-  if (status.done > 0 && status.notDone === 0)
+  if (status.done > 0 && status.started === 0 && status.notDone === 0)
     return `Great! All tasks updated.`;
 
-  return `${status.done} done. ${status.notDone} more to go.`;
+  return `
+    ${status.done ? `${status.done} done.` : ``}
+    ${status.started ? ` ${status.started} started.` : ``}
+    ${status.notDone ? ` ${status.notDone} yet to start.` : ``}
+  `;
 });
 const isStatusEditorOpen = signal(false);
 const statusEditableHabitIndex = signal(0);

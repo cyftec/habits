@@ -89,6 +89,7 @@ export type Habit = {
 };
 
 export type LevelUI = {
+  isMaxLevel: boolean;
   name: string;
   code: number;
 };
