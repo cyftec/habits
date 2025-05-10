@@ -159,7 +159,7 @@ export default Page({
               nthChild: m.Div({
                 class: "silver f6 mt5 mb2",
                 children: [
-                  "OLD HABITS (DIE HARD, LOL)",
+                  "STOPPED HABITS",
                   m.If({
                     subject: derive(() => !!sortedStoppedHabits.value.length),
                     isFalsy: m.Div("None"),

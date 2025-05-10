@@ -13,6 +13,11 @@ export const Page = component<PageProps>(({ classNames, body, onMount }) => {
       m.Head({
         children: [
           m.Title("Habits (by Cyfer)"),
+          m.Link({
+            rel: "icon",
+            type: "image/x-icon",
+            href: "/assets/images/favicon.ico",
+          }),
           m.Meta({ charset: "UTF-8" }),
           m.Meta({
             "http-equiv": "X-UA-Compatible",

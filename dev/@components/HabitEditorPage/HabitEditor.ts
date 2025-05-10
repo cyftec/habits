@@ -259,7 +259,7 @@ export const HabitEditor = component<HabitEditorProps>(
               }),
             }),
             Section({
-              title: "Your goal",
+              title: "Habit completion goal",
               hideDescription: hideDescriptions,
               description: dstring`
                   Goals are something for long-term. Let's say based on below table, after
