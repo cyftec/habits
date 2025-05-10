@@ -2,6 +2,7 @@ import { derive, dobject, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
   getCompletion,
+  getDateWindow,
   getMilestone,
   getMonthFirstDates,
 } from "../@common/transforms";
@@ -19,23 +20,16 @@ type HabitCardProps = {
 
 export const HabitCard = component<HabitCardProps>(
   ({ classNames, habit, months, onClick }) => {
-    const { milestones, title, colorIndex, levels } = dobject(
-      derive(() => habit.value)
-    ).props;
+    const habitVal = derive(() => habit.value);
+    const { milestones, title, colorIndex, levels } = dobject(habitVal).props;
     const completion = derive(() => {
-      const now = new Date();
-      const thisYear = now.getFullYear();
-      const thisMonth = now.getMonth();
-      const firstDay = new Date(thisYear, thisMonth - months.value, 1);
-      const lastDay = new Date(thisYear, thisMonth + 1, 0);
-      return getCompletion(habit.value, firstDay, lastDay).percent;
+      const { startDate, endDate } = getDateWindow(months.value);
+      return getCompletion(habit.value, startDate, endDate).percent;
     });
-    const milestoneIcon = derive(
-      () => getMilestone(milestones.value, completion.value).icon
+    const acheivedMilestone = derive(() =>
+      getMilestone(milestones.value, completion.value)
     );
-    const milestoneIconColor = derive(
-      () => getMilestone(milestones.value, completion.value).color
-    );
+    const { icon, color } = dobject(acheivedMilestone).props;
     const monthFirstDates = derive(() => getMonthFirstDates(months.value));
 
     return m.Div({
@@ -53,8 +47,8 @@ export const HabitCard = component<HabitCardProps>(
               class: "f6 silver b flex items-center",
               children: [
                 Icon({
-                  className: dstring`mr1 ${milestoneIconColor}`,
-                  iconName: milestoneIcon,
+                  className: dstring`mr1 ${color}`,
+                  iconName: icon,
                 }),
                 dstring`${completion}%`,
               ],
