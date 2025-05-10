@@ -51,6 +51,9 @@ export const ColorDot = component<ColorDotProps>(
         )
       ).props;
     const text = derive(() => textContent?.value || "·");
+    const showIcon = derive(
+      () => showHeight?.value && icon?.value && levelPercent.value > 99
+    );
 
     const onTap = () => {
       if (onClick && level.value >= 0) onClick();
@@ -62,11 +65,19 @@ export const ColorDot = component<ColorDotProps>(
       children: m.If({
         subject: showHeight,
         isTruthy: m.Span({
-          class: dstring`absolute left-0 right-0 bottom-0 br0 ${dotClassNames}`,
+          class: dstring`flex items-center justify-around absolute left-0 right-0 bottom-0 br0 ${dotClassNames}`,
           style: dstring`
             background-color: ${peakBackgroundColor};
+            color: white;
             height: ${levelPercent}%;
           `,
+          children: m.If({
+            subject: showIcon,
+            isTruthy: Icon({
+              iconName: icon as MaybeSignalObject<string>,
+              size: iconSize,
+            }),
+          }),
         }),
         isFalsy: m.Span({
           class: dstring`flex items-center justify-around absolute absolute--fill ${dotClassNames}`,
