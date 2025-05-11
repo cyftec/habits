@@ -164,9 +164,11 @@ export default Page({
                   }),
                   Section({
                     classNames: "pb3",
-                    title: "Acheivment",
+                    title: "Acheivments",
                     children: m.For({
-                      subject: acheievemnts,
+                      subject: derive(() =>
+                        acheievemnts.value.slice().reverse()
+                      ),
                       n: Infinity,
                       nthChild: m.Div({
                         class:
@@ -196,12 +198,24 @@ export default Page({
                           class: "flex items-center justify-between mb2",
                           children: [
                             m.Div(derive(() => `${acheievemnt.level.name}`)),
-                            m.Div(
-                              derive(
-                                () =>
-                                  `${acheievemnt.total} times (${acheievemnt.percent}%)`
-                              )
-                            ),
+                            m.Div({
+                              class: "flex items-center",
+                              children: [
+                                m.Div(
+                                  derive(
+                                    () =>
+                                      `${acheievemnt.total} times (${acheievemnt.percent}%)`
+                                  )
+                                ),
+                                ColorDot({
+                                  classNames: `pa1 ml2`,
+                                  colorIndex: habit.value.colorIndex,
+                                  level: acheievemnt.level.code,
+                                  totalLevels: habit.value.levels.length,
+                                  isRectangular: true,
+                                }),
+                              ],
+                            }),
                           ],
                         }),
                     }),
