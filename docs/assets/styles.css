@@ -52,7 +52,16 @@ input::placeholder {
 .ml1px { margin-left: 1px; }
 .mt05 { margin-top: 0.1rem; }
 .mr05 { margin-right: 0.1rem; }
+.nt3dot5 { margin-top: -1.5rem; }
+.nt3dot6 { margin-top: -1.6rem; }
 .sticky { position: sticky; }
+.h0dot1 { height: 0.1rem; }
+.h0dot15 { height: 0.15rem; }
+.h0dot2 { height: 0.2rem; }
+.h0dot5 { height: 0.5rem; }
+.h1dot1 { height: 1.1rem; }
+.h1dot2 { height: 1.2rem; }
+.h1dot5 { height: 1.5rem; }
 .w1dot5 { width: 1.5rem; }
 .w4dot50 { width: 12rem; }
 .mnw5 { min-width: 16rem; }
