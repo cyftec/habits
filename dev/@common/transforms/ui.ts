@@ -472,25 +472,31 @@ export const getTrackerForLevelsChange = (
 ) => {
   if (!oldLevels.length || oldLevels.length === newLevels.length)
     return tracker;
-
   const updatedTracker = [...tracker];
   const updates: { indices: number[]; newLevel: LevelUI }[] = [];
-  oldLevels.forEach((oldLevel) => {
+  oldLevels.forEach((oldLevel, oldLevelIndex) => {
     const newLevel = newLevels.find((l) => l.name === oldLevel.name);
     const oldLevelRemoved = !newLevel;
+    const registerUpdates = (changedLevel: LevelUI) => {
+      const indices: number[] = [];
+      tracker.forEach((status, i) => {
+        if (status.level.code === oldLevel.code) indices.push(i);
+      });
+      updates.push({
+        indices: indices,
+        newLevel: changedLevel,
+      });
+    };
     // the status for the day in old tracker should remain the same
-    if (oldLevelRemoved) return;
+    if (oldLevelRemoved) {
+      // if last level is removed, the old highest statu codes should decrease by 1
+      if (oldLevelIndex === oldLevels.length - 1)
+        registerUpdates(newLevels[newLevels.length - 1]);
+      return;
+    }
     const levelPositionChanged = newLevel.code !== oldLevel.code;
     if (!levelPositionChanged) return;
-
-    const indices: number[] = [];
-    tracker.forEach((status, i) => {
-      if (status.level.code === oldLevel.code) indices.push(i);
-    });
-    updates.push({
-      indices: indices,
-      newLevel: newLevel,
-    });
+    registerUpdates(newLevel);
   });
 
   updates.forEach((update) => {
@@ -503,6 +509,20 @@ export const getTrackerForLevelsChange = (
   });
 
   return updatedTracker;
+};
+
+export const getSanitizedLevelsAfterAddOrRemove = (
+  modifiedLevels: LevelUI[]
+) => {
+  const newMaxIndex = modifiedLevels.length - 1;
+  for (let i = 0; i < modifiedLevels.length; i++) {
+    modifiedLevels[i] = {
+      ...modifiedLevels[i],
+      code: i,
+      isMaxLevel: i === newMaxIndex,
+    };
+  }
+  return modifiedLevels;
 };
 
 export const isLastInteractionLongBack = () => {
