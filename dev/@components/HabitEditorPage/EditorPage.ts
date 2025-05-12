@@ -138,7 +138,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
                               className: "w-100 pv2 ph3 ml2 b",
                               children: "Yes, stop this",
                               onTap: () => {
-                                stopHabit(editedHabit.value.id);
+                                stopHabit(editedHabit.value);
                                 stopActionModalOpen.value = false;
                                 history.back();
                               },

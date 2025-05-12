@@ -121,11 +121,9 @@ export const saveHabit = (habit: HabitUI) => {
   const habitData: Habit = getHabitData(habit);
   saveHabitInStore(habitData);
 };
-export const stopHabit = (habitId: number) => {
-  const habit = fetchHabit(habitId);
-  const habitData = getHabitData(habit);
-  const updatedHabit: Habit = { ...habitData, isStopped: true };
-  saveHabitInStore(updatedHabit);
+export const stopHabit = (habit: HabitUI) => {
+  const updatedHabit: HabitUI = { ...habit, isStopped: true };
+  saveHabit(updatedHabit);
 };
 export const deleteHabit = (habitId: number) =>
   hardDeleteHabitFromStore(habitId);

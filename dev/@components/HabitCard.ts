@@ -3,7 +3,7 @@ import { component, m } from "@mufw/maya";
 import {
   getCompletion,
   getDateWindow,
-  getMilestone,
+  getAchievedMilestone,
   getMonthFirstDates,
 } from "../@common/transforms";
 import { HabitUI } from "../@common/types";
@@ -26,10 +26,10 @@ export const HabitCard = component<HabitCardProps>(
       const { startDate, endDate } = getDateWindow(months.value);
       return getCompletion(habit.value, startDate, endDate).percent;
     });
-    const acheivedMilestone = derive(() =>
-      getMilestone(milestones.value, completion.value)
+    const achievedMilestone = derive(() =>
+      getAchievedMilestone(milestones.value, completion.value)
     );
-    const { icon, color } = dobject(acheivedMilestone).props;
+    const { icon, color } = dobject(achievedMilestone).props;
     const monthFirstDates = derive(() => getMonthFirstDates(months.value));
 
     return m.Div({

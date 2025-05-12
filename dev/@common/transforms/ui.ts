@@ -13,12 +13,13 @@ import {
   saveHabit,
 } from "../localstorage";
 import {
+  AchievedMilestone,
   DailyStatus,
   Habit,
   HabitUI,
   LevelUI,
   MilestonesData,
-  MilestoneUI,
+  MilestonesUI,
 } from "../types";
 import { getQueryParamValue } from "../utils/navigation";
 import {
@@ -100,6 +101,7 @@ export const getHabitUI = (habit: Habit): HabitUI => {
     tracker: habit.tracker.map((status, i) =>
       getDailyStatus(status, habit.levels, getGapDate(startDate, i))
     ),
+    milestones: getMilestonesUI(habit.milestones),
   };
 };
 
@@ -108,6 +110,7 @@ export const getHabitData = (uiHabit: HabitUI): Habit => {
     ...uiHabit,
     levels: uiHabit.levels.map((level) => level.name),
     tracker: uiHabit.tracker.map((status, i) => status.level.code),
+    milestones: getMilestonesData(uiHabit.milestones),
   };
 };
 
@@ -128,41 +131,56 @@ export const getNewHabit = (): HabitUI => {
   return getHabitUI(habit);
 };
 
-export const getDetailedMilestones = (
-  milestones: MilestonesData
-): MilestoneUI[] => [
+export const getMilestonesUI = (milestones: MilestonesData): MilestonesUI => [
   {
     label: "Successful",
+    upperLimit: 100,
     percent: milestones[0],
     icon: "verified_user",
     color: "green",
   },
   {
     label: "Little more to go",
+    upperLimit: milestones[0],
     percent: milestones[1],
     icon: "done_all",
     color: "light-blue",
   },
   {
     label: "Going good",
+    upperLimit: milestones[1],
     percent: milestones[2],
     icon: "check",
     color: "blue",
   },
-  { label: "Unacceptable", percent: 0, icon: "close", color: "red" },
+  {
+    label: "Unacceptable",
+    upperLimit: milestones[2],
+    percent: 0,
+    icon: "close",
+    color: "red",
+  },
 ];
 
-export const getMilestone = (
-  milestones: MilestonesData,
+export const getMilestonesData = (milestones: MilestonesUI): MilestonesData =>
+  milestones
+    .filter((ms) => !!ms.percent)
+    .map((ms) => ms.percent) as MilestonesData;
+
+export const getAchievedMilestone = (
+  allMilestones: MilestonesUI,
   completionPercentage: number
-): MilestoneUI => {
-  const dms = getDetailedMilestones(milestones);
-  let milestone: MilestoneUI = dms[0];
-  for (let i = 0; i < dms.length; i++) {
-    milestone = dms[i];
-    if (milestone.percent < completionPercentage) break;
+): AchievedMilestone => {
+  let milestone = allMilestones[0];
+  for (let i = 0; i < allMilestones.length; i++) {
+    milestone = allMilestones[i];
+    if (milestone.percent <= completionPercentage) break;
   }
-  return milestone;
+  return {
+    label: milestone.label,
+    icon: milestone.icon,
+    color: milestone.color,
+  };
 };
 
 export const getHabitValidationError = (
@@ -190,10 +208,14 @@ export const getHabitValidationError = (
   if (duplicateLevel) {
     return "Multiple levels have same name";
   }
-  if (!habit.milestones.every((m) => m <= 100 && m >= 0)) {
+  if (!habit.milestones.every((m) => m.percent <= 100 && m.percent >= 0)) {
     return `The milestones should be between 0 and 100 percents`;
   }
-  if (!habit.milestones.every((m, i, ms) => (i === 0 ? true : ms[i - 1] > m))) {
+  if (
+    !habit.milestones.every((m, i, ms) =>
+      i === 0 ? true : ms[i - 1].percent > m.percent
+    )
+  ) {
     return `Milestones should be in order (from high to low)`;
   }
 
@@ -243,7 +265,7 @@ export const getCompletion = (
     aceStreak,
     followStreak,
     missed,
-    percent: Math.ceil(100 * (completion / (totalDays * totalStatusLevels))),
+    percent: Math.round(100 * (completion / (totalDays * totalStatusLevels))),
     totalDays,
     workingDays,
   };

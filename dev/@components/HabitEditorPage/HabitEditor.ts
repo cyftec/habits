@@ -1,22 +1,14 @@
-import {
-  derive,
-  dobject,
-  dstring,
-  effect,
-  signal,
-  Signal,
-} from "@cyftech/signal";
+import { derive, dobject, dstring, signal, Signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { Section } from "..";
 import { BASE_COLORS, BASE_LEVELS } from "../../@common/constants";
 import {
+  getAchievedMilestone,
   getAddRemoveButtonsVisibility,
-  getDetailedMilestones,
-  getMilestone,
   getWeekdayName,
   levelTextboxDisability,
 } from "../../@common/transforms";
-import { HabitUI, MilestonesData, WeekdayFrequency } from "../../@common/types";
+import { HabitUI, MilestonesUI, WeekdayFrequency } from "../../@common/types";
 import { handleCTA } from "../../@common/utils";
 import {
   AddRemoveButton,
@@ -119,10 +111,11 @@ export const HabitEditor = component<HabitEditorProps>(
     const updateMilestone = (value: number, index: number) => {
       if (index < 0 || index > 2)
         throw `Incorrect index of milestone passed. Milestone values should not be more than 3.`;
-      const updatedMilestones: MilestonesData = [
-        ...editedHabit.value.milestones,
-      ];
-      updatedMilestones[index] = value;
+      const updatedMilestones: MilestonesUI = [...editedHabit.value.milestones];
+      updatedMilestones[index] = {
+        ...updatedMilestones[index],
+        percent: value,
+      };
       onChange({ ...editedHabit.value, milestones: updatedMilestones });
     };
 
@@ -275,12 +268,12 @@ export const HabitEditor = component<HabitEditorProps>(
                   Goals are something for long-term. Let's say based on below table, after
                   a month or two, you followed your habit for 67% of the times, then you
                   just crossed the milestone - '${() =>
-                    getMilestone(editedHabit.value.milestones, 67)
-                      .label}'. For acheiving your goal (in %), you can set your
+                    getAchievedMilestone(editedHabit.value.milestones, 67)
+                      .label}'. For achieving your goal (in %), you can set your
                   own custom milestones depending on the difficulty of the habit.
                 `,
               children: m.For({
-                subject: derive(() => getDetailedMilestones(milestones.value)),
+                subject: milestones,
                 n: 0,
                 nthChild: m.Div({
                   class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",

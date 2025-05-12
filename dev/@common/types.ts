@@ -69,9 +69,16 @@ export type WeekdayFrequency = [
   0 | 1
 ];
 export type MilestonesData = [number, number, number];
-export type MilestoneUI = {
+export type MilestonesUI = [Milestone, Milestone, Milestone, Milestone];
+export type Milestone = {
   label: string;
+  upperLimit: number;
   percent: number;
+  icon: string;
+  color: string;
+};
+export type AchievedMilestone = {
+  label: string;
   icon: string;
   color: string;
 };
@@ -107,7 +114,7 @@ export type HabitUI = {
   colorIndex: number;
   levels: LevelUI[];
   tracker: DailyStatus[];
-  milestones: MilestonesData;
+  milestones: MilestonesUI;
   pauses: HabitPause[];
   isStopped: boolean;
 };

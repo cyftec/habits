@@ -1,5 +1,6 @@
 export * from "./AddHabitButton";
 export * from "./GoBackButton";
+export * from "./GoalStatus";
 export * from "./HabitCard";
 export * from "./HabitEditorPage";
 export * from "./Modals";

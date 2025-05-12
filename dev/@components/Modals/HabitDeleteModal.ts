@@ -28,7 +28,7 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
             class: "mb4",
             children: [
               `
-              All the data and the acheivements associated with this habit will be lost forever
+              All the data and the achievements associated with this habit will be lost forever
               with this action, and cannot be reversed.
               `,
               m.Br({}),

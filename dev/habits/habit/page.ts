@@ -2,9 +2,9 @@ import { derive, dobject, dstring, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { intializeTrackerEmptyDays } from "../../@common/localstorage";
 import {
+  getAchievedMilestone,
   getCompletion,
   getHabitFromUrl,
-  getMilestone,
   getMonthName,
   getNewHabit,
   getWeekdayName,
@@ -14,6 +14,7 @@ import {
 import { HabitUI } from "../../@common/types";
 import { goToHabitEditPage } from "../../@common/utils";
 import {
+  GoalStatus,
   GoBackButton,
   HabitDeleteModal,
   HabitStatusEditModal,
@@ -23,13 +24,21 @@ import { Button, ColorDot, Icon, Page, Scaffold } from "../../@elements";
 
 const error = signal("");
 const habit = signal<HabitUI>(getNewHabit());
+const {
+  id: habitId,
+  title: pageTitle,
+  colorIndex: habitColorIndex,
+  levels: habitLevels,
+  milestones: habitMilestones,
+  isStopped: habitIsStopped,
+} = dobject(habit).props;
+const showGoalStatus = signal(false);
 const deleteActionModalOpen = signal(false);
 const updateLevelModalOpen = signal(false);
 const updateLevelModalData = signal({
   date: new Date(),
   selectedLevelIndex: 0,
 });
-const pageTitle = derive(() => (habit.value ? habit.value.title : "Loading.."));
 
 const acheievemnts = derive(() => {
   const currentHabit = habit.value;
@@ -46,23 +55,25 @@ const acheievemnts = derive(() => {
   const achTotal = acheievemntsList.reduce((a, b) => a + b);
   const list = acheievemntsList.map((ach, i) => ({
     level: currentHabit.levels[i],
-    total: ach,
+    count: ach,
+    weightage: ach * (i / (currentHabit.levels.length - 1)),
     percent: Math.round((100 * ach) / achTotal),
   }));
 
   return list;
 });
 
-const completion = derive(() =>
-  habit.value
-    ? getCompletion(habit.value, new Date(habit.value.id), new Date()).percent
-    : 0
+const completion = derive(
+  () => getCompletion(habit.value, new Date(habitId.value), new Date()).percent
 );
-const milestoneAchieved = derive(() => {
-  const compl = completion.value;
-  const hab = habit.value;
-  return hab ? getMilestone(hab.milestones, compl) : undefined;
-});
+const milestoneAchieved = derive(() =>
+  getAchievedMilestone(habitMilestones.value, completion.value)
+);
+const {
+  icon: achievedMilestoneIcon,
+  label: achievedMilestoneLabel,
+  color: achievedMilestoneColor,
+} = dobject(milestoneAchieved).props;
 
 const weekwiseTracker = derive(() => {
   const currentHabit = habit.value;
@@ -112,14 +123,12 @@ export default Page({
           children: pageTitle,
         }),
         m.If({
-          subject: derive(() => habit.value?.isStopped),
+          subject: habitIsStopped,
           isFalsy: Icon({
             className: "mt1 mr1 ba b--silver bw1 br-100 pa1 noselect",
             size: 18,
             iconName: "edit",
-            onClick: () => {
-              if (habit.value) goToHabitEditPage(habit.value.id);
-            },
+            onClick: () => goToHabitEditPage(habitId.value),
           }),
         }),
       ],
@@ -149,7 +158,7 @@ export default Page({
               isTruthy: m.Div({
                 children: [
                   m.If({
-                    subject: derive(() => !!habit.value?.isStopped),
+                    subject: habitIsStopped,
                     isTruthy: m.Div([
                       m.Div({
                         class: "red mb3",
@@ -164,61 +173,103 @@ export default Page({
                   }),
                   Section({
                     classNames: "pb3",
-                    title: "Acheivments",
-                    children: m.For({
-                      subject: derive(() =>
-                        acheievemnts.value.slice().reverse()
-                      ),
-                      n: Infinity,
-                      nthChild: m.Div({
-                        class:
-                          "flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray",
-                        children: [
-                          m.Div(`Overall`),
-                          m.Div({
-                            class: "flex items-center",
+                    title: dstring`Completion status ${() =>
+                      showGoalStatus.value
+                        ? ""
+                        : `(target ${habitMilestones.value[0].percent}%)`}`,
+                    children: [
+                      m.Div({
+                        class: "mt3",
+                        children: m.For({
+                          subject: derive(() =>
+                            acheievemnts.value.slice().reverse()
+                          ),
+                          n: Infinity,
+                          nthChild: m.Div({
+                            class:
+                              "flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray",
                             children: [
-                              Icon({
-                                className: dstring`mr2 ${() =>
-                                  milestoneAchieved.value?.color}`,
-                                size: 20,
-                                iconName: derive(
-                                  () => `${milestoneAchieved.value?.icon}`
-                                ),
+                              m.Div({
+                                class: "flex items-center",
+                                children: [
+                                  Icon({
+                                    className: dstring`mr1 ${achievedMilestoneColor}`,
+                                    size: 12,
+                                    iconName: achievedMilestoneIcon,
+                                  }),
+                                  achievedMilestoneLabel,
+                                ],
                               }),
-                              derive(() => `${milestoneAchieved.value?.label}`),
-                              m.Span({ class: "ml1" }),
-                              m.Div(derive(() => ` (${completion.value}%)`)),
+                              m.Div({
+                                class: "flex items-center",
+                                children: [
+                                  derive(() => {
+                                    const outOf = acheievemnts.value.reduce(
+                                      (sum, ach) => sum + ach.count,
+                                      0
+                                    );
+                                    const times = acheievemnts.value.reduce(
+                                      (sum, ach) => sum + ach.weightage,
+                                      0
+                                    );
+                                    return `${times.toFixed(1)} / ${outOf}`;
+                                  }),
+                                  m.Span({ class: "ml1" }),
+                                  m.Div(
+                                    derive(() => ` (${completion.value}%)`)
+                                  ),
+                                ],
+                              }),
                             ],
                           }),
-                        ],
-                      }),
-                      map: (acheievemnt, i) =>
-                        m.Div({
-                          class: "flex items-center justify-between mb2",
-                          children: [
-                            m.Div(derive(() => `${acheievemnt.level.name}`)),
+                          map: (acheievemnt, i) =>
                             m.Div({
-                              class: "flex items-center",
+                              class: "flex items-center justify-between mb2",
                               children: [
+                                m.Div({
+                                  class: "flex items-center",
+                                  children: [
+                                    ColorDot({
+                                      classNames: `pa1 mr2`,
+                                      colorIndex: habitColorIndex,
+                                      level: acheievemnt.level.code,
+                                      totalLevels: habitLevels.value.length,
+                                      isRectangular: true,
+                                    }),
+                                    m.Div(
+                                      derive(() => `${acheievemnt.level.name}`)
+                                    ),
+                                  ],
+                                }),
                                 m.Div(
                                   derive(
                                     () =>
-                                      `${acheievemnt.total} times (${acheievemnt.percent}%)`
+                                      `${acheievemnt.count} times (${acheievemnt.percent}%)`
                                   )
                                 ),
-                                ColorDot({
-                                  classNames: `pa1 ml2`,
-                                  colorIndex: habit.value.colorIndex,
-                                  level: acheievemnt.level.code,
-                                  totalLevels: habit.value.levels.length,
-                                  isRectangular: true,
-                                }),
                               ],
                             }),
-                          ],
                         }),
-                    }),
+                      }),
+                      m.If({
+                        subject: showGoalStatus,
+                        isTruthy: GoalStatus({
+                          classNames: "pt4 mt3 mb3",
+                          milestones: habitMilestones,
+                          achievedMilestone: milestoneAchieved,
+                          completionPercent: completion,
+                        }),
+                      }),
+                      Button({
+                        className: "pa2 ph3 mt4 mb2",
+                        children: dstring`${() =>
+                          showGoalStatus.value
+                            ? "Hide"
+                            : "Show"} target goal status`,
+                        onTap: () =>
+                          (showGoalStatus.value = !showGoalStatus.value),
+                      }),
+                    ],
                   }),
                   Section({
                     title: "Tracker",
@@ -288,16 +339,14 @@ export default Page({
                                           return ColorDot({
                                             classNames:
                                               "h2 w2 flex items-center justify-center f7",
-                                            colorIndex:
-                                              habit.value?.colorIndex ?? 0,
+                                            colorIndex: habitColorIndex,
                                             level: day.level.code,
                                             totalLevels:
-                                              habit.value?.levels.length || 2,
+                                              habitLevels.value.length || 2,
                                             textContent: dateText,
                                             showText: day.level !== undefined,
                                             onClick: () => {
-                                              if (habit.value?.isStopped)
-                                                return;
+                                              if (habitIsStopped.value) return;
                                               updateLevelModalOpen.value = true;
                                               updateLevelModalData.value = {
                                                 date: day.date,
