@@ -1,4 +1,11 @@
-import { derive, dobject, dstring, signal, Signal } from "@cyftech/signal";
+import {
+  compute,
+  derive,
+  dobject,
+  dstring,
+  signal,
+  Signal,
+} from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { ColorDot, Section } from "..";
 import { BASE_COLORS, BASE_LEVELS } from "../../@common/constants";
@@ -48,14 +55,15 @@ export const HabitEditor = component<HabitEditorProps>(
     const everyDay = derive(() => frequency.value.every((day) => !!day));
     const selectedCss = "bg-mid-gray white";
     const unSelectedCss = "bg-near-white light-silver";
-    const dailyBtnCss = derive(() =>
-      everyDay.value ? selectedCss : unSelectedCss
+    const dailyBtnCss = compute(everyDay).oneOf(selectedCss, unSelectedCss);
+    const customisationsButtonIcon = compute(moreDetails).oneOf(
+      "remove",
+      "add"
     );
-    const customisationsButtonIcon = derive(() =>
-      moreDetails.value ? "remove" : "add"
-    );
-    const customisationsButtonLabel = dstring`Show ${() =>
-      moreDetails.value ? "Less" : "More"} Customisations`;
+    const customisationsButtonLabel = dstring`Show ${compute(moreDetails).oneOf(
+      "Less",
+      "More"
+    )} Customisations`;
 
     const updateTitle = (title: string) => {
       onChange({ ...editedHabit.value, title });

@@ -1,6 +1,6 @@
 import { component, m } from "@mufw/maya";
 import { Icon, Modal } from "../@elements";
-import { derive, dobject, dstring, signal } from "@cyftech/signal";
+import { compute, derive, dobject, dstring, signal } from "@cyftech/signal";
 import { HOMEPAGE_SORT_OPTIONS } from "../@common/constants";
 import { handleTap } from "../@common/utils";
 
@@ -38,7 +38,7 @@ export const SortOptions = component<SortOptionsProps>(
           classNames: "pointer",
           descending: dobject(selectedOption).prop("decending"),
           iconName: dobject(selectedOption).prop("icon"),
-          size: derive(() => iconSize?.value ?? 20),
+          size: compute(iconSize).or(20),
           onClick: openModal,
         }),
         Modal({
@@ -91,8 +91,9 @@ type SortIconProps = {
 const SortIcon = component<SortIconProps>(
   ({ classNames, descending, iconName, size, onClick }) => {
     const pointerCss = derive(() => (onClick ? "pointer" : ""));
-    const arrowIconName = derive(() =>
-      descending.value ? "arrow_upward" : "arrow_downward"
+    const arrowIconName = compute(descending).oneOf(
+      "arrow_upward",
+      "arrow_downward"
     );
     const arrowIconSize = derive(() => (4 * size.value) / 5);
 

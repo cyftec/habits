@@ -1,4 +1,4 @@
-import { derive, dstring } from "@cyftech/signal";
+import { compute, derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { goToHref, handleTap } from "../@common/utils";
 import { Icon } from "../@elements";
@@ -39,9 +39,7 @@ type NavBarLinkProps = {
 
 export const NavBarLink = component<NavBarLinkProps>(
   ({ classNames, label, icon, isSelected, href }) => {
-    const fontColor = derive(() =>
-      isSelected.value ? "app-theme-color b" : "black"
-    );
+    const fontColor = compute(isSelected).oneOf("app-theme-color b", "black");
 
     return m.Div({
       class: dstring`pointer noselect flex flex-column items-center justify-center pb2 ${fontColor} ${classNames}`,

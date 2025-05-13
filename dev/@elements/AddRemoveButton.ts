@@ -1,4 +1,4 @@
-import { derive, dstring } from "@cyftech/signal";
+import { compute, derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { handleTap } from "../@common/utils";
 
@@ -15,7 +15,7 @@ export const AddRemoveButton = component<AddRemoveButtonProps>(
     const containerBorderCss = derive(() =>
       hideRemove?.value && hideAdd?.value ? "bn" : "ba"
     );
-    const removeBtnBorderCss = derive(() => (hideAdd?.value ? "" : "br"));
+    const removeBtnBorderCss = compute(hideAdd).oneOf("", "br");
 
     return m.Span({
       class: dstring`br3 pb1 f4 bw1 b--light-silver dark-gray ${containerBorderCss} ${classNames}`,

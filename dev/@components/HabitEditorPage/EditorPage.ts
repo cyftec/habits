@@ -1,4 +1,4 @@
-import { derive, dobject, signal } from "@cyftech/signal";
+import { compute, derive, dobject, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
   GoBackButton,
@@ -39,12 +39,9 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
         ? `Edit '${editableHabit.value.title}'`
         : "Add new habit"
     );
-    const pageTitleCss = derive(() =>
-      pageTitle.value.length > 22 ? "f2dot66" : ""
-    );
-    const actionButtonLabel = derive(() =>
-      editableHabit?.value ? "Update" : "Add"
-    );
+    const largeTitle = derive(() => pageTitle.value.length > 22);
+    const pageTitleCss = compute(largeTitle).oneOf("f2dot66", "");
+    const actionButtonLabel = compute(editableHabit).oneOf("Update", "Add");
 
     const openDeleteModal = () => (deleteActionModalOpen.value = true);
     const closeDeleteModal = () => (deleteActionModalOpen.value = false);

@@ -1,4 +1,4 @@
-import { derive, dobject, dstring } from "@cyftech/signal";
+import { compute, derive, dobject, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { AchievedMilestone, MilestonesUI } from "../@common/types";
 
@@ -65,8 +65,9 @@ type CrossSectionProps = {
 
 const CrossSection = component<CrossSectionProps>(
   ({ colorCss, hideUpperLimit, percent }) => {
-    const percentLabel = derive(() =>
-      hideUpperLimit?.value ? "" : `${percent.value}%`
+    const percentLabel = compute(hideUpperLimit).oneOf(
+      "",
+      dstring`${percent}%`
     );
     const widthStyle = derive(() => `width: ${percent.value}%;`);
 

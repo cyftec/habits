@@ -1,4 +1,10 @@
-import { derive, dobject, dstring, MaybeSignalObject } from "@cyftech/signal";
+import {
+  compute,
+  derive,
+  dobject,
+  dstring,
+  MaybeSignalObject,
+} from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { handleTap } from "../@common/utils";
 import { getColorsForLevel } from "../@common/transforms";
@@ -35,7 +41,7 @@ export const ColorDot = component<ColorDotProps>(
     showHeight,
     onClick,
   }) => {
-    const outerBorder = derive(() => (isRectangular?.value ? "br0" : "br-100"));
+    const outerBorder = compute(isRectangular).oneOf("br0", "br-100");
     const outerBg = derive(() =>
       level.value < 0 ? "bg-transparent" : "bg-light-gray"
     );
