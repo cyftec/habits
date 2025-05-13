@@ -1,5 +1,5 @@
 import { derive, dstring } from "@cyftech/signal";
-import { Child, Children, component, m } from "@mufw/maya";
+import { Children, component, m } from "@mufw/maya";
 
 type SectionProps = {
   classNames?: string;
@@ -19,6 +19,10 @@ export const Section = component<SectionProps>(
     hideDescription,
     children,
   }) => {
+    const showDescription = derive(
+      () => description?.value && !hideDescription?.value
+    );
+
     return m.Div({
       class: dstring`mt3 mb4 ${classNames}`,
       children: [
@@ -27,7 +31,7 @@ export const Section = component<SectionProps>(
           children: title,
         }),
         m.If({
-          subject: derive(() => description?.value && !hideDescription?.value),
+          subject: showDescription,
           isTruthy: m.Div({
             class: "mb3 f6 silver fw5",
             children: dstring`${description}`,

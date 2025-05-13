@@ -1,6 +1,6 @@
 import { derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { handleCTA } from "../@common/utils";
+import { handleTap } from "../@common/utils";
 
 type TabBarProps = {
   classNames?: string;
@@ -36,7 +36,7 @@ export const TabBar = component<TabBarProps>(
               class: dstring`
                 w-100 br3 pv3 ph2 flex justify-center noselect br-pill ba bw1 bg-inherit
                 ${tabSelectionCss(i)} ${tabItemClassNames}`,
-              onclick: handleCTA(() => onTabChange(i)),
+              onclick: handleTap(() => onTabChange(i)),
               children: tab,
             }),
         }),

@@ -1,6 +1,6 @@
 import { derive, dobject, dstring, MaybeSignalObject } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { handleCTA } from "../@common/utils";
+import { handleTap } from "../@common/utils";
 import { getColorsForLevel } from "../@common/transforms";
 import { Icon } from "../@elements";
 
@@ -61,7 +61,7 @@ export const ColorDot = component<ColorDotProps>(
 
     return m.Span({
       class: dstring`pointer relative overflow-hidden ${outerBorder} ${outerBg} ${classNames}`,
-      onclick: handleCTA(onTap),
+      onclick: handleTap(onTap),
       children: m.If({
         subject: showHeight,
         isTruthy: m.Span({

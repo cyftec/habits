@@ -1,6 +1,6 @@
 import { component, m } from "@mufw/maya";
 import { derive, dstring } from "@cyftech/signal";
-import { handleCTA } from "../@common/utils";
+import { handleTap } from "../@common/utils";
 
 type IconProps = {
   className?: string;
@@ -18,7 +18,7 @@ export const Icon = component<IconProps>(
     return m.Span({
       class: dstring`material-symbols-outlined ${pointerCss} ${className}`,
       style: dstring`font-size: ${fontSize}px`,
-      onclick: handleCTA(onClick),
+      onclick: handleTap(onClick),
       children: iconName,
       title: title,
     });

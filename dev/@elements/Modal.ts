@@ -1,6 +1,6 @@
 import { dstring, effect } from "@cyftech/signal";
 import { type Children, component, m } from "@mufw/maya";
-import { handleCTA } from "../@common/utils";
+import { handleTap } from "../@common/utils";
 
 type ModalProps = {
   classNames?: string;
@@ -22,7 +22,7 @@ export const Modal = component<ModalProps>(
 
     return m.Dialog({
       onmount: onDialogMount,
-      onclick: handleCTA(onTapOutside),
+      onclick: handleTap(onTapOutside),
       class: dstring`pa0 br3 ${classNames}`,
       children: [
         m.Div({

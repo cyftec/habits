@@ -1,6 +1,12 @@
-import { derive, dobject, dstring, signal } from "@cyftech/signal";
+import { derive, dobject, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { GoBackButton, HabitDeleteModal, Page, Section } from "..";
+import {
+  GoBackButton,
+  HabitDeleteModal,
+  HabitStopModal,
+  Page,
+  Section,
+} from "..";
 import { INITIAL_SETTINGS } from "../../@common/constants";
 import {
   getEditPageSettings,
@@ -10,10 +16,10 @@ import {
 import {
   getHabitValidationError,
   getNewHabit,
-  getTrackerForLevelsChange,
+  getUpdatedTrackerDataForModifiedLevels,
 } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
-import { Button, Link, Modal, Scaffold } from "../../@elements";
+import { Button, Link, Scaffold } from "../../@elements";
 import { HabitEditor } from "./HabitEditor";
 
 type HabitEditorPageProps = {
@@ -33,13 +39,32 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
         ? `Edit '${editableHabit.value.title}'`
         : "Add new habit"
     );
+    const pageTitleCss = derive(() =>
+      pageTitle.value.length > 22 ? "f2dot66" : ""
+    );
+    const actionButtonLabel = derive(() =>
+      editableHabit?.value ? "Update" : "Add"
+    );
 
     const openDeleteModal = () => (deleteActionModalOpen.value = true);
     const closeDeleteModal = () => (deleteActionModalOpen.value = false);
+
     const onHabitDelete = () => {
       closeDeleteModal();
       history.go(-2);
     };
+
+    const openHabitStopModal = () => (stopActionModalOpen.value = true);
+    const closeHabitStopModal = () => (stopActionModalOpen.value = false);
+
+    const onStopHabitUpdate = () => {
+      stopHabit(editedHabit.value);
+      closeHabitStopModal();
+      history.back();
+    };
+
+    const onHabitChange = (updatedHabit: HabitUI) =>
+      (editedHabit.value = updatedHabit);
 
     const save = () => {
       error.value = getHabitValidationError(
@@ -50,7 +75,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
 
       const newHabit = editedHabit.value;
       const oldLevels = [...(editableHabit?.value?.levels || [])];
-      const updatedTracker = getTrackerForLevelsChange(
+      const updatedTracker = getUpdatedTrackerDataForModifiedLevels(
         oldLevels,
         newHabit.levels,
         newHabit.tracker
@@ -73,8 +98,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
       body: Scaffold({
         classNames: "bg-white ph3",
         header: m.Div({
-          class: dstring`${() =>
-            pageTitle.value.length > 22 ? "f2dot66" : ""}`,
+          class: pageTitleCss,
           children: pageTitle,
         }),
         content: m.Div([
@@ -93,66 +117,19 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
                   }),
                   Link({
                     classNames: "db mb3 f6 red",
-                    children:
-                      "Delete this habit permanently along with its data",
+                    children: `Delete this habit permanently along with its data`,
                     onClick: openDeleteModal,
                   }),
-                  Modal({
-                    classNames: "bn",
+                  HabitStopModal({
                     isOpen: stopActionModalOpen,
-                    onTapOutside: () => (stopActionModalOpen.value = false),
-                    content: m.Div({
-                      class: "pa3 f5",
-                      children: [
-                        m.Div({
-                          class: "mb3 b f4",
-                          children: dstring`Stop '${() =>
-                            editedHabit.value.title}'?`,
-                        }),
-                        m.Div({
-                          class: "mb4",
-                          children: [
-                            `
-                          This action is not reversible. You will not be able to resume it again.`,
-                            // USE BELOW LINE WHEN HABIT PAUSE ACTION IS IMPLEMENTED
-                            // `
-                            // This action is not reversible. You will not be able to resume it again.
-                            // If you're unsure about resuming it later, you can close this dialog and
-                            // trying pausing this habit with the other link.`,
-                            m.Br({}),
-                            m.Br({}),
-                            `
-                          Are you sure, you want to STOP this habit permanently?
-                          `,
-                          ],
-                        }),
-                        m.Div({
-                          class: "flex items-center justify-between f6",
-                          children: [
-                            Button({
-                              className: "w-100 pv2 ph3 mr2",
-                              children: "No, go back",
-                              onTap: () => (stopActionModalOpen.value = false),
-                            }),
-                            Button({
-                              className: "w-100 pv2 ph3 ml2 b",
-                              children: "Yes, stop this",
-                              onTap: () => {
-                                stopHabit(editedHabit.value);
-                                stopActionModalOpen.value = false;
-                                history.back();
-                              },
-                            }),
-                          ],
-                        }),
-                      ],
-                    }),
+                    habit: editedHabit,
+                    onClose: closeHabitStopModal,
+                    onDone: onStopHabitUpdate,
                   }),
                   Link({
                     classNames: "db mb3 f6 gray",
-                    children:
-                      "Stop this habit permanently and keep it for future",
-                    onClick: () => (stopActionModalOpen.value = true),
+                    children: `Stop this habit permanently and keep it for future`,
+                    onClick: openHabitStopModal,
                   }),
                 ],
               }),
@@ -165,7 +142,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
             showFullCustomisations: dobject(editPageSettings).prop(
               "showFullCustomisation"
             ),
-            onChange: (updatedHabit) => (editedHabit.value = updatedHabit),
+            onChange: onHabitChange,
           }),
         ]),
         bottombar: m.Div({
@@ -186,9 +163,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
                 }),
                 Button({
                   className: "w-100 pa3 ml3 b",
-                  children: derive(() =>
-                    editableHabit?.value ? "Update" : "Add"
-                  ),
+                  children: actionButtonLabel,
                   onTap: save,
                 }),
               ],

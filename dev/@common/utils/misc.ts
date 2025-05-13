@@ -22,7 +22,7 @@ export const parseObjectJsonString = <T extends Object>(
   return obj;
 };
 
-export const handleCTA = (fn: ((...args: any[]) => any) | undefined) => {
+export const handleTap = (fn: ((...args: any[]) => any) | undefined) => {
   return (...args: any) => {
     vibrateOnTap();
     updateInteractionTime(new Date());

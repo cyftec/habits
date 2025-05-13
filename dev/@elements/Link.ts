@@ -1,6 +1,6 @@
 import { derive, dstring } from "@cyftech/signal";
 import { Children, component, m } from "@mufw/maya";
-import { handleCTA } from "../@common/utils";
+import { handleTap } from "../@common/utils";
 
 type LinkProps = {
   classNames?: string;
@@ -20,7 +20,7 @@ export const Link = component<LinkProps>(
       class: dstring`noselect ${linkCss} ${classNames}`,
       href,
       target,
-      onclick: handleCTA(onClick),
+      onclick: handleTap(onClick),
       children,
     });
   }

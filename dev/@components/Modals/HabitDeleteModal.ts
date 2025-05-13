@@ -13,6 +13,11 @@ type HabitDeleteModalProps = {
 
 export const HabitDeleteModal = component<HabitDeleteModalProps>(
   ({ isOpen, habit, onClose, onDone }) => {
+    const deletePermanently = () => {
+      deleteHabit(habit.value.id);
+      onDone();
+    };
+
     return Modal({
       classNames: "bn w-30-ns",
       isOpen: isOpen,
@@ -22,7 +27,7 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
         children: [
           m.Div({
             class: "mb3 b f4",
-            children: dstring`Delete '${() => habit.value?.title}'?`,
+            children: dstring`Delete '${() => habit.value.title}'?`,
           }),
           m.Div({
             class: "mb4",
@@ -49,10 +54,7 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
               Button({
                 className: "pv2 ph3 ml2 b red",
                 children: "Yes, delete permanently",
-                onTap: () => {
-                  deleteHabit(habit.value.id);
-                  onDone();
-                },
+                onTap: deletePermanently,
               }),
             ],
           }),

@@ -1,8 +1,8 @@
 import { component, m } from "@mufw/maya";
 import { Icon, Modal } from "../@elements";
-import { derive, dstring, signal } from "@cyftech/signal";
+import { derive, dobject, dstring, signal } from "@cyftech/signal";
 import { HOMEPAGE_SORT_OPTIONS } from "../@common/constants";
-import { handleCTA } from "../@common/utils";
+import { handleTap } from "../@common/utils";
 
 type SortOptionsProps = {
   classNames?: string;
@@ -18,9 +18,17 @@ export const SortOptions = component<SortOptionsProps>(
       () => HOMEPAGE_SORT_OPTIONS[selectedOptionIndex.value]
     );
 
+    const openModal = () => (isSortingOptionsModalOpen.value = true);
+    const closeModal = () => (isSortingOptionsModalOpen.value = false);
+
+    const getOptionCss = (optionLabel: string) =>
+      optionLabel === selectedOption.value.label
+        ? "bg-near-white black fw6"
+        : "gray fw5";
+
     const onOptionTap = (optionIndex: number) => {
       onChange(optionIndex);
-      isSortingOptionsModalOpen.value = false;
+      closeModal();
     };
 
     return m.Div({
@@ -28,15 +36,15 @@ export const SortOptions = component<SortOptionsProps>(
       children: [
         SortIcon({
           classNames: "pointer",
-          descending: derive(() => selectedOption.value.decending),
-          iconName: derive(() => selectedOption.value.icon),
+          descending: dobject(selectedOption).prop("decending"),
+          iconName: dobject(selectedOption).prop("icon"),
           size: derive(() => iconSize?.value ?? 20),
-          onClick: () => (isSortingOptionsModalOpen.value = true),
+          onClick: openModal,
         }),
         Modal({
           classNames: "f5 normal ba bw0 outline-0",
           isOpen: isSortingOptionsModalOpen,
-          onTapOutside: () => (isSortingOptionsModalOpen.value = false),
+          onTapOutside: closeModal,
           content: m.Div({
             children: [
               m.Div({
@@ -47,15 +55,11 @@ export const SortOptions = component<SortOptionsProps>(
                 class: "f5 mb1",
                 children: m.For({
                   subject: HOMEPAGE_SORT_OPTIONS,
-                  map: (option, optionIndex) => {
-                    const optionCSS = dstring`pointer flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
-                      option.label === selectedOption.value.label
-                        ? "bg-near-white black fw6"
-                        : "gray fw5"}`;
-
-                    return m.Div({
-                      class: optionCSS,
-                      onclick: handleCTA(() => onOptionTap(optionIndex)),
+                  map: (option, optionIndex) =>
+                    m.Div({
+                      class: dstring`pointer flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
+                        getOptionCss(option.label)}`,
+                      onclick: handleTap(() => onOptionTap(optionIndex)),
                       children: [
                         SortIcon({
                           classNames: "ml1 mr2",
@@ -65,8 +69,7 @@ export const SortOptions = component<SortOptionsProps>(
                         }),
                         m.Span(option.label),
                       ],
-                    });
-                  },
+                    }),
                 }),
               }),
             ],
@@ -87,20 +90,22 @@ type SortIconProps = {
 
 const SortIcon = component<SortIconProps>(
   ({ classNames, descending, iconName, size, onClick }) => {
+    const pointerCss = derive(() => (onClick ? "pointer" : ""));
+    const arrowIconName = derive(() =>
+      descending.value ? "arrow_upward" : "arrow_downward"
+    );
+    const arrowIconSize = derive(() => (4 * size.value) / 5);
+
     return m.Span({
-      class: dstring`flex items-center ${() =>
-        onClick ? "pointer" : ""} ${classNames}`,
-      onclick: handleCTA(onClick),
+      class: dstring`flex items-center ${pointerCss} ${classNames}`,
+      onclick: handleTap(onClick),
       children: [
         Icon({
           className: "silver",
-          size: derive(() => (4 * size.value) / 5),
-          iconName: derive(() =>
-            descending.value ? "arrow_upward" : "arrow_downward"
-          ),
+          iconName: arrowIconName,
+          size: arrowIconSize,
         }),
         Icon({
-          className: "",
           size: size,
           iconName: iconName,
         }),

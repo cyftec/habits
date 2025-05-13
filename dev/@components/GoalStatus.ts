@@ -12,6 +12,15 @@ type GoalStatusProps = {
 export const GoalStatus = component<GoalStatusProps>(
   ({ classNames, milestones, achievedMilestone, completionPercent }) => {
     const achievedMilestoneColor = dobject(achievedMilestone).prop("color");
+    const completionLabel = derive(() =>
+      completionPercent.value > 53
+        ? "Average completion"
+        : completionPercent.value > 43
+        ? "Avg completion"
+        : completionPercent.value > 35
+        ? "Completion"
+        : ""
+    );
 
     return m.Div({
       class: dstring`center ${classNames}`,
@@ -35,17 +44,7 @@ export const GoalStatus = component<GoalStatusProps>(
           children: m.Div({
             class: dstring`relative flex items-start nt1 justify-between f7 mid-gray`,
             children: [
-              m.Div(
-                derive(() =>
-                  completionPercent.value > 53
-                    ? "Average completion"
-                    : completionPercent.value > 43
-                    ? "Avg completion"
-                    : completionPercent.value > 35
-                    ? "Completion"
-                    : ""
-                )
-              ),
+              m.Div(completionLabel),
               m.Div({
                 class: dstring`absolute right-0 pr1 b f6 ${achievedMilestoneColor}`,
                 children: derive(() => `${completionPercent.value}%`),
@@ -66,9 +65,14 @@ type CrossSectionProps = {
 
 const CrossSection = component<CrossSectionProps>(
   ({ colorCss, hideUpperLimit, percent }) => {
+    const percentLabel = derive(() =>
+      hideUpperLimit?.value ? "" : `${percent.value}%`
+    );
+    const widthStyle = derive(() => `width: ${percent.value}%;`);
+
     return m.Div({
       class: "absolute flex items-start h0dot5 bl br b--light-silver bw1",
-      style: derive(() => `width: ${percent.value}%;`),
+      style: widthStyle,
       children: [
         m.Div({
           class: dstring`absolute absolute-fill h0dot15 w-100 ${colorCss}`,
@@ -77,9 +81,7 @@ const CrossSection = component<CrossSectionProps>(
           class: "flex justify-end w-100 pt2 f7",
           children: m.Div({
             class: "nr3 pb2 light-silver b",
-            children: derive(() =>
-              hideUpperLimit?.value ? "" : `${percent.value}%`
-            ),
+            children: percentLabel,
           }),
         }),
       ],

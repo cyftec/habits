@@ -1,13 +1,13 @@
 import { derive, dobject, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
+  getAchievedMilestone,
   getCompletion,
   getDateWindow,
-  getAchievedMilestone,
   getMonthFirstDates,
 } from "../@common/transforms";
 import { HabitUI } from "../@common/types";
-import { handleCTA } from "../@common/utils";
+import { handleTap } from "../@common/utils";
 import { Icon } from "../@elements";
 import { MonthMap } from "./MonthMap";
 
@@ -34,7 +34,7 @@ export const HabitCard = component<HabitCardProps>(
 
     return m.Div({
       class: dstring`pointer bg-white ${classNames}`,
-      onclick: handleCTA(onClick),
+      onclick: handleTap(onClick),
       children: [
         m.Div({
           class: "flex items-center justify-between nt1 mb2",

@@ -7,10 +7,6 @@ type GoBackButtonProps = {
 };
 
 export const GoBackButton = component<GoBackButtonProps>(({ classNames }) => {
-  // const goBack = () => {
-  //   // isNew.value ? goToHabitsPage() : goToHabitPage(habit.value.id);
-  // };
-
   return Button({
     className: dstring`pa3 flex items-center ${classNames}`,
     children: [

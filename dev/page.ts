@@ -20,7 +20,7 @@ import {
   updateHabitStatus,
 } from "./@common/transforms";
 import { DailyStatus } from "./@common/types";
-import { goToHabitPage, goToNewHabitsPage, handleCTA } from "./@common/utils";
+import { goToHabitPage, goToNewHabitsPage, handleTap } from "./@common/utils";
 import {
   AddHabitButton,
   ColorDot,
@@ -186,7 +186,7 @@ export default Page({
                               ? "light-gray b--transparent"
                               : "light-silver pointer b--transparent"
                           }`,
-                          onclick: handleCTA(
+                          onclick: handleTap(
                             () =>
                               !(isSelectedDay || isFuture) &&
                               (selectedDate.value = date)
@@ -258,7 +258,7 @@ export default Page({
                             }),
                             m.Div({
                               class: "pointer",
-                              onclick: handleCTA(() => goToHabitPage(habit.id)),
+                              onclick: handleTap(() => goToHabitPage(habit.id)),
                               children: [
                                 m.Div({
                                   class: "f5 fw6 f4-ns fw4-ns",

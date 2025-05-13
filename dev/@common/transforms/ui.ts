@@ -465,7 +465,7 @@ export const getHabitInfoLabel = (habitId: number) => {
   return "Just stick to it. Patience is the key.";
 };
 
-export const getTrackerForLevelsChange = (
+export const getUpdatedTrackerDataForModifiedLevels = (
   oldLevels: LevelUI[],
   newLevels: LevelUI[],
   tracker: DailyStatus[]

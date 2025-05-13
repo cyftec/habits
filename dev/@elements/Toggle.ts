@@ -1,6 +1,6 @@
 import { derive, dobject, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { handleCTA } from "../@common/utils";
+import { handleTap } from "../@common/utils";
 
 type ToggleProps = {
   classNames?: string;
@@ -25,7 +25,7 @@ export const Toggle = component<ToggleProps>(
 
     return m.Div({
       class: dstring`flex items-center pointer noselect br-pill ba bw1dot5 b--mid-gray b--hover-black bg-white pa05 black ${classNames}`,
-      onclick: handleCTA(onToggle),
+      onclick: handleTap(onToggle),
       children: [
         m.Div({
           class: dstring`br-100 ba bw1 b--hover-black pa1 ${leftCircleCss}`,

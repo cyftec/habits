@@ -1,7 +1,7 @@
-import { Child, component, m } from "@mufw/maya";
+import { derive, dstring } from "@cyftech/signal";
+import { component, m } from "@mufw/maya";
+import { goToHref, handleTap } from "../@common/utils";
 import { Icon } from "../@elements";
-import { dstring } from "@cyftech/signal";
-import { goToHref, handleCTA } from "../@common/utils";
 
 type NavBarProps = {
   classNames?: string;
@@ -39,19 +39,16 @@ type NavBarLinkProps = {
 
 export const NavBarLink = component<NavBarLinkProps>(
   ({ classNames, label, icon, isSelected, href }) => {
+    const fontColor = derive(() =>
+      isSelected.value ? "app-theme-color b" : "black"
+    );
+
     return m.Div({
-      class: dstring`pointer noselect flex flex-column items-center justify-center pb2 ${() =>
-        isSelected.value ? "app-theme-color b" : "black"} ${classNames}`,
-      onclick: handleCTA(() => goToHref(href.value)),
+      class: dstring`pointer noselect flex flex-column items-center justify-center pb2 ${fontColor} ${classNames}`,
+      onclick: handleTap(() => goToHref(href.value)),
       children: [
-        Icon({
-          size: 22,
-          iconName: icon,
-        }),
-        m.Div({
-          class: "f7",
-          children: label,
-        }),
+        Icon({ size: 22, iconName: icon }),
+        m.Div({ class: "f7", children: label }),
       ],
     });
   }

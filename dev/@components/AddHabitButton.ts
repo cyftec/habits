@@ -1,7 +1,7 @@
-import { component, m } from "@mufw/maya";
-import { Button, Icon } from "../@elements";
 import { derive, dstring } from "@cyftech/signal";
+import { component, m } from "@mufw/maya";
 import { goToNewHabitsPage } from "../@common/utils";
+import { Button, Icon } from "../@elements";
 
 type AddHabitButtonProps = {
   classNames?: string;
@@ -11,9 +11,11 @@ type AddHabitButtonProps = {
 
 export const AddHabitButton = component<AddHabitButtonProps>(
   ({ classNames, justifyClassNames, label }) => {
+    const justifyCss = derive(() => justifyClassNames?.value || "justify-end");
+    const buttonLabel = derive(() => label?.value || `Add habit`);
+
     return m.Div({
-      class: dstring`w-100 flex ${() =>
-        justifyClassNames?.value || "justify-end"} ${classNames}`,
+      class: dstring`w-100 flex ${justifyCss} ${classNames}`,
       children: Button({
         className: "pa3 mb3 shadow-4 b flex items-center",
         children: [
@@ -22,7 +24,7 @@ export const AddHabitButton = component<AddHabitButtonProps>(
             size: 22,
             iconName: "add",
           }),
-          derive(() => label?.value || `Add habit`),
+          buttonLabel,
         ],
         onTap: goToNewHabitsPage,
       }),

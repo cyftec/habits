@@ -10,7 +10,7 @@ import {
   levelTextboxDisability,
 } from "../../@common/transforms";
 import { HabitUI, MilestonesUI, WeekdayFrequency } from "../../@common/types";
-import { handleCTA } from "../../@common/utils";
+import { handleTap } from "../../@common/utils";
 import {
   AddRemoveButton,
   Button,
@@ -48,6 +48,14 @@ export const HabitEditor = component<HabitEditorProps>(
     const everyDay = derive(() => frequency.value.every((day) => !!day));
     const selectedCss = "bg-mid-gray white";
     const unSelectedCss = "bg-near-white light-silver";
+    const dailyBtnCss = derive(() =>
+      everyDay.value ? selectedCss : unSelectedCss
+    );
+    const customisationsButtonIcon = derive(() =>
+      moreDetails.value ? "remove" : "add"
+    );
+    const customisationsButtonLabel = dstring`Show ${() =>
+      moreDetails.value ? "Less" : "More"} Customisations`;
 
     const updateTitle = (title: string) => {
       onChange({ ...editedHabit.value, title });
@@ -131,10 +139,9 @@ export const HabitEditor = component<HabitEditorProps>(
               subject: Array(7).fill(0),
               n: 0,
               nthChild: m.Span({
-                class: dstring`pointer flex items-center justify-center br-pill h2 ph2 mr3-ns ${() =>
-                  everyDay.value ? selectedCss : unSelectedCss}`,
+                class: dstring`pointer flex items-center justify-center br-pill h2 ph2 mr3-ns ${dailyBtnCss}`,
                 children: "Daily",
-                onclick: handleCTA(() => updateFrequency(-1)),
+                onclick: handleTap(() => updateFrequency(-1)),
               }),
               map: (_, dayIndex) => {
                 const colorCss = derive(() =>
@@ -146,7 +153,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 return m.Span({
                   class: dstring`pointer flex items-center justify-center br-100 h2 w2 mr3-ns ${colorCss}`,
                   children: getWeekdayName(dayIndex, 1),
-                  onclick: handleCTA(() => updateFrequency(dayIndex)),
+                  onclick: handleTap(() => updateFrequency(dayIndex)),
                 });
               },
             }),
@@ -180,7 +187,7 @@ export const HabitEditor = component<HabitEditorProps>(
                     return m.Span({
                       class: `pointer mb2 mr3 pa1 br-100 bw2 ba flex`,
                       style: dstring`border-color: ${borderColorCss}`,
-                      onclick: handleCTA(() => updateColor(i)),
+                      onclick: handleTap(() => updateColor(i)),
                       children: m.Span({
                         class: dstring`pa2 br-100`,
                         style: `background-color: ${colorOption}`,
@@ -201,8 +208,7 @@ export const HabitEditor = component<HabitEditorProps>(
                   should ideally have three levels - '0 litre', '1 litre' and '2 litres', from low to high.
                   You can add or remove levels by clicking on + or - buttons. Click on textbox
                   for editing the status level name. The levels from top to bottom should go from lowest
-                  to the highest.
-                `,
+                  to the highest.`,
               children: m.For({
                 subject: levels,
                 map: (currentLevel, i) => {
@@ -270,25 +276,19 @@ export const HabitEditor = component<HabitEditorProps>(
                   just crossed the milestone - '${() =>
                     getAchievedMilestone(editedHabit.value.milestones, 67)
                       .label}'. For achieving your goal (in %), you can set your
-                  own custom milestones depending on the difficulty of the habit.
-                `,
+                  own custom milestones depending on the difficulty of the habit.`,
               children: m.For({
                 subject: milestones,
                 n: 0,
                 nthChild: m.Div({
                   class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",
                   children: [
+                    m.Span({ class: "lh-copy", children: "" }),
                     m.Span({
-                      class: "lh-copy",
-                      children: "",
-                    }),
-                    m.Span({
-                      class:
-                        "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
+                      class: `w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1`,
                       children: [
                         m.Span({
-                          class:
-                            "w-100 bg-white bn bw1 ph2dot5 di f4 b light-silver pb3 nl1",
+                          class: `w-100 bg-white bn bw1 ph2dot5 di f4 b light-silver pb3 nl1`,
                           children: "100",
                         }),
                         m.Span({
@@ -301,10 +301,10 @@ export const HabitEditor = component<HabitEditorProps>(
                 }),
                 map: (milestone, i) =>
                   m.Div({
-                    class: "mb1 ph4 pv4 ba br3 bw1 b--light-gray relative",
+                    class: `mb1 ph4 pv4 ba br3 bw1 b--light-gray relative`,
                     children: [
                       m.Span({
-                        class: "lh-copy flex items-center",
+                        class: `lh-copy flex items-center`,
                         children: [
                           Icon({
                             className: `mr2 ${milestone.color}`,
@@ -315,19 +315,16 @@ export const HabitEditor = component<HabitEditorProps>(
                         ],
                       }),
                       m.Span({
-                        class:
-                          "w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1",
+                        class: `w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1`,
                         children: [
                           m.If({
                             subject: i === 3,
                             isTruthy: m.Span({
-                              class:
-                                "w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1",
+                              class: `w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1`,
                               children: "00",
                             }),
                             isFalsy: NumberBox({
-                              classNames:
-                                "w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray",
+                              classNames: `w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray`,
                               num: milestone.percent,
                               onchange: (value) => updateMilestone(value, i),
                             }),
@@ -352,11 +349,9 @@ export const HabitEditor = component<HabitEditorProps>(
             children: [
               Icon({
                 className: "mr1",
-                // size: 20,
-                iconName: derive(() => (moreDetails.value ? "remove" : "add")),
+                iconName: customisationsButtonIcon,
               }),
-              dstring`Show ${() =>
-                moreDetails.value ? "Less" : "More"} Customisations`,
+              customisationsButtonLabel,
             ],
           }),
         }),
