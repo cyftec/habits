@@ -3,7 +3,8 @@ import { component, m } from "@mufw/maya";
 import { getDayStatus } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
 import { handleCTA } from "../../@common/utils";
-import { ColorDot, Modal } from "../../@elements";
+import { Modal } from "../../@elements";
+import { ColorDot } from "../ColorDot";
 
 type HabitStatusEditModalProps = {
   isOpen: boolean;

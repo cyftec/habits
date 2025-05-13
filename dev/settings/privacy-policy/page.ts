@@ -1,6 +1,6 @@
 import { m } from "@mufw/maya";
-import { GoBackButton } from "../../@components";
-import { Page, Scaffold } from "../../@elements";
+import { GoBackButton, Page } from "../../@components";
+import { Scaffold } from "../../@elements";
 import { PRIVACY_POLICY } from "./@lib/constants";
 
 export default Page({

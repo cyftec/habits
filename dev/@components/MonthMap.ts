@@ -5,7 +5,7 @@ import {
   getMonthName,
 } from "../@common/transforms";
 import { HabitUI } from "../@common/types";
-import { ColorDot } from "../@elements";
+import { ColorDot } from "./ColorDot";
 
 type MonthMapProps = {
   classNames?: string;

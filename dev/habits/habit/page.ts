@@ -14,13 +14,15 @@ import {
 import { HabitUI } from "../../@common/types";
 import { goToHabitEditPage } from "../../@common/utils";
 import {
+  ColorDot,
   GoalStatus,
   GoBackButton,
   HabitDeleteModal,
   HabitStatusEditModal,
+  Page,
   Section,
 } from "../../@components";
-import { Button, ColorDot, Icon, Page, Scaffold } from "../../@elements";
+import { Button, Icon, Scaffold } from "../../@elements";
 
 const error = signal("");
 const habit = signal<HabitUI>(getNewHabit());

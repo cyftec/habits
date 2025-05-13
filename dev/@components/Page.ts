@@ -1,4 +1,4 @@
-import { Child, Children, component, m } from "@mufw/maya";
+import { Child, component, m } from "@mufw/maya";
 
 type PageProps = {
   classNames?: string;

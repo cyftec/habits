@@ -1,6 +1,6 @@
 import { derive, dobject, dstring, signal, Signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { Section } from "..";
+import { ColorDot, Section } from "..";
 import { BASE_COLORS, BASE_LEVELS } from "../../@common/constants";
 import {
   getAchievedMilestone,
@@ -14,7 +14,6 @@ import { handleCTA } from "../../@common/utils";
 import {
   AddRemoveButton,
   Button,
-  ColorDot,
   Icon,
   NumberBox,
   TextBox,

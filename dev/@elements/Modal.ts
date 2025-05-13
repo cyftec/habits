@@ -11,14 +11,17 @@ type ModalProps = {
 
 export const Modal = component<ModalProps>(
   ({ classNames, isOpen, content, onTapOutside }) => {
+    const onDialogMount = (dialogElem) => {
+      setTimeout(() =>
+        effect(() => {
+          if (isOpen.value) dialogElem.showModal();
+          else dialogElem.close();
+        })
+      );
+    };
+
     return m.Dialog({
-      onmount: (dialogElem) =>
-        setTimeout(() =>
-          effect(() => {
-            if (isOpen.value) dialogElem.showModal();
-            else dialogElem.close();
-          })
-        ),
+      onmount: onDialogMount,
       onclick: handleCTA(onTapOutside),
       class: dstring`pa0 br3 ${classNames}`,
       children: [

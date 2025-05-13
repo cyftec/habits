@@ -1,6 +1,7 @@
-import { derive, dobject, dstring, effect, signal } from "@cyftech/signal";
+import { derive, dobject, dstring, signal } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { GoBackButton, HabitDeleteModal, Section } from "..";
+import { GoBackButton, HabitDeleteModal, Page, Section } from "..";
+import { INITIAL_SETTINGS } from "../../@common/constants";
 import {
   getEditPageSettings,
   saveHabit,
@@ -12,9 +13,8 @@ import {
   getTrackerForLevelsChange,
 } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
-import { Button, Link, Modal, Page, Scaffold } from "../../@elements";
+import { Button, Link, Modal, Scaffold } from "../../@elements";
 import { HabitEditor } from "./HabitEditor";
-import { INITIAL_SETTINGS } from "../../@common/constants";
 
 type HabitEditorPageProps = {
   editableHabit?: HabitUI;

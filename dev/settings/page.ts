@@ -6,11 +6,11 @@ import {
   getStorageData,
   updateEditPageSettings,
 } from "../@common/localstorage";
-import { goToPrivacyPolicyPage } from "../@common/utils";
-import { NavScaffold, Section } from "../@components";
-import { Divider, Icon, Link, Page } from "../@elements";
-import { ToggleSetting } from "./@components/ToggleSetting";
 import { StorageDetails } from "../@common/types";
+import { goToPrivacyPolicyPage } from "../@common/utils";
+import { NavScaffold, Page, Section } from "../@components";
+import { Divider, Icon, Link } from "../@elements";
+import { ToggleSetting } from "./@components/ToggleSetting";
 
 const storageSpace = signal<StorageDetails>(INITIAL_STORAGE_DATA);
 const editPageSettings = signal(INITIAL_SETTINGS.editPage);

@@ -1,4 +1,4 @@
-import { derive, dobject, effect, signal } from "@cyftech/signal";
+import { derive, dobject, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import {
   HOMEPAGE_OVERVIEW_TABS,
@@ -11,6 +11,7 @@ import {
   intializeTrackerEmptyDays,
   updateHabitsPageSettings,
 } from "../@common/localstorage";
+import { checkNoHabitsInStore } from "../@common/localstorage/habits";
 import { getCompletion, getDateWindow } from "../@common/transforms";
 import { HabitUI } from "../@common/types";
 import { goToHabitPage } from "../@common/utils";
@@ -18,10 +19,10 @@ import {
   AddHabitButton,
   HabitCard,
   NavScaffold,
+  Page,
   SortOptions,
 } from "../@components";
-import { Page, TabBar } from "../@elements";
-import { checkNoHabitsInStore } from "../@common/localstorage/habits";
+import { TabBar } from "../@elements";
 
 const noHabitsInStore = signal(false);
 const pageSettings = signal(INITIAL_SETTINGS.habitsPage);

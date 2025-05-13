@@ -2,7 +2,7 @@ import { derive, dobject, dstring, MaybeSignalObject } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { handleCTA } from "../@common/utils";
 import { getColorsForLevel } from "../@common/transforms";
-import { Icon } from "./Icon";
+import { Icon } from "../@elements";
 
 type ColorDotProps = {
   classNames?: string;

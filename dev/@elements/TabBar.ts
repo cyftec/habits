@@ -1,4 +1,4 @@
-import { dstring } from "@cyftech/signal";
+import { derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { handleCTA } from "../@common/utils";
 
@@ -20,6 +20,11 @@ export const TabBar = component<TabBarProps>(
     selectedTabIndex,
     onTabChange,
   }) => {
+    const tabSelectionCss = (tabIndex: number) =>
+      tabIndex === selectedTabIndex.value
+        ? `b--light-silver b black ${selectedTabClassNames?.value}`
+        : "pointer b--transparent b--hover-black silver pointer";
+
     return m.Div({
       class: dstring`bg-white br3 ${classNames}`,
       children: m.Div({
@@ -28,10 +33,9 @@ export const TabBar = component<TabBarProps>(
           subject: tabs,
           map: (tab, i) =>
             m.Span({
-              class: dstring`w-100 br3 pv3 ph2 flex justify-center noselect br-pill ba bw1 bg-inherit ${() =>
-                i === selectedTabIndex.value
-                  ? `b--light-silver b black ${selectedTabClassNames?.value}`
-                  : "pointer b--transparent b--hover-black silver pointer"} ${tabItemClassNames}`,
+              class: dstring`
+                w-100 br3 pv3 ph2 flex justify-center noselect br-pill ba bw1 bg-inherit
+                ${tabSelectionCss(i)} ${tabItemClassNames}`,
               onclick: handleCTA(() => onTabChange(i)),
               children: tab,
             }),

@@ -4,6 +4,7 @@ import {
   intializeTrackerEmptyDays,
   updateInteractionTime,
 } from "./@common/localstorage";
+import { checkNoHabitsInStore } from "./@common/localstorage/habits";
 import {
   areSameDates,
   getDayLabel,
@@ -22,11 +23,12 @@ import { DailyStatus } from "./@common/types";
 import { goToHabitPage, goToNewHabitsPage, handleCTA } from "./@common/utils";
 import {
   AddHabitButton,
+  ColorDot,
   HabitStatusEditModal,
   NavScaffold,
+  Page,
 } from "./@components";
-import { ColorDot, Link, Page, ProgressBar } from "./@elements";
-import { checkNoHabitsInStore } from "./@common/localstorage/habits";
+import { Link, ProgressBar } from "./@elements";
 
 const now = new Date();
 const noHabitsInStore = signal(false);
