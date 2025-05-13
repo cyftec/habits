@@ -102,7 +102,7 @@ const SortIcon = component<SortIconProps>(
       onclick: handleTap(onClick),
       children: [
         Icon({
-          className: "silver",
+          classNames: "silver",
           iconName: arrowIconName,
           size: arrowIconSize,
         }),

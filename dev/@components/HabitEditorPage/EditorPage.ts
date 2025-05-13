@@ -159,7 +159,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
                   classNames: "w4dot50 w4dot25-ns",
                 }),
                 Button({
-                  className: "w-100 pa3 ml3 b",
+                  classNames: "w-100 pa3 ml3 b",
                   children: actionButtonLabel,
                   onTap: save,
                 }),

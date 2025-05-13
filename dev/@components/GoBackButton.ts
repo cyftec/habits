@@ -8,7 +8,7 @@ type GoBackButtonProps = {
 
 export const GoBackButton = component<GoBackButtonProps>(({ classNames }) => {
   return Button({
-    className: dstring`pa3 flex items-center ${classNames}`,
+    classNames: dstring`pa3 flex items-center ${classNames}`,
     children: [
       Icon({ iconName: "arrow_back" }),
       m.Span({

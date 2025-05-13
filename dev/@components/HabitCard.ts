@@ -47,7 +47,7 @@ export const HabitCard = component<HabitCardProps>(
               class: "f6 silver b flex items-center",
               children: [
                 Icon({
-                  className: dstring`mr1 ${color}`,
+                  classNames: dstring`mr1 ${color}`,
                   iconName: icon,
                 }),
                 dstring`${completion}%`,

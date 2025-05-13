@@ -3,7 +3,7 @@ import { compute, derive, dstring } from "@cyftech/signal";
 import { handleTap } from "../@common/utils";
 
 type IconProps = {
-  className?: string;
+  classNames?: string;
   size?: number;
   iconName: string;
   onClick?: () => void;
@@ -11,12 +11,12 @@ type IconProps = {
 };
 
 export const Icon = component<IconProps>(
-  ({ className, size, onClick, iconName, title }) => {
+  ({ classNames, size, onClick, iconName, title }) => {
     const pointerCss = !!onClick ? "pointer" : "";
     const fontSize = compute(size).or(16);
 
     return m.Span({
-      class: dstring`material-symbols-outlined ${pointerCss} ${className}`,
+      class: dstring`material-symbols-outlined ${pointerCss} ${classNames}`,
       style: dstring`font-size: ${fontSize}px`,
       onclick: handleTap(onClick),
       children: iconName,

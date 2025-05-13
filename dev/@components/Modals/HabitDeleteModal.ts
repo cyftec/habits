@@ -47,12 +47,12 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
             class: "flex items-center justify-between f6",
             children: [
               Button({
-                className: "w-25 pv2 ph3 mr1 b",
+                classNames: "w-25 pv2 ph3 mr1 b",
                 children: "No",
                 onTap: onClose,
               }),
               Button({
-                className: "pv2 ph3 ml2 b red",
+                classNames: "pv2 ph3 ml2 b red",
                 children: "Yes, delete permanently",
                 onTap: deletePermanently,
               }),

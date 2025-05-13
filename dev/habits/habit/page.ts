@@ -127,7 +127,7 @@ export default HTMLPage({
         m.If({
           subject: habitIsStopped,
           isFalsy: Icon({
-            className: "mt1 mr1 ba b--silver bw1 br-100 pa1 noselect",
+            classNames: "mt1 mr1 ba b--silver bw1 br-100 pa1 noselect",
             size: 18,
             iconName: "edit",
             onClick: () => goToHabitEditPage(habitId.value),
@@ -167,7 +167,7 @@ export default HTMLPage({
                         children: "Status: STOPPED PERMANENTLY",
                       }),
                       Button({
-                        className: "pv2 ph3 nt2 mb4 red",
+                        classNames: "pv2 ph3 nt2 mb4 red",
                         onTap: openDeleteModal,
                         children: "Delete Permanently",
                       }),
@@ -195,7 +195,7 @@ export default HTMLPage({
                                 class: "flex items-center",
                                 children: [
                                   Icon({
-                                    className: dstring`mr1 ${achievedMilestoneColor}`,
+                                    classNames: dstring`mr1 ${achievedMilestoneColor}`,
                                     size: 12,
                                     iconName: achievedMilestoneIcon,
                                   }),
@@ -263,7 +263,7 @@ export default HTMLPage({
                         }),
                       }),
                       Button({
-                        className: "pa2 ph3 mt4 mb2",
+                        classNames: "pa2 ph3 mt4 mb2",
                         children: dstring`${() =>
                           showGoalStatus.value
                             ? "Hide"

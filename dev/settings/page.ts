@@ -88,7 +88,7 @@ export default HTMLPage({
             children: [
               "Read complete policy here",
               Icon({
-                className: "ml1",
+                classNames: "ml1",
                 size: 12,
                 iconName: "call_made",
               }),
@@ -113,7 +113,7 @@ export default HTMLPage({
                 children: [
                   "Made with",
                   Icon({
-                    className: "mh1 gray",
+                    classNames: "mh1 gray",
                     size: 21,
                     iconName: "volunteer_activism",
                   }),

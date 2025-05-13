@@ -17,10 +17,10 @@ export const AddHabitButton = component<AddHabitButtonProps>(
     return m.Div({
       class: dstring`w-100 flex ${justifyCss} ${classNames}`,
       children: Button({
-        className: "pa3 mb3 shadow-4 b flex items-center",
+        classNames: "pa3 mb3 shadow-4 b flex items-center",
         children: [
           Icon({
-            className: "nl1 mr1",
+            classNames: "nl1 mr1",
             size: 22,
             iconName: "add",
           }),

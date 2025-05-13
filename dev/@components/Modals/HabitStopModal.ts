@@ -36,12 +36,12 @@ export const HabitStopModal = component<HabitStopModalProps>(
             class: "flex items-center justify-between f6",
             children: [
               Button({
-                className: "w-100 pv2 ph3 mr2",
+                classNames: "w-100 pv2 ph3 mr2",
                 children: "No, go back",
                 onTap: onClose,
               }),
               Button({
-                className: "w-100 pv2 ph3 ml2 b",
+                classNames: "w-100 pv2 ph3 ml2 b",
                 children: "Yes, stop this",
                 onTap: onDone,
               }),

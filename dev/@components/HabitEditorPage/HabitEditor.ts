@@ -315,7 +315,7 @@ export const HabitEditor = component<HabitEditorProps>(
                         class: `lh-copy flex items-center`,
                         children: [
                           Icon({
-                            className: `mr2 ${milestone.color}`,
+                            classNames: `mr2 ${milestone.color}`,
                             size: 20,
                             iconName: milestone.icon,
                           }),
@@ -352,11 +352,11 @@ export const HabitEditor = component<HabitEditorProps>(
         m.If({
           subject: showFullCustomisations,
           isFalsy: Button({
-            className: "pv2 ph3 flex items-center",
+            classNames: "pv2 ph3 flex items-center",
             onTap: () => (moreDetails.value = !moreDetails.value),
             children: [
               Icon({
-                className: "mr1",
+                classNames: "mr1",
                 iconName: customisationsButtonIcon,
               }),
               customisationsButtonLabel,
