@@ -1,4 +1,4 @@
-import { derive, dstring } from "@cyftech/signal";
+import { compute, derive, dstring } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { goToNewHabitsPage } from "../@common/utils";
 import { Button, Icon } from "../@elements";
@@ -11,8 +11,8 @@ type AddHabitButtonProps = {
 
 export const AddHabitButton = component<AddHabitButtonProps>(
   ({ classNames, justifyClassNames, label }) => {
-    const justifyCss = derive(() => justifyClassNames?.value || "justify-end");
-    const buttonLabel = derive(() => label?.value || `Add habit`);
+    const justifyCss = compute(justifyClassNames).or("justify-end");
+    const buttonLabel = compute(label).or(`Add habit`);
 
     return m.Div({
       class: dstring`w-100 flex ${justifyCss} ${classNames}`,

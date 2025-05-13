@@ -56,7 +56,7 @@ export const ColorDot = component<ColorDotProps>(
           )
         )
       ).props;
-    const text = derive(() => textContent?.value || "·");
+    const text = compute(textContent).or("·");
     const showIcon = derive(
       () => showHeight?.value && icon?.value && levelPercent.value > 99
     );
