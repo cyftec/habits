@@ -8,12 +8,15 @@ import {
 } from "../@common/localstorage";
 import { StorageDetails } from "../@common/types";
 import { goToPrivacyPolicyPage } from "../@common/utils";
-import { NavScaffold, Page, Section } from "../@components";
+import { NavScaffold, HTMLPage, Section } from "../@components";
 import { Divider, Icon, Link } from "../@elements";
 import { ToggleSetting } from "./@components/ToggleSetting";
 
-const storageSpace = signal<StorageDetails>(INITIAL_STORAGE_DATA);
 const editPageSettings = signal(INITIAL_SETTINGS.editPage);
+const storageSpace = signal<StorageDetails>(INITIAL_STORAGE_DATA);
+const storageSpaceLabel = dstring`${() =>
+  storageSpace.value.total?.toFixed(2)} KB used (${() =>
+  storageSpace.value.spaceLeft?.toFixed(2)}% left)`;
 
 const onEditPageHintsSettingToggle = () => {
   updateEditPageSettings({
@@ -36,7 +39,7 @@ const onPageMount = () => {
   editPageSettings.value = getEditPageSettings();
 };
 
-export default Page({
+export default HTMLPage({
   classNames: "bg-white",
   onMount: onPageMount,
   body: NavScaffold({
@@ -48,11 +51,7 @@ export default Page({
         Section({
           classNames: "pb3",
           title: "Storage space",
-          children: [
-            dstring`${() =>
-              storageSpace.value.total?.toFixed(2)} KB used (${() =>
-              storageSpace.value.spaceLeft?.toFixed(2)}% left)`,
-          ],
+          children: storageSpaceLabel,
         }),
         Section({
           classNames: "pb3",
@@ -82,8 +81,7 @@ export default Page({
             This app does not collect any data, nor does it store
             them remotely or send elsewhere for data persistence.
             It uses local storage of the browser for saving data. And it is safe
-            for use by any age group person.
-          `,
+            for use by any age group person.`,
           children: Link({
             classNames: "flex items-center",
             onClick: goToPrivacyPolicyPage,
@@ -101,31 +99,28 @@ export default Page({
           contentClassNames: "flex justify-between",
           title: "About",
           children: [
-            m.Div({
-              class: "",
-              children: [
-                m.Div({
-                  class: "",
-                  children: "Habits (by Cyfer)",
-                }),
-                m.Div({
-                  class: "silver mt1",
-                  children: "version 1.0",
-                }),
-                m.Div({
-                  class: "silver mt1 flex items-center",
-                  children: [
-                    "Made with",
-                    Icon({
-                      className: "mh1 gray",
-                      size: 21,
-                      iconName: "volunteer_activism",
-                    }),
-                    "from Bharat",
-                  ],
-                }),
-              ],
-            }),
+            m.Div([
+              m.Div({
+                class: "",
+                children: "Habits (by Cyfer)",
+              }),
+              m.Div({
+                class: "silver mt1",
+                children: "version 1.0",
+              }),
+              m.Div({
+                class: "silver mt1 flex items-center",
+                children: [
+                  "Made with",
+                  Icon({
+                    className: "mh1 gray",
+                    size: 21,
+                    iconName: "volunteer_activism",
+                  }),
+                  "from Bharat",
+                ],
+              }),
+            ]),
             m.Div({
               class: "pa05 h3 bg-green ba b--blue relative",
               children: [

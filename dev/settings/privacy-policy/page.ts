@@ -1,9 +1,9 @@
 import { m } from "@mufw/maya";
-import { GoBackButton, Page } from "../../@components";
+import { GoBackButton, HTMLPage } from "../../@components";
 import { Scaffold } from "../../@elements";
 import { PRIVACY_POLICY } from "./@lib/constants";
 
-export default Page({
+export default HTMLPage({
   classNames: "bg-white ph3",
   body: Scaffold({
     classNames: "bg-white",
@@ -40,11 +40,7 @@ export default Page({
                     isTruthy: m.Ul(
                       m.For({
                         subject: policy.bullets,
-                        map: (bulletPoint) =>
-                          m.Li({
-                            class: "",
-                            children: bulletPoint,
-                          }),
+                        map: (bulletPoint) => m.Li(bulletPoint),
                       })
                     ),
                   }),
@@ -54,6 +50,9 @@ export default Page({
         ),
       ],
     }),
-    bottombar: GoBackButton({}),
+    bottombar: m.Div({
+      class: "pb3",
+      children: GoBackButton({}),
+    }),
   }),
 });

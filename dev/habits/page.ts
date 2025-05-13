@@ -1,10 +1,6 @@
 import { derive, dobject, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import {
-  HOMEPAGE_OVERVIEW_TABS,
-  HOMEPAGE_SORT_OPTIONS,
-  INITIAL_SETTINGS,
-} from "../@common/constants";
+import { HOMEPAGE_OVERVIEW_TABS, INITIAL_SETTINGS } from "../@common/constants";
 import {
   fetchHabits,
   getHabitsPageSettings,
@@ -12,14 +8,14 @@ import {
   updateHabitsPageSettings,
 } from "../@common/localstorage";
 import { checkNoHabitsInStore } from "../@common/localstorage/habits";
-import { getCompletion, getDateWindow } from "../@common/transforms";
+import { getSortedHabits } from "../@common/transforms";
 import { HabitUI } from "../@common/types";
 import { goToHabitPage } from "../@common/utils";
 import {
   AddHabitButton,
   HabitCard,
+  HTMLPage,
   NavScaffold,
-  Page,
   SortOptions,
 } from "../@components";
 import { TabBar } from "../@elements";
@@ -30,28 +26,13 @@ const totalOverviewMonths = derive(
   () => HOMEPAGE_OVERVIEW_TABS[pageSettings.value.tabIndex].months
 );
 const habits = signal<HabitUI[]>([]);
-const sortedHabits = derive(() => {
-  const selectedOption =
-    HOMEPAGE_SORT_OPTIONS[pageSettings.value.sortOptionIndex];
-  const totalMonths = totalOverviewMonths.value;
-  const { startDate, endDate } = getDateWindow(totalMonths);
-  const optionLabel = selectedOption.label;
-  const sortedHabitsWithCompletion = habits.value.map((habit) => ({
-    ...habit,
-    completion: getCompletion(habit, startDate, endDate).percent,
-  }));
-  sortedHabitsWithCompletion.sort((a, b) => {
-    if (optionLabel === "Completion (Highest first)")
-      return b.completion - a.completion;
-    if (optionLabel === "Completion (Lowest first)")
-      return a.completion - b.completion;
-    if (optionLabel === "Date created (Oldest first)") return a.id - b.id;
-
-    return b.id - a.id;
-  });
-
-  return sortedHabitsWithCompletion;
-});
+const sortedHabits = derive(() =>
+  getSortedHabits(
+    habits.value,
+    pageSettings.value.sortOptionIndex,
+    totalOverviewMonths.value
+  )
+);
 const sortedActiveHabits = derive(() =>
   sortedHabits.value.filter((hab) => !hab.isStopped)
 );
@@ -84,7 +65,7 @@ const onPageMount = () => {
   window.addEventListener("pageshow", triggerPageDataRefresh);
 };
 
-export default Page({
+export default HTMLPage({
   classNames: "bg-white",
   onMount: onPageMount,
   body: NavScaffold({
@@ -139,7 +120,10 @@ export default Page({
                   "ACTIVE HABITS",
                   m.If({
                     subject: derive(() => !!sortedActiveHabits.value.length),
-                    isFalsy: m.Div("None"),
+                    isFalsy: m.Div({
+                      class: "mt3",
+                      children: "None",
+                    }),
                   }),
                 ],
               }),
@@ -163,7 +147,10 @@ export default Page({
                   "STOPPED HABITS",
                   m.If({
                     subject: derive(() => !!sortedStoppedHabits.value.length),
-                    isFalsy: m.Div("None"),
+                    isFalsy: m.Div({
+                      class: "mt3",
+                      children: "None",
+                    }),
                   }),
                 ],
               }),

@@ -4,7 +4,7 @@ import {
   GoBackButton,
   HabitDeleteModal,
   HabitStopModal,
-  Page,
+  HTMLPage,
   Section,
 } from "..";
 import { INITIAL_SETTINGS } from "../../@common/constants";
@@ -93,7 +93,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
       editPageSettings.value = getEditPageSettings();
     };
 
-    return Page({
+    return HTMLPage({
       onMount: onPageMount,
       body: Scaffold({
         classNames: "bg-white ph3",

@@ -19,7 +19,7 @@ import {
   GoBackButton,
   HabitDeleteModal,
   HabitStatusEditModal,
-  Page,
+  HTMLPage,
   Section,
 } from "../../@components";
 import { Button, Icon, Scaffold } from "../../@elements";
@@ -112,7 +112,7 @@ const onPageMount = () => {
   window.addEventListener("pageshow", triggerPageDataRefresh);
 };
 
-export default Page({
+export default HTMLPage({
   onMount: onPageMount,
   body: Scaffold({
     classNames: "bg-white ph3",

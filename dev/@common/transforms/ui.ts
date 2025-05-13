@@ -3,6 +3,7 @@ import {
   BASE_LEVELS,
   BASE_MILESTONES,
   BASE_WEEKDAY_FREQUENCY,
+  HOMEPAGE_SORT_OPTIONS,
   SYSTEM_DEFINED_LEVELS,
 } from "../constants";
 import {
@@ -26,6 +27,7 @@ import {
   areSameDates,
   getDateGapFromToday,
   getDatesArrayBetweenDates,
+  getDateWindow,
   getDaysGap,
   getGapDate,
   getMinutesInMS,
@@ -529,4 +531,62 @@ export const isLastInteractionLongBack = () => {
   const now = new Date().getTime();
   const lastIntrxn = getLastInteraction();
   return now - lastIntrxn > getMinutesInMS(1);
+};
+
+export const getHabitsStatusLabelForTheDay = (
+  habits: HabitUI[],
+  date: Date
+) => {
+  const statuses = habits.map(
+    (hab) => getDayStatus(hab.tracker, date) as DailyStatus
+  );
+  const status = {
+    done: statuses.reduce((sum, st) => sum + (st.level.isMaxLevel ? 1 : 0), 0),
+    started: statuses.reduce(
+      (sum, st) => sum + (st.level.code > 0 && !st.level.isMaxLevel ? 1 : 0),
+      0
+    ),
+    notDone: statuses.reduce(
+      (sum, st) => sum + (st.level.code === 0 ? 1 : 0),
+      0
+    ),
+  };
+
+  if (status.done === 0 && status.started === 0 && status.notDone === 0)
+    return ``;
+  if (status.done === 0 && status.started === 0 && status.notDone > 0)
+    return `Update below ${status.notDone} tsaks for the day.`;
+  if (status.done > 0 && status.started === 0 && status.notDone === 0)
+    return `Great! All tasks updated.`;
+
+  return `
+    ${status.done ? `${status.done} done.` : ``}
+    ${status.started ? ` ${status.started} started.` : ``}
+    ${status.notDone ? ` ${status.notDone} yet to start.` : ``}
+  `;
+};
+
+export const getSortedHabits = (
+  habits: HabitUI[],
+  sortOptionIndex: number,
+  totalMonths: number
+): HabitUI[] => {
+  const selectedOption = HOMEPAGE_SORT_OPTIONS[sortOptionIndex];
+  const { startDate, endDate } = getDateWindow(totalMonths);
+  const optionLabel = selectedOption.label;
+  const sortedHabitsWithCompletion = habits.map((habit) => ({
+    ...habit,
+    completion: getCompletion(habit, startDate, endDate).percent,
+  }));
+  sortedHabitsWithCompletion.sort((a, b) => {
+    if (optionLabel === "Completion (Highest first)")
+      return b.completion - a.completion;
+    if (optionLabel === "Completion (Lowest first)")
+      return a.completion - b.completion;
+    if (optionLabel === "Date created (Oldest first)") return a.id - b.id;
+
+    return b.id - a.id;
+  });
+
+  return sortedHabitsWithCompletion;
 };
