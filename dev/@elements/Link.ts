@@ -15,8 +15,8 @@ export const Link = component<LinkProps>(
     const linkCss = op(href).or(onClick).ternary("pointer underline", "");
 
     return m.A({
+      ...(href ? { href } : {}),
       class: tmpl`noselect ${linkCss} ${cssClasses}`,
-      href,
       target,
       onclick: handleTap(onClick),
       children,
