@@ -1,4 +1,4 @@
-import { compute, derive, dobject, signal } from "@cyftech/signal";
+import { compute, derive, op, signal, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
   GoBackButton,
@@ -34,14 +34,12 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
     const stopActionModalOpen = signal(false);
     const error = signal("");
     const editedHabit = signal<HabitUI>(getNewHabit());
-    const pageTitle = derive(() =>
-      editableHabit?.value
-        ? `Edit '${editableHabit.value.title}'`
-        : "Add new habit"
+    const pageTitle = compute(
+      (edHab) => (edHab ? `Edit '${edHab.title}'` : "Add new habit"),
+      editableHabit
     );
-    const largeTitle = derive(() => pageTitle.value.length > 22);
-    const pageTitleCss = compute(largeTitle).oneOf("f2dot66", "");
-    const actionButtonLabel = compute(editableHabit).oneOf("Update", "Add");
+    const pageTitleCss = op(pageTitle).lengthGT(22).ternary("f2dot66", "");
+    const actionButtonLabel = op(editableHabit).ternary("Update", "Add");
 
     const openDeleteModal = () => (deleteActionModalOpen.value = true);
     const closeDeleteModal = () => (deleteActionModalOpen.value = false);
@@ -93,7 +91,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
     return HTMLPage({
       onMount: onPageMount,
       body: Scaffold({
-        classNames: "bg-white ph3",
+        cssClasses: "bg-white ph3",
         header: m.Div({
           class: pageTitleCss,
           children: pageTitle,
@@ -103,7 +101,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
             subject: editableHabit,
             isTruthy: m.Div([
               Section({
-                classNames: "pb2",
+                cssClasses: "pb2",
                 title: "Actions",
                 children: [
                   HabitDeleteModal({
@@ -113,7 +111,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
                     onDone: onHabitDelete,
                   }),
                   Link({
-                    classNames: "db mb3 f6 red",
+                    cssClasses: "db mb3 f6 red",
                     children: `Delete this habit permanently along with its data`,
                     onClick: openDeleteModal,
                   }),
@@ -124,7 +122,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
                     onDone: onStopHabitUpdate,
                   }),
                   Link({
-                    classNames: "db mb3 f6 gray",
+                    cssClasses: "db mb3 f6 gray",
                     children: `Stop this habit permanently and keep it for future`,
                     onClick: openHabitStopModal,
                   }),
@@ -136,7 +134,7 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
             editableHabit: editableHabit,
             editedHabit: editedHabit,
             hideDescriptions: derive(() => !editPageSettings.value.showHints),
-            showFullCustomisations: dobject(editPageSettings).prop(
+            showFullCustomisations: trap(editPageSettings).prop(
               "showFullCustomisation"
             ),
             onChange: onHabitChange,
@@ -156,10 +154,10 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
               class: "flex items-center justify-stretch",
               children: [
                 GoBackButton({
-                  classNames: "w4dot50 w4dot25-ns",
+                  cssClasses: "w4dot50 w4dot25-ns",
                 }),
                 Button({
-                  classNames: "w-100 pa3 ml3 b",
+                  cssClasses: "w-100 pa3 ml3 b",
                   children: actionButtonLabel,
                   onTap: save,
                 }),

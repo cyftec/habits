@@ -1,19 +1,19 @@
-import { dstring } from "@cyftech/signal";
+import { tmpl } from "@cyftech/signal";
 import { Child, component, m } from "@mufw/maya";
 
 type ScaffoldProps = {
-  classNames?: string;
+  cssClasses?: string;
   header?: Child;
   content: Child;
   bottombar?: Child;
 };
 
 export const Scaffold = component<ScaffoldProps>(
-  ({ classNames, header, content, bottombar }) => {
+  ({ cssClasses, header, content, bottombar }) => {
     return m.Div({
       class: "flex-ns justify-center-ns",
       children: m.Div({
-        class: dstring`w6-ns ${classNames}`,
+        class: tmpl`w6-ns ${cssClasses}`,
         children: [
           m.If({
             subject: header,

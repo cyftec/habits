@@ -1,14 +1,14 @@
 import { component, m } from "@mufw/maya";
 import { Button, Icon } from "../@elements";
-import { dstring } from "@cyftech/signal";
+import { tmpl } from "@cyftech/signal";
 
 type GoBackButtonProps = {
-  classNames?: string;
+  cssClasses?: string;
 };
 
-export const GoBackButton = component<GoBackButtonProps>(({ classNames }) => {
+export const GoBackButton = component<GoBackButtonProps>(({ cssClasses }) => {
   return Button({
-    classNames: dstring`pa3 flex items-center ${classNames}`,
+    cssClasses: tmpl`pa3 flex items-center ${cssClasses}`,
     children: [
       Icon({ iconName: "arrow_back" }),
       m.Span({

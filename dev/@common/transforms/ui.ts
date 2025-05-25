@@ -18,9 +18,11 @@ import {
   DailyStatus,
   Habit,
   HabitUI,
+  LevelCompletion,
   LevelUI,
   MilestonesData,
   MilestonesUI,
+  NavbarLink,
 } from "../types";
 import { getQueryParamValue } from "../utils/navigation";
 import {
@@ -533,14 +535,11 @@ export const isLastInteractionLongBack = () => {
   return now - lastIntrxn > getMinutesInMS(1);
 };
 
-export const getHabitsStatusLabelForTheDay = (
-  habits: HabitUI[],
-  date: Date
-) => {
+export const getHabitsStatusForTheDay = (habits: HabitUI[], date: Date) => {
   const statuses = habits.map(
     (hab) => getDayStatus(hab.tracker, date) as DailyStatus
   );
-  const status = {
+  return {
     done: statuses.reduce((sum, st) => sum + (st.level.isMaxLevel ? 1 : 0), 0),
     started: statuses.reduce(
       (sum, st) => sum + (st.level.code > 0 && !st.level.isMaxLevel ? 1 : 0),
@@ -550,7 +549,15 @@ export const getHabitsStatusLabelForTheDay = (
       (sum, st) => sum + (st.level.code === 0 ? 1 : 0),
       0
     ),
+    total: habits.reduce((sum, hab) => sum + hab.levels.length - 1, 0),
   };
+};
+
+export const getHabitsStatusLabelForTheDay = (
+  habits: HabitUI[],
+  date: Date
+) => {
+  const status = getHabitsStatusForTheDay(habits, date);
 
   if (status.done === 0 && status.started === 0 && status.notDone === 0)
     return ``;
@@ -590,3 +597,57 @@ export const getSortedHabits = (
 
   return sortedHabitsWithCompletion;
 };
+
+export const getLevelsCompletionList = (habit: HabitUI): LevelCompletion[] => {
+  const initialLevelsCompletion = habit.levels.map((_) => 0);
+
+  const levelsCompletionCount = habit.tracker.reduce((arr, status) => {
+    if (status.level.code > -1)
+      arr[status.level.code] = arr[status.level.code]
+        ? arr[status.level.code] + 1
+        : 1;
+    return arr;
+  }, initialLevelsCompletion);
+  const completionTotal = levelsCompletionCount.reduce((a, b) => a + b);
+  const list = levelsCompletionCount.map((count, i) => ({
+    level: habit.levels[i],
+    count,
+    weightage: count * (i / (habit.levels.length - 1)),
+    percent: Math.round((100 * count) / completionTotal),
+  }));
+  list.reverse();
+
+  return list;
+};
+
+export const getAllLevelsCompletionLabel = (
+  levelsCompletion: LevelCompletion[]
+) => {
+  return `${levelsCompletion
+    .reduce((sum, levelData) => sum + levelData.weightage, 0)
+    .toFixed(1)} / ${levelsCompletion.reduce(
+    (sum, levelData) => sum + levelData.count,
+    0
+  )}`;
+};
+
+export const getNavbarLinks = (urlPath: string): NavbarLink[] => [
+  {
+    label: "Today",
+    icon: "calendar_month",
+    isSelected: urlPath === "/",
+    href: "/",
+  },
+  {
+    label: "Habits",
+    icon: "checklist",
+    isSelected: urlPath === "/habits/",
+    href: "/habits/",
+  },
+  {
+    label: "Settings",
+    icon: "settings",
+    isSelected: urlPath === "/settings/",
+    href: "/settings/",
+  },
+];

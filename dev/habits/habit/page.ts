@@ -1,10 +1,12 @@
-import { derive, dobject, dstring, signal } from "@cyftech/signal";
+import { compute, derive, tmpl, signal, trap, op } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { intializeTrackerEmptyDays } from "../../@common/localstorage";
 import {
   getAchievedMilestone,
+  getAllLevelsCompletionLabel,
   getCompletion,
   getHabitFromUrl,
+  getLevelsCompletionList,
   getMonthName,
   getNewHabit,
   getWeekdayName,
@@ -33,7 +35,7 @@ const {
   levels: habitLevels,
   milestones: habitMilestones,
   isStopped: habitIsStopped,
-} = dobject(habit).props;
+} = trap(habit).props;
 const showGoalStatus = signal(false);
 const deleteActionModalOpen = signal(false);
 const updateLevelModalOpen = signal(false);
@@ -41,47 +43,25 @@ const updateLevelModalData = signal({
   date: new Date(),
   selectedLevelIndex: 0,
 });
-
-const acheievemnts = derive(() => {
-  const currentHabit = habit.value;
-  if (!currentHabit) return [];
-  const initialAcheievments = currentHabit.levels.map((_) => 0);
-
-  const acheievemntsList = currentHabit.tracker.reduce((arr, status) => {
-    if (status.level.code > -1)
-      arr[status.level.code] = arr[status.level.code]
-        ? arr[status.level.code] + 1
-        : 1;
-    return arr;
-  }, initialAcheievments);
-  const achTotal = acheievemntsList.reduce((a, b) => a + b);
-  const list = acheievemntsList.map((ach, i) => ({
-    level: currentHabit.levels[i],
-    count: ach,
-    weightage: ach * (i / (currentHabit.levels.length - 1)),
-    percent: Math.round((100 * ach) / achTotal),
-  }));
-
-  return list;
-});
-
+const levelsCompletionList = compute(getLevelsCompletionList, habit);
+const allLevelsCompletionLabel = compute(
+  getAllLevelsCompletionLabel,
+  levelsCompletionList
+);
 const completion = derive(
   () => getCompletion(habit.value, new Date(habitId.value), new Date()).percent
 );
-const milestoneAchieved = derive(() =>
-  getAchievedMilestone(habitMilestones.value, completion.value)
+const milestoneAchieved = compute(
+  getAchievedMilestone,
+  habitMilestones,
+  completion
 );
 const {
   icon: achievedMilestoneIcon,
   label: achievedMilestoneLabel,
   color: achievedMilestoneColor,
-} = dobject(milestoneAchieved).props;
-
-const weekwiseTracker = derive(() => {
-  const currentHabit = habit.value;
-  if (!currentHabit) return [];
-  return getWeekwiseStatus(currentHabit);
-});
+} = trap(milestoneAchieved).props;
+const weekwiseTracker = compute(getWeekwiseStatus, habit);
 
 const triggerPageDataRefresh = () => {
   const fetchedHabit = getHabitFromUrl();
@@ -115,19 +95,18 @@ const onPageMount = () => {
 export default HTMLPage({
   onMount: onPageMount,
   body: Scaffold({
-    classNames: "bg-white ph3",
+    cssClasses: "bg-white ph3",
     header: m.Div({
       class: "flex items-start justify-between",
       children: [
         m.Div({
-          class: dstring`${() =>
-            pageTitle.value.length > 22 ? "f2dot66" : ""}`,
+          class: op(pageTitle).lengthGT(22).ternary("f2dot66", ""),
           children: pageTitle,
         }),
         m.If({
           subject: habitIsStopped,
           isFalsy: Icon({
-            classNames: "mt1 mr1 ba b--silver bw1 br-100 pa1 noselect",
+            cssClasses: "mt1 mr1 ba b--silver bw1 br-100 pa1 noselect",
             size: 18,
             iconName: "edit",
             onClick: () => goToHabitEditPage(habitId.value),
@@ -146,7 +125,7 @@ export default HTMLPage({
         HabitStatusEditModal({
           isOpen: updateLevelModalOpen,
           habit: habit,
-          date: dobject(updateLevelModalData).prop("date"),
+          date: trap(updateLevelModalData).prop("date"),
           onClose: () => (updateLevelModalOpen.value = false),
           onChange: updateLevel,
         }),
@@ -167,15 +146,15 @@ export default HTMLPage({
                         children: "Status: STOPPED PERMANENTLY",
                       }),
                       Button({
-                        classNames: "pv2 ph3 nt2 mb4 red",
+                        cssClasses: "pv2 ph3 nt2 mb4 red",
                         onTap: openDeleteModal,
                         children: "Delete Permanently",
                       }),
                     ]),
                   }),
                   Section({
-                    classNames: "pb3",
-                    title: dstring`Completion status ${() =>
+                    cssClasses: "pb3",
+                    title: tmpl`Completion status ${() =>
                       showGoalStatus.value
                         ? ""
                         : `(target ${habitMilestones.value[0].percent}%)`}`,
@@ -183,19 +162,16 @@ export default HTMLPage({
                       m.Div({
                         class: "mt3",
                         children: m.For({
-                          subject: derive(() =>
-                            acheievemnts.value.slice().reverse()
-                          ),
+                          subject: levelsCompletionList,
                           n: Infinity,
                           nthChild: m.Div({
-                            class:
-                              "flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray",
+                            class: `flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray`,
                             children: [
                               m.Div({
                                 class: "flex items-center",
                                 children: [
                                   Icon({
-                                    classNames: dstring`mr1 ${achievedMilestoneColor}`,
+                                    cssClasses: tmpl`mr1 ${achievedMilestoneColor}`,
                                     size: 12,
                                     iconName: achievedMilestoneIcon,
                                   }),
@@ -205,21 +181,9 @@ export default HTMLPage({
                               m.Div({
                                 class: "flex items-center",
                                 children: [
-                                  derive(() => {
-                                    const outOf = acheievemnts.value.reduce(
-                                      (sum, ach) => sum + ach.count,
-                                      0
-                                    );
-                                    const times = acheievemnts.value.reduce(
-                                      (sum, ach) => sum + ach.weightage,
-                                      0
-                                    );
-                                    return `${times.toFixed(1)} / ${outOf}`;
-                                  }),
+                                  allLevelsCompletionLabel,
                                   m.Span({ class: "ml1" }),
-                                  m.Div(
-                                    derive(() => ` (${completion.value}%)`)
-                                  ),
+                                  m.Div(tmpl` (${completion}%)`),
                                 ],
                               }),
                             ],
@@ -232,22 +196,17 @@ export default HTMLPage({
                                   class: "flex items-center",
                                   children: [
                                     ColorDot({
-                                      classNames: `pa1 mr2`,
+                                      cssClasses: `pa1 mr2`,
                                       colorIndex: habitColorIndex,
                                       level: acheievemnt.level.code,
                                       totalLevels: habitLevels.value.length,
                                       isRectangular: true,
                                     }),
-                                    m.Div(
-                                      derive(() => `${acheievemnt.level.name}`)
-                                    ),
+                                    m.Div(acheievemnt.level.name),
                                   ],
                                 }),
                                 m.Div(
-                                  derive(
-                                    () =>
-                                      `${acheievemnt.count} times (${acheievemnt.percent}%)`
-                                  )
+                                  `${acheievemnt.count} times (${acheievemnt.percent}%)`
                                 ),
                               ],
                             }),
@@ -256,18 +215,18 @@ export default HTMLPage({
                       m.If({
                         subject: showGoalStatus,
                         isTruthy: GoalStatus({
-                          classNames: "pt4 mt3 mb3",
+                          cssClasses: "pt4 mt3 mb3",
                           milestones: habitMilestones,
                           achievedMilestone: milestoneAchieved,
                           completionPercent: completion,
                         }),
                       }),
                       Button({
-                        classNames: "pa2 ph3 mt4 mb2",
-                        children: dstring`${() =>
-                          showGoalStatus.value
-                            ? "Hide"
-                            : "Show"} target goal status`,
+                        cssClasses: "pa2 ph3 mt4 mb2",
+                        children: tmpl`${op(showGoalStatus).ternary(
+                          "Hide",
+                          "Show"
+                        )} target goal status`,
                         onTap: () =>
                           (showGoalStatus.value = !showGoalStatus.value),
                       }),
@@ -282,8 +241,7 @@ export default HTMLPage({
                           subject: Array(7).fill(0),
                           map: (_, dayIndex) =>
                             m.Div({
-                              class:
-                                "h2 w2 br-100 gray f7 flex items-center justify-center",
+                              class: `h2 w2 br-100 gray f7 flex items-center justify-center`,
                               children: getWeekdayName(dayIndex, 1),
                             }),
                         }),
@@ -293,31 +251,30 @@ export default HTMLPage({
                           el.scroll({
                             top: el.scrollHeight - el.clientHeight,
                           }),
-                        class:
-                          "mxh5 mxh6-ns nt2 bb bw1 b--near-white mh2 overflow-y-scroll",
+                        class: `mxh5 mxh6-ns nt2 bb bw1 b--near-white mh2 overflow-y-scroll`,
                         children: [
                           m.Div({
-                            class: dstring`absolute left-0 right-0 bg-to-top-white z-999 ${() =>
-                              weekwiseTracker.value.length > 4 ? "h3" : ""}`,
+                            class: tmpl`absolute left-0 right-0 bg-to-top-white z-999 ${op(
+                              weekwiseTracker
+                            )
+                              .lengthGT(4)
+                              .ternary("h3", "")}`,
                           }),
                           m.Div({
                             children: m.For({
                               subject: weekwiseTracker,
                               n: 0,
                               nthChild: m.Div({
-                                class: derive(() =>
-                                  weekwiseTracker.value.length > 4
-                                    ? "pv3 mt2"
-                                    : "pv2"
-                                ),
+                                class: op(weekwiseTracker)
+                                  .lengthGT(4)
+                                  .ternary("pv3 mt2", "pv2"),
                               }),
                               map: (week) =>
                                 m.Div({
                                   class: "flex items-center h-60",
                                   children: [
                                     m.Div({
-                                      class:
-                                        "w-100 mb3 flex items-center justify-between",
+                                      class: `w-100 mb3 flex items-center justify-between`,
                                       children: m.For({
                                         subject: week,
                                         map: (day) => {
@@ -339,7 +296,7 @@ export default HTMLPage({
                                           }`;
 
                                           return ColorDot({
-                                            classNames:
+                                            cssClasses:
                                               "h2 w2 flex items-center justify-center f7",
                                             colorIndex: habitColorIndex,
                                             level: day.level.code,

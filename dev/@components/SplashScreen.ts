@@ -1,16 +1,16 @@
 import { component, m } from "@mufw/maya";
 import { ProgressBar } from "../@elements";
-import { dstring } from "@cyftech/signal";
+import { tmpl } from "@cyftech/signal";
 
 type SplashScreenProps = {
-  classNames?: string;
+  cssClasses?: string;
   progress: number;
 };
 
 export const SplashScreen = component<SplashScreenProps>(
-  ({ classNames, progress }) => {
+  ({ cssClasses, progress }) => {
     return m.Div({
-      class: dstring`flex flex-column justify-center items-center vh-100 ${classNames}`,
+      class: tmpl`flex flex-column justify-center items-center vh-100 ${cssClasses}`,
       children: [
         m.Img({
           class: "mt6 br4",
@@ -23,7 +23,7 @@ export const SplashScreen = component<SplashScreenProps>(
           children: "Habits",
         }),
         ProgressBar({
-          classNames: "w-40",
+          cssClasses: "w-40",
           progress: progress,
         }),
         m.Div({
