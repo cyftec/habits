@@ -1,4 +1,4 @@
-import { derive, dobject, dstring } from "@cyftech/signal";
+import { compute, tmpl, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
   getAchievedMilestone,
@@ -12,28 +12,33 @@ import { Icon } from "../@elements";
 import { MonthMap } from "./MonthMap";
 
 type HabitCardProps = {
-  classNames?: string;
+  cssClasses?: string;
   habit: HabitUI;
   months: number;
   onClick: () => void;
 };
 
 export const HabitCard = component<HabitCardProps>(
-  ({ classNames, habit, months, onClick }) => {
-    const habitVal = derive(() => habit.value);
-    const { milestones, title, colorIndex, levels } = dobject(habitVal).props;
-    const completion = derive(() => {
-      const { startDate, endDate } = getDateWindow(months.value);
-      return getCompletion(habit.value, startDate, endDate).percent;
-    });
-    const achievedMilestone = derive(() =>
-      getAchievedMilestone(milestones.value, completion.value)
+  ({ cssClasses, habit, months, onClick }) => {
+    const { milestones, title, colorIndex, levels } = trap(habit).props;
+    const completion = compute(
+      (months: number, habit: HabitUI) => {
+        const { startDate, endDate } = getDateWindow(months);
+        return getCompletion(habit, startDate, endDate).percent;
+      },
+      months,
+      habit
     );
-    const { icon, color } = dobject(achievedMilestone).props;
-    const monthFirstDates = derive(() => getMonthFirstDates(months.value));
+    const achievedMilestone = compute(
+      getAchievedMilestone,
+      milestones,
+      completion
+    );
+    const { icon, color } = trap(achievedMilestone).props;
+    const monthFirstDates = compute(getMonthFirstDates, months);
 
     return m.Div({
-      class: dstring`pointer bg-white ${classNames}`,
+      class: tmpl`pointer bg-white ${cssClasses}`,
       onclick: handleTap(onClick),
       children: [
         m.Div({
@@ -47,10 +52,10 @@ export const HabitCard = component<HabitCardProps>(
               class: "f6 silver b flex items-center",
               children: [
                 Icon({
-                  classNames: dstring`mr1 ${color}`,
+                  cssClasses: tmpl`mr1 ${color}`,
                   iconName: icon,
                 }),
-                dstring`${completion}%`,
+                tmpl`${completion}%`,
               ],
             }),
           ],
@@ -61,7 +66,7 @@ export const HabitCard = component<HabitCardProps>(
             subject: monthFirstDates,
             map: (monthFirstDay) =>
               MonthMap({
-                classNames: "mb1",
+                cssClasses: "mb1",
                 habit: habit,
                 date: monthFirstDay,
                 colorIndex: colorIndex,

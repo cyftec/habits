@@ -10,6 +10,13 @@ export type LocalSettings = {
   };
 };
 
+export type NavbarLink = {
+  label: string;
+  icon: string;
+  isSelected: boolean;
+  href: string;
+};
+
 export type StorageDetails = {
   total: number;
   spaceLeft: number;
@@ -81,6 +88,12 @@ export type AchievedMilestone = {
   label: string;
   icon: string;
   color: string;
+};
+export type LevelCompletion = {
+  level: LevelUI;
+  count: number;
+  weightage: number;
+  percent: number;
 };
 export type StoreHabitRecordKey = `h.${number}`;
 export type Habit = {

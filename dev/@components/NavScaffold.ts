@@ -1,10 +1,11 @@
-import { derive } from "@cyftech/signal";
+import { compute } from "@cyftech/signal";
 import { Child, component, m } from "@mufw/maya";
+import { getNavbarLinks } from "../@common/transforms";
 import { Scaffold } from "../@elements";
 import { NavBar } from "./NavBar";
 
 type NavScaffoldProps = {
-  classNames?: string;
+  cssClasses?: string;
   header?: Child;
   content: Child;
   navbarTop?: Child;
@@ -12,9 +13,9 @@ type NavScaffoldProps = {
 };
 
 export const NavScaffold = component<NavScaffoldProps>(
-  ({ classNames, header, content, navbarTop, route }) => {
+  ({ cssClasses, header, content, navbarTop, route }) => {
     return Scaffold({
-      classNames: classNames,
+      cssClasses: cssClasses,
       header: header,
       content: content,
       bottombar: m.Div({
@@ -24,27 +25,8 @@ export const NavScaffold = component<NavScaffoldProps>(
             isTruthy: navbarTop as Child,
           }),
           NavBar({
-            classNames: "nl3 nr3 ph4",
-            links: derive(() => [
-              {
-                label: "Today",
-                icon: "calendar_month",
-                isSelected: route.value === "/",
-                href: "/",
-              },
-              {
-                label: "Habits",
-                icon: "checklist",
-                isSelected: route.value === "/habits/",
-                href: "/habits/",
-              },
-              {
-                label: "Settings",
-                icon: "settings",
-                isSelected: route.value === "/settings/",
-                href: "/settings/",
-              },
-            ]),
+            cssClasses: "nl3 nr3 ph4",
+            links: compute(getNavbarLinks, route),
           }),
         ],
       }),

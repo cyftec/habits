@@ -1,11 +1,4 @@
-import {
-  compute,
-  derive,
-  dobject,
-  dstring,
-  signal,
-  Signal,
-} from "@cyftech/signal";
+import { derive, tmpl, signal, Signal, trap, op } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { ColorDot, Section } from "..";
 import { BASE_COLORS, BASE_LEVELS } from "../../@common/constants";
@@ -27,7 +20,7 @@ import {
 } from "../../@elements";
 
 type HabitEditorProps = {
-  classNames?: string;
+  cssClasses?: string;
   editableHabit?: HabitUI;
   editedHabit: Signal<HabitUI>;
   hideDescriptions?: boolean;
@@ -37,7 +30,7 @@ type HabitEditorProps = {
 
 export const HabitEditor = component<HabitEditorProps>(
   ({
-    classNames,
+    cssClasses,
     editableHabit,
     editedHabit,
     hideDescriptions,
@@ -45,22 +38,15 @@ export const HabitEditor = component<HabitEditorProps>(
     onChange,
   }) => {
     const moreDetails = signal(false);
-    const customisationsVisible = derive(() => {
-      const moreDetailsValue = moreDetails.value;
-      const overridingOption = showFullCustomisations?.value;
-      return overridingOption || moreDetailsValue;
-    });
+    const customisationsVisible = trap(showFullCustomisations).or(moreDetails);
     const { title, frequency, levels, milestones, colorIndex } =
-      dobject(editedHabit).props;
-    const everyDay = derive(() => frequency.value.every((day) => !!day));
+      trap(editedHabit).props;
+    const everyDay = trap(frequency).every((day) => !!day);
     const selectedCss = "bg-mid-gray white";
     const unSelectedCss = "bg-near-white light-silver";
-    const dailyBtnCss = compute(everyDay).oneOf(selectedCss, unSelectedCss);
-    const customisationsButtonIcon = compute(moreDetails).oneOf(
-      "remove",
-      "add"
-    );
-    const customisationsButtonLabel = dstring`Show ${compute(moreDetails).oneOf(
+    const dailyBtnCss = op(everyDay).ternary(selectedCss, unSelectedCss);
+    const customisationsButtonIcon = op(moreDetails).ternary("remove", "add");
+    const customisationsButtonLabel = tmpl`Show ${op(moreDetails).ternary(
       "Less",
       "More"
     )} Customisations`;
@@ -136,10 +122,10 @@ export const HabitEditor = component<HabitEditorProps>(
     };
 
     return m.Div({
-      class: classNames,
+      class: cssClasses,
       children: [
         Section({
-          classNames: "pb1",
+          cssClasses: "pb1",
           title: "Weekdays",
           children: m.Div({
             class: "mb3 f6 flex items-center justify-between justify-start-ns",
@@ -147,7 +133,7 @@ export const HabitEditor = component<HabitEditorProps>(
               subject: Array(7).fill(0),
               n: 0,
               nthChild: m.Span({
-                class: dstring`pointer flex items-center justify-center br-pill h2 ph2 mr3-ns ${dailyBtnCss}`,
+                class: tmpl`pointer flex items-center justify-center br-pill h2 ph2 mr3-ns ${dailyBtnCss}`,
                 children: "Daily",
                 onclick: handleTap(() => updateFrequency(-1)),
               }),
@@ -159,7 +145,7 @@ export const HabitEditor = component<HabitEditorProps>(
                 );
 
                 return m.Span({
-                  class: dstring`pointer flex items-center justify-center br-100 h2 w2 mr3-ns ${colorCss}`,
+                  class: tmpl`pointer flex items-center justify-center br-100 h2 w2 mr3-ns ${colorCss}`,
                   children: getWeekdayName(dayIndex, 1),
                   onclick: handleTap(() => updateFrequency(dayIndex)),
                 });
@@ -168,10 +154,10 @@ export const HabitEditor = component<HabitEditorProps>(
           }),
         }),
         Section({
-          classNames: "pb2",
+          cssClasses: "pb2",
           title: "Title of the habit",
           children: TextBox({
-            classNames: "ba bw1 b--light-silver br3 pa2 w-100",
+            cssClasses: "ba bw1 b--light-silver br3 pa2 w-100",
             placeholder: `for example, "wake up at 5am"`,
             text: title,
             onchange: updateTitle,
@@ -181,23 +167,23 @@ export const HabitEditor = component<HabitEditorProps>(
           subject: customisationsVisible,
           isTruthy: m.Div([
             Section({
-              classNames: "pb1",
+              cssClasses: "pb1",
               title: "Select a color tag",
               children: m.Div({
                 class: "mb1 flex items-center",
                 children: m.For({
                   subject: BASE_COLORS,
                   map: (colorOption, i) => {
-                    const borderColorCss = derive(() =>
-                      i === colorIndex.value ? "#999" : "#f4f4f4"
-                    );
+                    const borderColorCss = op(colorIndex)
+                      .equals(i)
+                      .ternary("#999", "#f4f4f4");
 
                     return m.Span({
                       class: `pointer mb2 mr3 pa1 br-100 bw2 ba flex`,
-                      style: dstring`border-color: ${borderColorCss}`,
+                      style: tmpl`border-color: ${borderColorCss}`,
                       onclick: handleTap(() => updateColor(i)),
                       children: m.Span({
-                        class: dstring`pa2 br-100`,
+                        class: tmpl`pa2 br-100`,
                         style: `background-color: ${colorOption}`,
                       }),
                     });
@@ -206,7 +192,7 @@ export const HabitEditor = component<HabitEditorProps>(
               }),
             }),
             Section({
-              classNames: "pb3",
+              cssClasses: "pb3",
               title: "Status update levels",
               hideDescription: hideDescriptions,
               description: `
@@ -240,15 +226,15 @@ export const HabitEditor = component<HabitEditorProps>(
                               "flex items-center ba bw1 b--light-silver br3 w-70 w-80-ns",
                             children: [
                               ColorDot({
-                                classNames: "w1 h2 br3 br--left ml1px",
-                                dotClassNames: "br3 br--left",
+                                cssClasses: "w1 h2 br3 br--left ml1px",
+                                dotCssClasses: "br3 br--left",
                                 colorIndex,
                                 level: i,
                                 isRectangular: true,
                                 totalLevels: levels.value.length,
                               }),
                               TextBox({
-                                classNames: "bn pa2 br3 w-100 outline-0",
+                                cssClasses: "bn pa2 br3 w-100 outline-0",
                                 placeholder: `Level ${i}`,
                                 disabled: textboxDisabled,
                                 text: currentLevel.name,
@@ -265,7 +251,7 @@ export const HabitEditor = component<HabitEditorProps>(
                         ],
                       }),
                       m.If({
-                        subject: i < levels.value.length - 1,
+                        subject: op(levels).lengthGT(i + 1).truthy,
                         isTruthy: m.Div({
                           class: "pa2 ml2 pl1 bl bw1 b--silver",
                         }),
@@ -278,7 +264,7 @@ export const HabitEditor = component<HabitEditorProps>(
             Section({
               title: "Habit completion goal",
               hideDescription: hideDescriptions,
-              description: dstring`
+              description: tmpl`
                   Goals are something for long-term. Let's say based on below table, after
                   a month or two, you followed your habit for 67% of the times, then you
                   just crossed the milestone - '${() =>
@@ -315,7 +301,7 @@ export const HabitEditor = component<HabitEditorProps>(
                         class: `lh-copy flex items-center`,
                         children: [
                           Icon({
-                            classNames: `mr2 ${milestone.color}`,
+                            cssClasses: `mr2 ${milestone.color}`,
                             size: 20,
                             iconName: milestone.icon,
                           }),
@@ -332,7 +318,7 @@ export const HabitEditor = component<HabitEditorProps>(
                               children: "00",
                             }),
                             isFalsy: NumberBox({
-                              classNames: `w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray`,
+                              cssClasses: `w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray`,
                               num: milestone.percent,
                               onchange: (value) => updateMilestone(value, i),
                             }),
@@ -352,11 +338,11 @@ export const HabitEditor = component<HabitEditorProps>(
         m.If({
           subject: showFullCustomisations,
           isFalsy: Button({
-            classNames: "pv2 ph3 flex items-center",
+            cssClasses: "pv2 ph3 flex items-center",
             onTap: () => (moreDetails.value = !moreDetails.value),
             children: [
               Icon({
-                classNames: "mr1",
+                cssClasses: "mr1",
                 iconName: customisationsButtonIcon,
               }),
               customisationsButtonLabel,

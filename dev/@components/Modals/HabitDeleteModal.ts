@@ -1,4 +1,4 @@
-import { dstring } from "@cyftech/signal";
+import { tmpl } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { deleteHabit } from "../../@common/localstorage";
 import { HabitUI } from "../../@common/types";
@@ -19,7 +19,7 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
     };
 
     return Modal({
-      classNames: "bn w-30-ns",
+      cssClasses: "bn w-30-ns",
       isOpen: isOpen,
       onTapOutside: onClose,
       content: m.Div({
@@ -27,7 +27,7 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
         children: [
           m.Div({
             class: "mb3 b f4",
-            children: dstring`Delete '${() => habit.value.title}'?`,
+            children: tmpl`Delete '${() => habit.value.title}'?`,
           }),
           m.Div({
             class: "mb4",
@@ -47,12 +47,12 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
             class: "flex items-center justify-between f6",
             children: [
               Button({
-                classNames: "w-25 pv2 ph3 mr1 b",
+                cssClasses: "w-25 pv2 ph3 mr1 b",
                 children: "No",
                 onTap: onClose,
               }),
               Button({
-                classNames: "pv2 ph3 ml2 b red",
+                cssClasses: "pv2 ph3 ml2 b red",
                 children: "Yes, delete permanently",
                 onTap: deletePermanently,
               }),

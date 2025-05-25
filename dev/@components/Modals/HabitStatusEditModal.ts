@@ -1,4 +1,4 @@
-import { derive, dobject, dstring } from "@cyftech/signal";
+import { derive, tmpl, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { getDayStatus } from "../../@common/transforms";
 import { HabitUI } from "../../@common/types";
@@ -17,18 +17,15 @@ type HabitStatusEditModalProps = {
 
 export const HabitStatusEditModal = component<HabitStatusEditModalProps>(
   ({ isOpen, habit, date, showTitleInHeader, onClose, onChange }) => {
-    const { title, levels, tracker, colorIndex } = dobject(
-      derive(() => habit.value)
-    ).props;
+    const { title, levels, tracker, colorIndex } = trap(habit).props;
     const header = derive(() =>
       showTitleInHeader?.value
         ? `Change status of  '${title.value}'`
         : `Change status for ${date.value.toDateString()}`
     );
-    const reversedLevels = derive(() => levels.value.slice().reverse() || []);
 
     return Modal({
-      classNames: "f5 normal ba bw0 outline-0",
+      cssClasses: "f5 normal ba bw0 outline-0",
       isOpen: isOpen,
       onTapOutside: onClose,
       content: m.Div({
@@ -41,10 +38,10 @@ export const HabitStatusEditModal = component<HabitStatusEditModalProps>(
           m.Div({
             class: "f5 mb1",
             children: m.For({
-              subject: reversedLevels,
+              subject: trap(levels).reversed,
               map: (level, levelIndex) => {
                 const levelCode = levels.value.length - 1 - levelIndex;
-                const optionCSS = dstring`pointer flex items-center pv3 pa3 bt b--moon-gray ${() =>
+                const optionCSS = tmpl`pointer flex items-center pv3 pa3 bt b--moon-gray ${() =>
                   getDayStatus(tracker.value, date.value)?.level.code ===
                   levelCode
                     ? "bg-near-white black fw6"
@@ -57,7 +54,7 @@ export const HabitStatusEditModal = component<HabitStatusEditModalProps>(
                   onclick: handleTap(() => onChange(levelCode)),
                   children: [
                     ColorDot({
-                      classNames: `pa1 mr3 ba b ${borderCss}`,
+                      cssClasses: `pa1 mr3 ba b ${borderCss}`,
                       colorIndex: colorIndex,
                       level: levelCode,
                       totalLevels: levels.value.length,

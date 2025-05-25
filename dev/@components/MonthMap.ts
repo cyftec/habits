@@ -1,4 +1,4 @@
-import { derive, dstring } from "@cyftech/signal";
+import { compute, derive, tmpl } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
   getHabitStatusBetweenDates,
@@ -8,7 +8,7 @@ import { HabitUI } from "../@common/types";
 import { ColorDot } from "./ColorDot";
 
 type MonthMapProps = {
-  classNames?: string;
+  cssClasses?: string;
   habit: HabitUI;
   date: Date;
   colorIndex: number;
@@ -16,7 +16,7 @@ type MonthMapProps = {
 };
 
 export const MonthMap = component<MonthMapProps>(
-  ({ classNames, habit, date, colorIndex, totalLevels }) => {
+  ({ cssClasses, habit, date, colorIndex, totalLevels }) => {
     const statusList = derive(() => {
       const dateYear = date.value.getFullYear();
       const dateMonth = date.value.getMonth();
@@ -26,7 +26,7 @@ export const MonthMap = component<MonthMapProps>(
     });
 
     return m.Div({
-      class: dstring`flex items-center ${classNames}`,
+      class: tmpl`flex items-center ${cssClasses}`,
       children: [
         m.Div({
           class: "f8 b w2 light-silver",
@@ -38,7 +38,7 @@ export const MonthMap = component<MonthMapProps>(
             subject: statusList,
             map: (status) =>
               ColorDot({
-                classNames: "pa1",
+                cssClasses: "pa1",
                 colorIndex: colorIndex,
                 level: status.level.code,
                 totalLevels: totalLevels,

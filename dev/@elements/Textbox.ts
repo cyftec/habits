@@ -1,4 +1,4 @@
-import { dstring } from "@cyftech/signal";
+import { op, tmpl } from "@cyftech/signal";
 import {
   component,
   CustomEventValue,
@@ -10,7 +10,7 @@ import {
 type CustomKeyDownEvent = { key: string; text: string };
 
 type TextBoxProps = {
-  classNames?: string;
+  cssClasses?: string;
   placeholder?: string;
   disabled?: boolean;
   text: string;
@@ -23,7 +23,7 @@ type TextBoxProps = {
 
 export const TextBox = component<TextBoxProps>(
   ({
-    classNames,
+    cssClasses,
     placeholder,
     disabled,
     text,
@@ -61,10 +61,10 @@ export const TextBox = component<TextBoxProps>(
 
     return m.Input({
       onmount: onMount,
-      class: dstring`${classNames}`,
+      class: tmpl`${cssClasses}`,
       type: "text",
       placeholder,
-      disabled,
+      disabled: op(disabled).truthy,
       value: text,
       onchange: onTextChange as DomEventValue,
       onkeydown: onKeyDown as DomEventValue,

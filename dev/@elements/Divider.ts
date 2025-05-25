@@ -1,10 +1,10 @@
-import { dstring } from "@cyftech/signal";
+import { tmpl } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 
 type DividerProps = {
-  classNames?: string;
+  cssClasses?: string;
 };
 
-export const Divider = component<DividerProps>(({ classNames }) => {
-  return m.Div({ class: dstring`bb b--light-gray ${classNames}` });
+export const Divider = component<DividerProps>(({ cssClasses }) => {
+  return m.Div({ class: tmpl`bb b--light-gray ${cssClasses}` });
 });
