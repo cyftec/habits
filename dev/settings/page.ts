@@ -105,7 +105,7 @@ export default HTMLPage({
               }),
               m.Div({
                 class: "silver mt1",
-                children: "version 1.0",
+                children: "version 1.1",
               }),
               m.Div({
                 class: "silver mt1 flex items-center",
