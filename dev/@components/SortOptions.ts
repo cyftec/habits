@@ -1,18 +1,18 @@
+import { derive, tmpl, signal, trap, op } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { Icon, Modal } from "../@elements";
-import { compute, derive, dobject, dstring, signal } from "@cyftech/signal";
 import { HOMEPAGE_SORT_OPTIONS } from "../@common/constants";
 import { handleTap } from "../@common/utils";
+import { Icon, Modal } from "../@elements";
 
 type SortOptionsProps = {
-  classNames?: string;
+  cssClasses?: string;
   iconSize?: number;
   selectedOptionIndex: number;
   onChange: (optionIndex: number) => void;
 };
 
 export const SortOptions = component<SortOptionsProps>(
-  ({ classNames, iconSize, selectedOptionIndex, onChange }) => {
+  ({ cssClasses, iconSize, selectedOptionIndex, onChange }) => {
     const isSortingOptionsModalOpen = signal(false);
     const selectedOption = derive(
       () => HOMEPAGE_SORT_OPTIONS[selectedOptionIndex.value]
@@ -32,17 +32,17 @@ export const SortOptions = component<SortOptionsProps>(
     };
 
     return m.Div({
-      class: classNames,
+      class: cssClasses,
       children: [
         SortIcon({
-          classNames: "pointer",
-          descending: dobject(selectedOption).prop("decending"),
-          iconName: dobject(selectedOption).prop("icon"),
-          size: compute(iconSize).or(20),
+          cssClasses: "pointer",
+          descending: trap(selectedOption).prop("decending"),
+          iconName: trap(selectedOption).prop("icon"),
+          size: trap(iconSize).or(20),
           onClick: openModal,
         }),
         Modal({
-          classNames: "f5 normal ba bw0 outline-0",
+          cssClasses: "f5 normal ba bw0 outline-0",
           isOpen: isSortingOptionsModalOpen,
           onTapOutside: closeModal,
           content: m.Div({
@@ -57,12 +57,12 @@ export const SortOptions = component<SortOptionsProps>(
                   subject: HOMEPAGE_SORT_OPTIONS,
                   map: (option, optionIndex) =>
                     m.Div({
-                      class: dstring`pointer flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
+                      class: tmpl`pointer flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
                         getOptionCss(option.label)}`,
                       onclick: handleTap(() => onOptionTap(optionIndex)),
                       children: [
                         SortIcon({
-                          classNames: "ml1 mr2",
+                          cssClasses: "ml1 mr2",
                           descending: option.decending,
                           iconName: option.icon,
                           size: 20,
@@ -81,7 +81,7 @@ export const SortOptions = component<SortOptionsProps>(
 );
 
 type SortIconProps = {
-  classNames?: string;
+  cssClasses?: string;
   descending: boolean;
   iconName: string;
   size: number;
@@ -89,20 +89,21 @@ type SortIconProps = {
 };
 
 const SortIcon = component<SortIconProps>(
-  ({ classNames, descending, iconName, size, onClick }) => {
-    const pointerCss = derive(() => (onClick ? "pointer" : ""));
-    const arrowIconName = compute(descending).oneOf(
+  ({ cssClasses, descending, iconName, size, onClick }) => {
+    const pointerCss = onClick ? "pointer" : "";
+    const arrowIconName = op(descending).ternary(
       "arrow_upward",
       "arrow_downward"
     );
-    const arrowIconSize = derive(() => (4 * size.value) / 5);
+    // (size.value * 4) / 5
+    const arrowIconSize = op(size).mul(4).div(5).result;
 
     return m.Span({
-      class: dstring`flex items-center ${pointerCss} ${classNames}`,
+      class: tmpl`flex items-center ${pointerCss} ${cssClasses}`,
       onclick: handleTap(onClick),
       children: [
         Icon({
-          classNames: "silver",
+          cssClasses: "silver",
           iconName: arrowIconName,
           size: arrowIconSize,
         }),

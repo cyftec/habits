@@ -1,29 +1,31 @@
-import { compute, derive, dobject, dstring } from "@cyftech/signal";
+import { compute, op, tmpl, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { AchievedMilestone, MilestonesUI } from "../@common/types";
 
 type GoalStatusProps = {
-  classNames?: string;
+  cssClasses?: string;
   milestones: MilestonesUI;
   achievedMilestone: AchievedMilestone;
   completionPercent: number;
 };
 
 export const GoalStatus = component<GoalStatusProps>(
-  ({ classNames, milestones, achievedMilestone, completionPercent }) => {
-    const achievedMilestoneColor = dobject(achievedMilestone).prop("color");
-    const completionLabel = derive(() =>
-      completionPercent.value > 53
-        ? "Average completion"
-        : completionPercent.value > 43
-        ? "Avg completion"
-        : completionPercent.value > 35
-        ? "Completion"
-        : ""
+  ({ cssClasses, milestones, achievedMilestone, completionPercent }) => {
+    const achievedMilestoneColor = trap(achievedMilestone).prop("color");
+    const completionLabel = compute(
+      (comp: number) =>
+        comp > 53
+          ? "Average completion"
+          : comp > 43
+          ? "Avg completion"
+          : comp > 35
+          ? "Completion"
+          : "",
+      completionPercent
     );
 
     return m.Div({
-      class: dstring`center ${classNames}`,
+      class: tmpl`center ${cssClasses}`,
       children: [
         m.Div({
           class: "pb2 w-100 relative",
@@ -39,15 +41,15 @@ export const GoalStatus = component<GoalStatusProps>(
           }),
         }),
         m.Div({
-          class: dstring`nt3dot6 h1dot2 bw1 relative br b--${achievedMilestoneColor}`,
-          style: derive(() => `width: ${completionPercent.value}%;`),
+          class: tmpl`nt3dot6 h1dot2 bw1 relative br b--${achievedMilestoneColor}`,
+          style: tmpl`width: ${completionPercent}%;`,
           children: m.Div({
-            class: dstring`relative flex items-start nt1 justify-between f7 mid-gray`,
+            class: tmpl`relative flex items-start nt1 justify-between f7 mid-gray`,
             children: [
               m.Div(completionLabel),
               m.Div({
-                class: dstring`absolute right-0 pr1 b f6 ${achievedMilestoneColor}`,
-                children: derive(() => `${completionPercent.value}%`),
+                class: tmpl`absolute right-0 pr1 b f6 ${achievedMilestoneColor}`,
+                children: tmpl`${completionPercent}%`,
               }),
             ],
           }),
@@ -65,18 +67,15 @@ type CrossSectionProps = {
 
 const CrossSection = component<CrossSectionProps>(
   ({ colorCss, hideUpperLimit, percent }) => {
-    const percentLabel = compute(hideUpperLimit).oneOf(
-      "",
-      dstring`${percent}%`
-    );
-    const widthStyle = derive(() => `width: ${percent.value}%;`);
+    const percentLabel = op(hideUpperLimit).ternary("", tmpl`${percent}%`);
+    const widthStyle = tmpl`width: ${percent}%;`;
 
     return m.Div({
       class: "absolute flex items-start h0dot5 bl br b--light-silver bw1",
       style: widthStyle,
       children: [
         m.Div({
-          class: dstring`absolute absolute-fill h0dot15 w-100 ${colorCss}`,
+          class: tmpl`absolute absolute-fill h0dot15 w-100 ${colorCss}`,
         }),
         m.Div({
           class: "flex justify-end w-100 pt2 f7",

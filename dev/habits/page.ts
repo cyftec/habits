@@ -1,4 +1,4 @@
-import { derive, dobject, signal } from "@cyftech/signal";
+import { compute, signal, trap } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { HOMEPAGE_OVERVIEW_TABS, INITIAL_SETTINGS } from "../@common/constants";
 import {
@@ -22,22 +22,20 @@ import { TabBar } from "../@elements";
 
 const noHabitsInStore = signal(false);
 const pageSettings = signal(INITIAL_SETTINGS.habitsPage);
-const totalOverviewMonths = derive(
-  () => HOMEPAGE_OVERVIEW_TABS[pageSettings.value.tabIndex].months
+const { tabIndex, sortOptionIndex } = trap(pageSettings).props;
+const totalOverviewMonths = compute(
+  (i: number) => HOMEPAGE_OVERVIEW_TABS[i].months,
+  tabIndex
 );
 const habits = signal<HabitUI[]>([]);
-const sortedHabits = derive(() =>
-  getSortedHabits(
-    habits.value,
-    pageSettings.value.sortOptionIndex,
-    totalOverviewMonths.value
-  )
+const sortedHabits = compute(
+  getSortedHabits,
+  habits,
+  sortOptionIndex,
+  totalOverviewMonths
 );
-const sortedActiveHabits = derive(() =>
-  sortedHabits.value.filter((hab) => !hab.isStopped)
-);
-const sortedStoppedHabits = derive(() =>
-  sortedHabits.value.filter((hab) => hab.isStopped)
+const [sortedStoppedHabits, sortedActiveHabits] = trap(sortedHabits).partition(
+  (hab) => hab.isStopped
 );
 
 const onSortOptionChange = (optionIndex) => {
@@ -66,19 +64,19 @@ const onPageMount = () => {
 };
 
 export default HTMLPage({
-  classNames: "bg-white",
+  cssClasses: "bg-white",
   onMount: onPageMount,
   body: NavScaffold({
-    classNames: "ph3 bg-white",
+    cssClasses: "ph3 bg-white",
     route: "/habits/",
     header: m.Div({
       class: "flex items-start justify-between bg-white",
       children: [
         "All habits",
         SortOptions({
-          classNames: "mt2 mr2",
+          cssClasses: "mt2 mr2",
           iconSize: 22,
-          selectedOptionIndex: dobject(pageSettings).prop("sortOptionIndex"),
+          selectedOptionIndex: sortOptionIndex,
           onChange: onSortOptionChange,
         }),
       ],
@@ -96,17 +94,17 @@ export default HTMLPage({
             }),
             m.Div("It's all empty here!"),
             AddHabitButton({
-              classNames: "pt5",
-              justifyClassNames: "justify-around",
+              cssClasses: "pt5",
+              justifyCssClasses: "justify-around",
               label: "Add your first habit",
             }),
           ],
         }),
         isFalsy: m.Div([
           TabBar({
-            classNames: "nl1 f6",
+            cssClasses: "nl1 f6",
             tabs: HOMEPAGE_OVERVIEW_TABS.map((ov) => ov.label),
-            selectedTabIndex: dobject(pageSettings).prop("tabIndex"),
+            selectedTabIndex: tabIndex,
             onTabChange: onTabChange,
           }),
           m.Div(
@@ -119,7 +117,7 @@ export default HTMLPage({
                 children: [
                   "ACTIVE HABITS",
                   m.If({
-                    subject: derive(() => !!sortedActiveHabits.value.length),
+                    subject: trap(sortedActiveHabits).length,
                     isFalsy: m.Div({
                       class: "mt3",
                       children: "None",
@@ -129,7 +127,7 @@ export default HTMLPage({
               }),
               map: (activeHabit) =>
                 HabitCard({
-                  classNames: "mb4",
+                  cssClasses: "mb4",
                   habit: activeHabit,
                   months: totalOverviewMonths,
                   onClick: () => goToHabitPage(activeHabit.value.id),
@@ -146,7 +144,7 @@ export default HTMLPage({
                 children: [
                   "STOPPED HABITS",
                   m.If({
-                    subject: derive(() => !!sortedStoppedHabits.value.length),
+                    subject: trap(sortedStoppedHabits).length,
                     isFalsy: m.Div({
                       class: "mt3",
                       children: "None",
@@ -156,7 +154,7 @@ export default HTMLPage({
               }),
               map: (stoppedHabit) =>
                 HabitCard({
-                  classNames: "mb4",
+                  cssClasses: "mb4",
                   habit: stoppedHabit,
                   months: totalOverviewMonths,
                   onClick: () => goToHabitPage(stoppedHabit.value.id),

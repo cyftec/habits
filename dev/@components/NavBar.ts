@@ -1,21 +1,17 @@
-import { compute, derive, dstring } from "@cyftech/signal";
+import { op, tmpl } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { goToHref, handleTap } from "../@common/utils";
 import { Icon } from "../@elements";
+import { NavbarLink } from "../@common/types";
 
 type NavBarProps = {
-  classNames?: string;
-  links: {
-    label: string;
-    icon: string;
-    isSelected: boolean;
-    href: string;
-  }[];
+  cssClasses?: string;
+  links: NavbarLink[];
 };
 
-export const NavBar = component<NavBarProps>(({ classNames, links }) => {
+export const NavBar = component<NavBarProps>(({ cssClasses, links }) => {
   return m.Div({
-    class: dstring`flex items-center justify-between pv3 bg-near-white ${classNames}`,
+    class: tmpl`flex items-center justify-between pv3 bg-near-white ${cssClasses}`,
     children: m.For({
       subject: links,
       map: (link) =>
@@ -30,7 +26,7 @@ export const NavBar = component<NavBarProps>(({ classNames, links }) => {
 });
 
 type NavBarLinkProps = {
-  classNames?: string;
+  cssClasses?: string;
   label: string;
   icon: string;
   isSelected: boolean;
@@ -38,11 +34,11 @@ type NavBarLinkProps = {
 };
 
 export const NavBarLink = component<NavBarLinkProps>(
-  ({ classNames, label, icon, isSelected, href }) => {
-    const fontColor = compute(isSelected).oneOf("app-theme-color b", "black");
+  ({ cssClasses, label, icon, isSelected, href }) => {
+    const fontColor = op(isSelected).ternary("app-theme-color b", "black");
 
     return m.Div({
-      class: dstring`pointer noselect flex flex-column items-center justify-center pb2 ${fontColor} ${classNames}`,
+      class: tmpl`pointer noselect flex flex-column items-center justify-center pb2 ${fontColor} ${cssClasses}`,
       onclick: handleTap(() => goToHref(href.value)),
       children: [
         Icon({ size: 22, iconName: icon }),

@@ -1,4 +1,4 @@
-import { derive, signal } from "@cyftech/signal";
+import { compute, derive, op, signal, tmpl, trap } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import {
   intializeTrackerEmptyDays,
@@ -20,7 +20,7 @@ import {
   isLastInteractionLongBack,
   updateHabitStatus,
 } from "./@common/transforms";
-import { DailyStatus } from "./@common/types";
+import { DailyStatus, HabitUI } from "./@common/types";
 import { goToHabitPage, goToNewHabitsPage, handleTap } from "./@common/utils";
 import {
   AddHabitButton,
@@ -37,28 +37,29 @@ const now = new Date();
 const noHabitsInStore = signal(false);
 const progress = signal(0);
 const itsTimeToRefresh = signal(false);
-const showSplashScreen = derive(
-  () => itsTimeToRefresh.value && progress.value < 100
-);
+const showSplashScreen = op(itsTimeToRefresh).andThisIsLT(progress, 100).truthy;
 const sevenDays = getLastNDays(getGapDate(now, 2), 7);
 const selectedDate = signal(now);
-const habits = derive(() => getHabitsForDate(selectedDate.value));
-const readableDateLabel = derive(() => getDayLabel(selectedDate.value));
-const habitsStatusLabel = derive(() =>
-  getHabitsStatusLabelForTheDay(habits.value, selectedDate.value)
+const habits = compute(getHabitsForDate, selectedDate);
+const readableDateLabel = compute(getDayLabel, selectedDate);
+const habitsStatusLabel = compute(
+  getHabitsStatusLabelForTheDay,
+  habits,
+  selectedDate
 );
-const createNewHabitBtnLabel = derive(() =>
-  habits.value.length === 0
-    ? "No habit for the day! Add one."
-    : habits.value.length < 5
-    ? `Only ${habits.value.length} habits a day! Add more.`
-    : ``
+const createNewHabitBtnLabel = compute(
+  (habits: HabitUI[]) =>
+    habits.length === 0
+      ? "No habit for the day! Add one."
+      : habits.length < 5
+      ? `Only ${habits.length} habits a day! Add more.`
+      : ``,
+  habits
 );
 const isStatusEditorOpen = signal(false);
 const statusEditableHabitIndex = signal(0);
-const editableHabit = derive(
-  () => habits.value?.[statusEditableHabitIndex.value] || getNewHabit()
-);
+const nullishEditableHabit = trap(habits).at(statusEditableHabitIndex);
+const editableHabit = trap(nullishEditableHabit).or(getNewHabit());
 
 const openHabitEditor = (habitIndex: number) => {
   isStatusEditorOpen.value = true;
@@ -101,7 +102,7 @@ const onPageMount = () => {
 };
 
 export default HTMLPage({
-  classNames: "bg-white",
+  cssClasses: "bg-white",
   onMount: onPageMount,
   body: m.Div({
     children: [
@@ -117,7 +118,7 @@ export default HTMLPage({
         subject: showSplashScreen,
         isTruthy: SplashScreen({ progress }),
         isFalsy: NavScaffold({
-          classNames: "ph3 bg-white",
+          cssClasses: "ph3 bg-white",
           route: "/",
           header: "Tasks in a day",
           content: m.Div(
@@ -176,47 +177,52 @@ export default HTMLPage({
                     class: "mt4",
                     children: m.For({
                       subject: habits,
+                      itemKey: "id",
                       n: Infinity,
                       nthChild: Link({
-                        classNames: "flex pl5 pr3 nl3 mt4",
+                        cssClasses: "flex pl5 pr3 nl3 mt4",
                         onClick: goToNewHabitsPage,
                         children: createNewHabitBtnLabel,
                       }),
-                      map: (habit, i) => {
-                        const status = getDayStatus(
-                          habit.tracker,
-                          selectedDate.value
-                        ) as DailyStatus;
-                        const borderCss =
-                          status.level.code < 1
-                            ? "b--light-silver"
-                            : "b--transparent";
+                      map: (habit, habitIndex) => {
+                        const { id, title, colorIndex, levels, tracker } =
+                          trap(habit).props;
+                        const statusLevelCode = derive(() => {
+                          const status = getDayStatus(
+                            tracker.value,
+                            selectedDate.value
+                          ) as DailyStatus;
+                          return status.level.code;
+                        });
+                        const borderCss = op(statusLevelCode)
+                          .isLT(1)
+                          .ternary("b--light-silver", "b--transparent");
 
                         return m.Div({
                           class: "mt4 flex items-center",
                           children: [
                             ColorDot({
-                              classNames: `pa3 mr3 ba b ${borderCss}`,
-                              colorIndex: habit.colorIndex,
-                              level: status.level.code,
-                              totalLevels: habit.levels.length,
+                              cssClasses: tmpl`pa3 mr3 ba b ${borderCss}`,
+                              colorIndex: colorIndex,
+                              level: statusLevelCode,
+                              totalLevels: trap(levels).length,
                               icon: "check",
                               iconSize: 22,
-                              showText: status.level.code > 0,
+                              showText: op(statusLevelCode).isGT(0).truthy,
                               showHeight: true,
-                              onClick: () => openHabitEditor(i),
+                              onClick: () => openHabitEditor(habitIndex.value),
                             }),
                             m.Div({
                               class: "pointer",
-                              onclick: handleTap(() => goToHabitPage(habit.id)),
+                              onclick: handleTap(() => goToHabitPage(id.value)),
                               children: [
                                 m.Div({
                                   class: "f5 fw6 f4-ns fw4-ns",
-                                  children: habit.title,
+                                  children: title,
                                 }),
                                 m.Div({
                                   class: "f6 light-silver pt05",
-                                  children: getHabitInfoLabel(habit.id),
+                                  children: getHabitInfoLabel(id.value),
                                 }),
                               ],
                             }),

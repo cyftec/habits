@@ -1,13 +1,13 @@
 import { Child, component, m } from "@mufw/maya";
 
 type HTMLPageProps = {
-  classNames?: string;
+  cssClasses?: string;
   body: Child;
   onMount?: () => void;
 };
 
 export const HTMLPage = component<HTMLPageProps>(
-  ({ classNames, body, onMount }) => {
+  ({ cssClasses, body, onMount }) => {
     return m.Html({
       lang: "en",
       children: [
@@ -40,7 +40,7 @@ export const HTMLPage = component<HTMLPageProps>(
         }),
         m.Body({
           tabindex: "-1",
-          class: classNames,
+          class: cssClasses,
           onmount: onMount,
           children: [m.Script({ src: "main.js", defer: "true" }), body],
         }),

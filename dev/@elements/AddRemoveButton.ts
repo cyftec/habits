@@ -1,9 +1,9 @@
-import { compute, derive, dstring } from "@cyftech/signal";
+import { op, tmpl } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { handleTap } from "../@common/utils";
 
 type AddRemoveButtonProps = {
-  classNames?: string;
+  cssClasses?: string;
   hideRemove?: boolean;
   hideAdd?: boolean;
   onRemove: () => void;
@@ -11,19 +11,17 @@ type AddRemoveButtonProps = {
 };
 
 export const AddRemoveButton = component<AddRemoveButtonProps>(
-  ({ classNames, hideRemove, hideAdd, onRemove, onAdd }) => {
-    const containerBorderCss = derive(() =>
-      hideRemove?.value && hideAdd?.value ? "bn" : "ba"
-    );
-    const removeBtnBorderCss = compute(hideAdd).oneOf("", "br");
+  ({ cssClasses, hideRemove, hideAdd, onRemove, onAdd }) => {
+    const containerBorderCss = op(hideRemove).and(hideAdd).ternary("bn", "ba");
+    const removeBtnBorderCss = op(hideAdd).ternary("", "br");
 
     return m.Span({
-      class: dstring`br3 pb1 f4 bw1 b--light-silver dark-gray ${containerBorderCss} ${classNames}`,
+      class: tmpl`br3 pb1 f4 bw1 b--light-silver dark-gray ${containerBorderCss} ${cssClasses}`,
       children: [
         m.If({
           subject: hideRemove,
           isFalsy: m.Span({
-            class: dstring`pointer ph2 pb1 bw1 b--light-silver ${removeBtnBorderCss}`,
+            class: tmpl`pointer ph2 pb1 bw1 b--light-silver ${removeBtnBorderCss}`,
             onclick: handleTap(onRemove),
             children: "-",
           }),

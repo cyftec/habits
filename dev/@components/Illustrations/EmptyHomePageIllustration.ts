@@ -1,15 +1,15 @@
 import { component, m } from "@mufw/maya";
 import { AddHabitButton } from "../AddHabitButton";
-import { dstring } from "@cyftech/signal";
+import { tmpl } from "@cyftech/signal";
 
 type EmptyHomePageIllustrationProps = {
-  classNames?: string;
+  cssClasses?: string;
 };
 
 export const EmptyHomePageIllustration =
-  component<EmptyHomePageIllustrationProps>(({ classNames }) => {
+  component<EmptyHomePageIllustrationProps>(({ cssClasses }) => {
     return m.Div({
-      class: dstring`flex flex-column items-center justify-around ${classNames}`,
+      class: tmpl`flex flex-column items-center justify-around ${cssClasses}`,
       children: [
         m.Img({
           class: "mt3 pt4",
@@ -18,8 +18,8 @@ export const EmptyHomePageIllustration =
         }),
         m.Div("Looks like, you just landed here!"),
         AddHabitButton({
-          classNames: "pt5",
-          justifyClassNames: "justify-around",
+          cssClasses: "pt5",
+          justifyCssClasses: "justify-around",
           label: "Add your first habit",
         }),
       ],

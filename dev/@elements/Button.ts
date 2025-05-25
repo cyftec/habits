@@ -1,17 +1,17 @@
-import { Child, Children, component, m } from "@mufw/maya";
-import { dstring, MaybeSignal } from "@cyftech/signal";
+import { tmpl } from "@cyftech/signal";
+import { Children, component, m } from "@mufw/maya";
 import { handleTap } from "../@common/utils";
 
 type ButtonProps = {
-  classNames?: string;
+  cssClasses?: string;
   onTap: () => void;
   children: Children;
 };
 
 export const Button = component<ButtonProps>(
-  ({ classNames, onTap, children }) =>
+  ({ cssClasses, onTap, children }) =>
     m.Button({
-      class: dstring`pointer noselect br-pill ba bw1 b--light-silver b--hover-black bg-white black ${classNames}`,
+      class: tmpl`pointer noselect br-pill ba bw1 b--light-silver b--hover-black bg-white black ${cssClasses}`,
       onclick: handleTap(() => onTap()),
       children: children,
     })

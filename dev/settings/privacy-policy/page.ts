@@ -4,9 +4,9 @@ import { Scaffold } from "../../@elements";
 import { PRIVACY_POLICY } from "./@lib/constants";
 
 export default HTMLPage({
-  classNames: "bg-white ph3",
+  cssClasses: "bg-white ph3",
   body: Scaffold({
-    classNames: "bg-white",
+    cssClasses: "bg-white",
     header: "Privacy Policy",
     content: m.Div({
       class: "gray pt3",
