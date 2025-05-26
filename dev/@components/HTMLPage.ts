@@ -19,6 +19,17 @@ export const HTMLPage = component<HTMLPageProps>(
               type: "image/x-icon",
               href: "/assets/images/favicon.ico",
             }),
+            m.Meta({
+              "http-equiv": "Content-Security-Policy",
+              content: `
+                default-src 'self';
+                script-src 'self';
+                style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com;
+                font-src https://fonts.gstatic.com;
+                object-src 'none';
+                base-uri 'none';
+              `,
+            }),
             m.Meta({ charset: "UTF-8" }),
             m.Meta({
               "http-equiv": "X-UA-Compatible",

@@ -1,6 +1,10 @@
 import { tmpl, signal, trap } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { INITIAL_SETTINGS, INITIAL_STORAGE_DATA } from "../@common/constants";
+import {
+  APP_VERSION,
+  INITIAL_SETTINGS,
+  INITIAL_STORAGE_DATA,
+} from "../@common/constants";
 import {
   getEditPageSettings,
   getStorageData,
@@ -105,7 +109,7 @@ export default HTMLPage({
               }),
               m.Div({
                 class: "silver mt1",
-                children: "version 1.1.1",
+                children: `version ${APP_VERSION}`,
               }),
               m.Div({
                 class: "silver mt1 flex items-center",
