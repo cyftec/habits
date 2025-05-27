@@ -47,6 +47,7 @@ input::placeholder {
 .bottom--1dot5 { bottom: -1.75rem; }
 .pa2dot5 { padding: 0.75rem; }
 .ph2dot5 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.pv2dot5 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
 .pa05 { padding: 0.125rem; }
 .pt05 { padding-top: 0.2rem; }
 .ml1px { margin-left: 1px; }
