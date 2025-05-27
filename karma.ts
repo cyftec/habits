@@ -8,6 +8,8 @@ export const projectFileNames: ProjectFileNames = {
   static: {
     sourceDir: "dev",
     karmaTypesFile: "karma-types.ts",
+    licenceFile: "LICENCE",
+    readMeFile: "README.md",
   },
   generated: {
     stagingDir: "stage",
@@ -34,7 +36,7 @@ export const config: KarmaConfig = {
       buildablePageFileName: projectFileNames.buildable.pageFile,
       buildableManifestFileName: projectFileNames.buildable.manifestFile,
       ignoreDelimiter: "@",
-      skipErrorAndBuildNext: false,
+      skipErrorAndBuildNext: true,
     },
     localServer: {
       port: 3000,
@@ -49,7 +51,7 @@ export const config: KarmaConfig = {
     sourceDirName: projectFileNames.static.sourceDir,
     packageJson: {
       dependencies: {
-        "@mufw/maya": "0.1.20",
+        "@mufw/maya": "0.1.22",
         "@cyftech/immutjs": "0.1.0",
         "@cyftech/signal": "0.1.8",
         "@types/web-app-manifest": "1.0.8",
@@ -61,13 +63,15 @@ export const config: KarmaConfig = {
       "deno.enable": false,
       "files.exclude": {
         [projectFileNames.static.karmaTypesFile]: true,
-        [projectFileNames.generated.stagingDir]: false,
+        [projectFileNames.static.licenceFile]: true,
+        [projectFileNames.static.readMeFile]: true,
+        [projectFileNames.generated.stagingDir]: true,
         [projectFileNames.generated.publishDir]: false,
         [projectFileNames.generated.bunLockFile]: true,
         [projectFileNames.generated.bunLockBFile]: true,
         [projectFileNames.generated.gitIgnoreFile]: true,
         [projectFileNames.generated.dotVscodeDir]: true,
-        [projectFileNames.generated.nodeModulesDir]: true,
+        [projectFileNames.generated.nodeModulesDir]: false,
         [projectFileNames.generated.packageJsonFile]: true,
       },
     },
