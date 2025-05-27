@@ -1,4 +1,4 @@
-import { op, tmpl, trap } from "@cyftech/signal";
+import { op, tmpl } from "@cyftech/signal";
 import { Children, component, m } from "@mufw/maya";
 
 type SectionProps = {
@@ -32,7 +32,7 @@ export const Section = component<SectionProps>(
           subject: showDescription,
           isTruthy: m.Div({
             class: "mb3 f6 silver fw5",
-            children: tmpl`${description}`,
+            children: description,
           }),
         }),
         m.Div({ class: contentCssClasses, children }),
