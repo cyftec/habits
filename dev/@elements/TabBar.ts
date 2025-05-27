@@ -34,7 +34,7 @@ export const TabBar = component<TabBarProps>(
           map: (tab, i) =>
             m.Span({
               class: tmpl`
-                w-100 br3 pv3 ph2 flex justify-center noselect br-pill ba bw1 bg-inherit
+                w-100 br3 pv2dot5 ph2 flex justify-center noselect br-pill ba bw1 bg-inherit
                 ${tabSelectionCss(i)} ${tabItemCssClasses}`,
               onclick: handleTap(() => onTabChange(i)),
               children: tab,
