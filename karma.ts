@@ -21,7 +21,7 @@ export const projectFileNames: ProjectFileNames = {
     packageJsonFile: "package.json",
   },
   built: {
-    publishDir: "docs",
+    publishDir: "release",
     pageFile: "page.ts",
     manifestFile: "manifest.ts",
   },
@@ -65,7 +65,7 @@ export const config: KarmaConfig = {
         [projectFileNames.static.karmaTypesFile]: true,
         [projectFileNames.static.licenceFile]: true,
         [projectFileNames.static.readMeFile]: true,
-        [projectFileNames.generated.stagingDir]: true,
+        [projectFileNames.generated.stagingDir]: false,
         [projectFileNames.generated.bunLockFile]: true,
         [projectFileNames.generated.bunLockBFile]: true,
         [projectFileNames.generated.gitIgnoreFile]: true,
