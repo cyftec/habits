@@ -21,7 +21,7 @@ export const projectFileNames: ProjectFileNames = {
     packageJsonFile: "package.json",
   },
   built: {
-    publishDir: "release",
+    publishDir: "docs",
     pageFile: "page.ts",
     manifestFile: "manifest.ts",
   },
