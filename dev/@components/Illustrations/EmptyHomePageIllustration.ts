@@ -1,6 +1,6 @@
 import { component, m } from "@mufw/maya";
 import { AddHabitButton } from "../AddHabitButton";
-import { tmpl } from "@cyftech/signal";
+import { dispose, tmpl } from "@cyftech/signal";
 
 type EmptyHomePageIllustrationProps = {
   cssClasses?: string;
@@ -8,8 +8,11 @@ type EmptyHomePageIllustrationProps = {
 
 export const EmptyHomePageIllustration =
   component<EmptyHomePageIllustrationProps>(({ cssClasses }) => {
+    const classes = tmpl`flex flex-column items-center justify-around ${cssClasses}`;
+
     return m.Div({
-      class: tmpl`flex flex-column items-center justify-around ${cssClasses}`,
+      onunmount: () => dispose(classes),
+      class: classes,
       children: [
         m.Img({
           class: "mt3 pt4",

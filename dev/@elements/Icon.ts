@@ -1,4 +1,4 @@
-import { tmpl, trap } from "@cyftech/signal";
+import { dispose, tmpl, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { handleTap } from "../@common/utils";
 
@@ -13,11 +13,14 @@ type IconProps = {
 export const Icon = component<IconProps>(
   ({ cssClasses, size, onClick, iconName, title }) => {
     const pointerCss = !!onClick ? "pointer" : "";
+    const classes = tmpl`material-symbols-outlined ${pointerCss} ${cssClasses}`;
     const fontSize = trap(size).or(16);
+    const styles = tmpl`font-size: ${fontSize}px`;
 
     return m.Span({
-      class: tmpl`material-symbols-outlined ${pointerCss} ${cssClasses}`,
-      style: tmpl`font-size: ${fontSize}px`,
+      onunmount: () => dispose(classes, fontSize, styles),
+      class: classes,
+      style: styles,
       onclick: handleTap(onClick),
       children: iconName,
       title: title,

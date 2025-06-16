@@ -1,4 +1,4 @@
-import { op, tmpl } from "@cyftech/signal";
+import { dispose, op, tmpl } from "@cyftech/signal";
 import {
   component,
   CustomEventValue,
@@ -34,6 +34,7 @@ export const TextBox = component<TextBoxProps>(
     onblur,
   }) => {
     let inputElem: MHtmlElement<HTMLInputElement>;
+    const isDisabled = op(disabled).truthy;
 
     const onMount: CustomEventValue = (elem) => {
       inputElem = elem as MHtmlElement<HTMLInputElement>;
@@ -61,10 +62,11 @@ export const TextBox = component<TextBoxProps>(
 
     return m.Input({
       onmount: onMount,
-      class: tmpl`${cssClasses}`,
+      onunmount: () => dispose(isDisabled),
+      class: cssClasses,
       type: "text",
       placeholder,
-      disabled: op(disabled).truthy,
+      disabled: isDisabled,
       value: text,
       onchange: onTextChange as DomEventValue,
       onkeydown: onKeyDown as DomEventValue,

@@ -1,4 +1,4 @@
-import { tmpl } from "@cyftech/signal";
+import { dispose, tmpl } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { HabitUI } from "../../@common/types";
 import { Button, Modal } from "../../@elements";
@@ -12,7 +12,10 @@ type HabitStopModalProps = {
 
 export const HabitStopModal = component<HabitStopModalProps>(
   ({ isOpen, habit, onClose, onDone }) => {
+    const headerLabel = tmpl`Stop '${() => habit.value.title}'?`;
+
     return Modal({
+      onUnmount: () => dispose(headerLabel),
       cssClasses: "bn",
       isOpen: isOpen,
       onTapOutside: onClose,
@@ -21,7 +24,7 @@ export const HabitStopModal = component<HabitStopModalProps>(
         children: [
           m.Div({
             class: "mb3 b f4",
-            children: tmpl`Stop '${() => habit.value.title}'?`,
+            children: headerLabel,
           }),
           m.Div({
             class: "mb4",

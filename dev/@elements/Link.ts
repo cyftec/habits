@@ -1,4 +1,4 @@
-import { op, tmpl } from "@cyftech/signal";
+import { dispose, op, tmpl } from "@cyftech/signal";
 import { Children, component, m } from "@mufw/maya";
 import { handleTap } from "../@common/utils";
 
@@ -13,10 +13,12 @@ type LinkProps = {
 export const Link = component<LinkProps>(
   ({ cssClasses, href, target, onClick, children }) => {
     const linkCss = op(href).or(onClick).ternary("pointer underline", "");
+    const classes = tmpl`noselect ${linkCss} ${cssClasses}`;
 
     return m.A({
+      onunmount: () => dispose(linkCss, classes),
       ...(href ? { href } : {}),
-      class: tmpl`noselect ${linkCss} ${cssClasses}`,
+      class: classes,
       target,
       onclick: handleTap(onClick),
       children,

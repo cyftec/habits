@@ -1,4 +1,4 @@
-import { trap } from "@cyftech/signal";
+import { dispose, trap } from "@cyftech/signal";
 import { component, type DomEventValue, m } from "@mufw/maya";
 
 type NumberBoxProps = {
@@ -10,6 +10,8 @@ type NumberBoxProps = {
 
 export const NumberBox = component<NumberBoxProps>(
   ({ cssClasses, placeholder, num, onchange }) => {
+    const stringValue = trap(num).string;
+
     const onTextChange = (e: KeyboardEvent) => {
       const text = (e.target as HTMLInputElement).value;
       const numValue = Number.parseFloat(
@@ -19,10 +21,11 @@ export const NumberBox = component<NumberBoxProps>(
     };
 
     return m.Input({
+      onunmount: () => dispose(stringValue),
       class: cssClasses,
       type: "number",
       placeholder,
-      value: trap(num).string,
+      value: stringValue,
       onchange: onTextChange as DomEventValue,
     });
   }

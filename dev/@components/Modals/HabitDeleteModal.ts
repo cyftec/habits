@@ -1,4 +1,4 @@
-import { tmpl } from "@cyftech/signal";
+import { dispose, tmpl } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { deleteHabit } from "../../@common/localstorage";
 import { HabitUI } from "../../@common/types";
@@ -13,12 +13,15 @@ type HabitDeleteModalProps = {
 
 export const HabitDeleteModal = component<HabitDeleteModalProps>(
   ({ isOpen, habit, onClose, onDone }) => {
+    const headerLabel = tmpl`Delete '${() => habit.value.title}'?`;
+
     const deletePermanently = () => {
       deleteHabit(habit.value.id);
       onDone();
     };
 
     return Modal({
+      onUnmount: () => dispose(headerLabel),
       cssClasses: "bn w-30-ns",
       isOpen: isOpen,
       onTapOutside: onClose,
@@ -27,7 +30,7 @@ export const HabitDeleteModal = component<HabitDeleteModalProps>(
         children: [
           m.Div({
             class: "mb3 b f4",
-            children: tmpl`Delete '${() => habit.value.title}'?`,
+            children: headerLabel,
           }),
           m.Div({
             class: "mb4",

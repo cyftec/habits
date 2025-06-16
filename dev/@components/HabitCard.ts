@@ -1,4 +1,4 @@
-import { compute, tmpl, trap } from "@cyftech/signal";
+import { compute, dispose, tmpl, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
   getAchievedMilestone,
@@ -35,10 +35,38 @@ export const HabitCard = component<HabitCardProps>(
       completion
     );
     const { icon, color } = trap(achievedMilestone).props;
-    const monthFirstDates = compute(getMonthFirstDates, months);
+    const monthFirstDates = compute(
+      (ms) =>
+        getMonthFirstDates(ms).map((monthFirstDate) => ({
+          monthFirstDate,
+          index: monthFirstDate.getTime(),
+        })),
+      months
+    );
+    const classes = tmpl`pointer bg-white ${cssClasses}`;
+    const completionIconCss = tmpl`mr1 ${color}`;
+    const completionLabel = tmpl`${completion}%`;
+
+    const onUnmount = () => {
+      dispose(
+        milestones,
+        title,
+        colorIndex,
+        levels,
+        completion,
+        achievedMilestone,
+        icon,
+        color,
+        monthFirstDates,
+        classes,
+        completionIconCss,
+        completionLabel
+      );
+    };
 
     return m.Div({
-      class: tmpl`pointer bg-white ${cssClasses}`,
+      onunmount: onUnmount,
+      class: classes,
       onclick: handleTap(onClick),
       children: [
         m.Div({
@@ -52,10 +80,10 @@ export const HabitCard = component<HabitCardProps>(
               class: "f6 silver b flex items-center",
               children: [
                 Icon({
-                  cssClasses: tmpl`mr1 ${color}`,
+                  cssClasses: completionIconCss,
                   iconName: icon,
                 }),
-                tmpl`${completion}%`,
+                completionLabel,
               ],
             }),
           ],
@@ -64,14 +92,16 @@ export const HabitCard = component<HabitCardProps>(
           class: "mt2 mb1",
           children: m.For({
             subject: monthFirstDates,
-            map: (monthFirstDay) =>
-              MonthMap({
+            itemKey: "index",
+            map: (monthsData) => {
+              return MonthMap({
                 cssClasses: "mb1",
                 habit: habit,
-                date: monthFirstDay,
+                date: trap(monthsData).prop("monthFirstDate"),
                 colorIndex: colorIndex,
                 totalLevels: levels.value.length,
-              }),
+              });
+            },
           }),
         }),
       ],

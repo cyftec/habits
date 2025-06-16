@@ -1,4 +1,4 @@
-import { compute, derive, tmpl, signal, trap, op } from "@cyftech/signal";
+import { compute, derive, op, signal, tmpl, trap } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import { intializeTrackerEmptyDays } from "../../@common/localstorage";
 import {
@@ -7,9 +7,7 @@ import {
   getCompletion,
   getHabitFromUrl,
   getLevelsCompletionList,
-  getMonthName,
   getNewHabit,
-  getWeekdayName,
   getWeekwiseStatus,
   updateHabitStatus,
 } from "../../@common/transforms";
@@ -25,6 +23,7 @@ import {
   Section,
 } from "../../@components";
 import { Button, Icon, Scaffold } from "../../@elements";
+import { Calendar } from "./@components";
 
 const error = signal("");
 const habit = signal<HabitUI>(getNewHabit());
@@ -188,7 +187,7 @@ export default HTMLPage({
                               }),
                             ],
                           }),
-                          map: (acheievemnt, i) =>
+                          map: (acheievemnt) =>
                             m.Div({
                               class: "flex items-center justify-between mb2",
                               children: [
@@ -234,96 +233,17 @@ export default HTMLPage({
                   }),
                   Section({
                     title: "Tracker",
-                    children: [
-                      m.Div({
-                        class: "mh2 flex items-center justify-between",
-                        children: m.For({
-                          subject: Array(7).fill(0),
-                          map: (_, dayIndex) =>
-                            m.Div({
-                              class: `h2 w2 br-100 gray f7 flex items-center justify-center`,
-                              children: getWeekdayName(dayIndex, 1),
-                            }),
-                        }),
-                      }),
-                      m.Div({
-                        onmount: (el) =>
-                          el.scroll({
-                            top: el.scrollHeight - el.clientHeight,
-                          }),
-                        class: `mxh5 mxh6-ns nt2 bb bw1 b--near-white mh2 overflow-y-scroll`,
-                        children: [
-                          m.Div({
-                            class: tmpl`absolute left-0 right-0 bg-to-top-white z-999 ${op(
-                              weekwiseTracker
-                            )
-                              .lengthGT(4)
-                              .ternary("h3", "")}`,
-                          }),
-                          m.Div({
-                            children: m.For({
-                              subject: weekwiseTracker,
-                              n: 0,
-                              nthChild: m.Div({
-                                class: op(weekwiseTracker)
-                                  .lengthGT(4)
-                                  .ternary("pv3 mt2", "pv2"),
-                              }),
-                              map: (week) =>
-                                m.Div({
-                                  class: "flex items-center h-60",
-                                  children: [
-                                    m.Div({
-                                      class: `w-100 mb3 flex items-center justify-between`,
-                                      children: m.For({
-                                        subject: week,
-                                        map: (day) => {
-                                          const dateNum = day.date.getDate();
-                                          const monthIndex =
-                                            day.date.getMonth();
-                                          const monthName = getMonthName(
-                                            monthIndex,
-                                            3
-                                          );
-                                          const dateText = `${
-                                            dateNum === 1
-                                              ? monthIndex === 0
-                                                ? day.date
-                                                    .getFullYear()
-                                                    .toString()
-                                                : monthName
-                                              : dateNum
-                                          }`;
-
-                                          return ColorDot({
-                                            cssClasses:
-                                              "h2 w2 flex items-center justify-center f7",
-                                            colorIndex: habitColorIndex,
-                                            level: day.level.code,
-                                            totalLevels:
-                                              habitLevels.value.length || 2,
-                                            textContent: dateText,
-                                            showText: day.level !== undefined,
-                                            onClick: () => {
-                                              if (habitIsStopped.value) return;
-                                              updateLevelModalOpen.value = true;
-                                              updateLevelModalData.value = {
-                                                date: day.date,
-                                                selectedLevelIndex:
-                                                  day.level.code,
-                                              };
-                                            },
-                                          });
-                                        },
-                                      }),
-                                    }),
-                                  ],
-                                }),
-                            }),
-                          }),
-                        ],
-                      }),
-                    ],
+                    children: Calendar({
+                      habit: habit,
+                      onDateClick: (dayStatus) => {
+                        if (habitIsStopped.value) return;
+                        updateLevelModalOpen.value = true;
+                        updateLevelModalData.value = {
+                          date: dayStatus.date,
+                          selectedLevelIndex: dayStatus.level.code,
+                        };
+                      },
+                    }),
                   }),
                 ],
               }),

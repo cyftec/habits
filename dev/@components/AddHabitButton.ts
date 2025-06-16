@@ -1,4 +1,4 @@
-import { tmpl, trap } from "@cyftech/signal";
+import { dispose, tmpl, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { goToNewHabitsPage } from "../@common/utils";
 import { Button, Icon } from "../@elements";
@@ -13,9 +13,11 @@ export const AddHabitButton = component<AddHabitButtonProps>(
   ({ cssClasses, justifyCssClasses, label }) => {
     const justifyCss = trap(justifyCssClasses).or("justify-end");
     const buttonLabel = trap(label).or(`Add habit`);
+    const classes = tmpl`w-100 flex ${justifyCss} ${cssClasses}`;
 
     return m.Div({
-      class: tmpl`w-100 flex ${justifyCss} ${cssClasses}`,
+      onunmount: () => dispose(justifyCss, buttonLabel, classes),
+      class: classes,
       children: Button({
         cssClasses: "pa3 mb3 shadow-4 b flex items-center",
         children: [
