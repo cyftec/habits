@@ -65,6 +65,7 @@ const triggerPageDataRefresh = () => {
 
 const onPageMount = () => {
   intializeTrackerEmptyDays();
+  triggerPageDataRefresh();
   window.addEventListener("pageshow", triggerPageDataRefresh);
 };
 
