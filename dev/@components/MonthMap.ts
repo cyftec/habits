@@ -1,4 +1,4 @@
-import { compute, derive, dispose, tmpl, trap } from "@cyftech/signal";
+import { derive, dispose, tmpl, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
   getHabitStatusBetweenDates,
@@ -15,10 +15,8 @@ type MonthMapProps = {
   totalLevels: number;
 };
 
-let renderCount = 0;
 export const MonthMap = component<MonthMapProps>(
   ({ cssClasses, habit, date, colorIndex, totalLevels }) => {
-    console.log(`MonthMap rendered ${++renderCount} times`);
     const statusList = derive(() => {
       const dateYear = date.value.getFullYear();
       const dateMonth = date.value.getMonth();
