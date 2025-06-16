@@ -115,6 +115,7 @@ export type LevelUI = {
 };
 
 export type DailyStatus = {
+  key: number;
   level: LevelUI;
   date: Date;
 };

@@ -1,23 +1,27 @@
 import { derive, tmpl, signal, Signal, trap, op } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
-import { ColorDot, Section } from "..";
-import { BASE_COLORS, BASE_LEVELS } from "../../@common/constants";
+import { ColorDot, Section } from "../../../@components";
+import { BASE_COLORS, BASE_LEVELS } from "../../../@common/constants";
 import {
   getAchievedMilestone,
   getAddRemoveButtonsVisibility,
   getSanitizedLevelsAfterAddOrRemove,
   getWeekdayName,
   levelTextboxDisability,
-} from "../../@common/transforms";
-import { HabitUI, MilestonesUI, WeekdayFrequency } from "../../@common/types";
-import { handleTap } from "../../@common/utils";
+} from "../../../@common/transforms";
+import {
+  HabitUI,
+  MilestonesUI,
+  WeekdayFrequency,
+} from "../../../@common/types";
+import { handleTap } from "../../../@common/utils";
 import {
   AddRemoveButton,
   Button,
   Icon,
   NumberBox,
   TextBox,
-} from "../../@elements";
+} from "../../../@elements";
 
 type HabitEditorProps = {
   cssClasses?: string;

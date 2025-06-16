@@ -1,4 +1,4 @@
-import { op, tmpl } from "@cyftech/signal";
+import { dispose, op, tmpl } from "@cyftech/signal";
 import { Children, component, m } from "@mufw/maya";
 
 type SectionProps = {
@@ -19,10 +19,12 @@ export const Section = component<SectionProps>(
     hideDescription,
     children,
   }) => {
+    const classes = tmpl`mt3 mb4 ${cssClasses}`;
     const showDescription = op(description).andNot(hideDescription).truthy;
 
     return m.Div({
-      class: tmpl`mt3 mb4 ${cssClasses}`,
+      onunmount: () => dispose(classes, showDescription),
+      class: classes,
       children: [
         m.Div({
           class: "mb2 dark-gray f4 b",

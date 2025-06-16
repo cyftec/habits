@@ -1,4 +1,4 @@
-import { compute, derive, tmpl } from "@cyftech/signal";
+import { compute, derive, dispose, tmpl, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import {
   getHabitStatusBetweenDates,
@@ -15,34 +15,48 @@ type MonthMapProps = {
   totalLevels: number;
 };
 
+let renderCount = 0;
 export const MonthMap = component<MonthMapProps>(
   ({ cssClasses, habit, date, colorIndex, totalLevels }) => {
+    console.log(`MonthMap rendered ${++renderCount} times`);
     const statusList = derive(() => {
       const dateYear = date.value.getFullYear();
       const dateMonth = date.value.getMonth();
       const firstDay = new Date(dateYear, dateMonth, 1);
       const lastDay = new Date(dateYear, dateMonth + 1, 0);
-      return getHabitStatusBetweenDates(habit.value.tracker, firstDay, lastDay);
+      return getHabitStatusBetweenDates(
+        habit.value.tracker,
+        firstDay,
+        lastDay
+      ).map((s) => ({ ...s, level: s.level.code }));
     });
+    const classes = tmpl`flex items-center ${cssClasses}`;
+    const monthLabel = derive(() => getMonthName(date.value.getMonth(), 3));
+
+    const onUnmount = () => dispose(statusList, classes, monthLabel);
 
     return m.Div({
-      class: tmpl`flex items-center ${cssClasses}`,
+      onunmount: onUnmount,
+      class: classes,
       children: [
         m.Div({
           class: "f8 b w2 light-silver",
-          children: derive(() => getMonthName(date.value.getMonth(), 3)),
+          children: monthLabel,
         }),
         m.Div({
           class: "w-100 flex items-center justify-between",
           children: m.For({
             subject: statusList,
-            map: (status) =>
-              ColorDot({
+            itemKey: "key",
+            map: (status) => {
+              const levelCode = trap(status).prop("level");
+              return ColorDot({
                 cssClasses: "pa1",
                 colorIndex: colorIndex,
-                level: status.level.code,
+                level: levelCode,
                 totalLevels: totalLevels,
-              }),
+              });
+            },
           }),
         }),
       ],

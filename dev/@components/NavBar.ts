@@ -1,4 +1,4 @@
-import { op, tmpl } from "@cyftech/signal";
+import { dispose, op, tmpl } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { goToHref, handleTap } from "../@common/utils";
 import { Icon } from "../@elements";
@@ -10,8 +10,11 @@ type NavBarProps = {
 };
 
 export const NavBar = component<NavBarProps>(({ cssClasses, links }) => {
+  const classes = tmpl`flex items-center justify-between pv3 bg-near-white ${cssClasses}`;
+
   return m.Div({
-    class: tmpl`flex items-center justify-between pv3 bg-near-white ${cssClasses}`,
+    onunmount: () => dispose(classes),
+    class: classes,
     children: m.For({
       subject: links,
       map: (link) =>
@@ -36,9 +39,11 @@ type NavBarLinkProps = {
 export const NavBarLink = component<NavBarLinkProps>(
   ({ cssClasses, label, icon, isSelected, href }) => {
     const fontColor = op(isSelected).ternary("app-theme-color b", "black");
+    const classes = tmpl`pointer noselect flex flex-column items-center justify-center pb2 ${fontColor} ${cssClasses}`;
 
     return m.Div({
-      class: tmpl`pointer noselect flex flex-column items-center justify-center pb2 ${fontColor} ${cssClasses}`,
+      onunmount: () => dispose(fontColor, classes),
+      class: classes,
       onclick: handleTap(() => goToHref(href.value)),
       children: [
         Icon({ size: 22, iconName: icon }),

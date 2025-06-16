@@ -1,4 +1,4 @@
-import { derive, tmpl, signal, trap, op } from "@cyftech/signal";
+import { derive, tmpl, signal, trap, op, dispose } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { HOMEPAGE_SORT_OPTIONS } from "../@common/constants";
 import { handleTap } from "../@common/utils";
@@ -17,6 +17,9 @@ export const SortOptions = component<SortOptionsProps>(
     const selectedOption = derive(
       () => HOMEPAGE_SORT_OPTIONS[selectedOptionIndex.value]
     );
+    const isDescending = trap(selectedOption).prop("decending");
+    const iconName = trap(selectedOption).prop("icon");
+    const safeIconSize = trap(iconSize).or(20);
 
     const openModal = () => (isSortingOptionsModalOpen.value = true);
     const closeModal = () => (isSortingOptionsModalOpen.value = false);
@@ -32,13 +35,15 @@ export const SortOptions = component<SortOptionsProps>(
     };
 
     return m.Div({
+      onunmount: () =>
+        dispose(selectedOption, isDescending, iconName, safeIconSize),
       class: cssClasses,
       children: [
         SortIcon({
           cssClasses: "pointer",
-          descending: trap(selectedOption).prop("decending"),
-          iconName: trap(selectedOption).prop("icon"),
-          size: trap(iconSize).or(20),
+          descending: isDescending,
+          iconName: iconName,
+          size: safeIconSize,
           onClick: openModal,
         }),
         Modal({
@@ -57,8 +62,9 @@ export const SortOptions = component<SortOptionsProps>(
                   subject: HOMEPAGE_SORT_OPTIONS,
                   map: (option, optionIndex) =>
                     m.Div({
-                      class: tmpl`pointer flex items-center pv3 pl2 pr3 bt b--moon-gray ${() =>
-                        getOptionCss(option.label)}`,
+                      class: `pointer flex items-center pv3 pl2 pr3 bt b--moon-gray ${getOptionCss(
+                        option.label
+                      )}`,
                       onclick: handleTap(() => onOptionTap(optionIndex)),
                       children: [
                         SortIcon({

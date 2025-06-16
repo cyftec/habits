@@ -1,4 +1,4 @@
-import { tmpl } from "@cyftech/signal";
+import { dispose, tmpl } from "@cyftech/signal";
 import { Child, component, m } from "@mufw/maya";
 
 type ScaffoldProps = {
@@ -10,10 +10,13 @@ type ScaffoldProps = {
 
 export const Scaffold = component<ScaffoldProps>(
   ({ cssClasses, header, content, bottombar }) => {
+    const classes = tmpl`w6-ns ${cssClasses}`;
+
     return m.Div({
+      onunmount: () => dispose(classes),
       class: "flex-ns justify-center-ns",
       children: m.Div({
-        class: tmpl`w6-ns ${cssClasses}`,
+        class: classes,
         children: [
           m.If({
             subject: header,

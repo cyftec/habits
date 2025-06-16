@@ -1,4 +1,4 @@
-import { compute, derive, op, signal, tmpl, trap } from "@cyftech/signal";
+import { compute, op, signal, trap } from "@cyftech/signal";
 import { m } from "@mufw/maya";
 import {
   intializeTrackerEmptyDays,
@@ -6,30 +6,26 @@ import {
 } from "./@common/localstorage";
 import { checkNoHabitsInStore } from "./@common/localstorage/habits";
 import {
-  areSameDates,
   getDayLabel,
-  getDayStatus,
   getGapDate,
-  getHabitInfoLabel,
   getHabitsForDate,
   getHabitsStatusLabelForTheDay,
   getLastNDays,
   getNewHabit,
-  getWeekdayName,
-  isFutureDay,
   isLastInteractionLongBack,
   updateHabitStatus,
 } from "./@common/transforms";
-import { DailyStatus, HabitUI } from "./@common/types";
-import { goToHabitPage, goToNewHabitsPage, handleTap } from "./@common/utils";
+import { HabitUI } from "./@common/types";
+import { goToNewHabitsPage } from "./@common/utils";
 import {
   AddHabitButton,
-  ColorDot,
+  DayHabitTile,
   EmptyHomePageIllustration,
   HabitStatusEditModal,
   HTMLPage,
   NavScaffold,
   SplashScreen,
+  WeekDateSelector,
 } from "./@components";
 import { Link } from "./@elements";
 
@@ -38,8 +34,8 @@ const noHabitsInStore = signal(false);
 const progress = signal(0);
 const itsTimeToRefresh = signal(false);
 const showSplashScreen = op(itsTimeToRefresh).andThisIsLT(progress, 100).truthy;
-const sevenDays = getLastNDays(getGapDate(now, 2), 7);
 const selectedDate = signal(now);
+const sevenDays = getLastNDays(getGapDate(now, 2), 7);
 const habits = compute(getHabitsForDate, selectedDate);
 const readableDateLabel = compute(getDayLabel, selectedDate);
 const habitsStatusLabel = compute(
@@ -132,37 +128,12 @@ export default HTMLPage({
                     class: `sticky top-3 bg-white pb2 flex items-center justify-between z-999 w-100`,
                     children: m.For({
                       subject: sevenDays,
-                      map: (date) => {
-                        const isFuture = isFutureDay(date);
-                        const isSelectedDay = areSameDates(
-                          selectedDate.value,
-                          date
-                        );
-                        const colorsCss = isSelectedDay
-                          ? "black b b--silver"
-                          : isFuture
-                          ? "light-gray b--transparent"
-                          : "light-silver pointer b--transparent";
-                        const onDateSelect = () => {
-                          if (isSelectedDay || isFuture) return;
-                          selectedDate.value = date;
-                        };
-
-                        return m.Div({
-                          class: `bw1 ba br-pill ph2 pv3 pb2 tc ${colorsCss}`,
-                          onclick: handleTap(onDateSelect),
-                          children: [
-                            m.Div({
-                              class: "f7 ",
-                              children: getWeekdayName(date.getDay(), 3),
-                            }),
-                            m.Div({
-                              class: "mt2 f4",
-                              children: ("0" + date.getDate()).slice(-2),
-                            }),
-                          ],
-                        });
-                      },
+                      map: (date) =>
+                        WeekDateSelector({
+                          date: date,
+                          selectedDate: selectedDate,
+                          onChange: (date) => (selectedDate.value = date),
+                        }),
                     }),
                   }),
                   m.Div({
@@ -184,51 +155,13 @@ export default HTMLPage({
                         onClick: goToNewHabitsPage,
                         children: createNewHabitBtnLabel,
                       }),
-                      map: (habit, habitIndex) => {
-                        const { id, title, colorIndex, levels, tracker } =
-                          trap(habit).props;
-                        const statusLevelCode = derive(() => {
-                          const status = getDayStatus(
-                            tracker.value,
-                            selectedDate.value
-                          ) as DailyStatus;
-                          return status.level.code;
-                        });
-                        const borderCss = op(statusLevelCode)
-                          .isLT(1)
-                          .ternary("b--light-silver", "b--transparent");
-
-                        return m.Div({
-                          class: "mt4 flex items-center",
-                          children: [
-                            ColorDot({
-                              cssClasses: tmpl`pa3 mr3 ba b ${borderCss}`,
-                              colorIndex: colorIndex,
-                              level: statusLevelCode,
-                              totalLevels: trap(levels).length,
-                              icon: "check",
-                              iconSize: 22,
-                              showText: op(statusLevelCode).isGT(0).truthy,
-                              showHeight: true,
-                              onClick: () => openHabitEditor(habitIndex.value),
-                            }),
-                            m.Div({
-                              class: "pointer",
-                              onclick: handleTap(() => goToHabitPage(id.value)),
-                              children: [
-                                m.Div({
-                                  class: "f5 fw6 f4-ns fw4-ns",
-                                  children: title,
-                                }),
-                                m.Div({
-                                  class: "f6 light-silver pt05",
-                                  children: getHabitInfoLabel(id.value),
-                                }),
-                              ],
-                            }),
-                          ],
-                        });
-                      },
+                      map: (habit, habitIndex) =>
+                        DayHabitTile({
+                          habit: habit,
+                          day: selectedDate,
+                          onColorDotClick: () =>
+                            openHabitEditor(habitIndex.value),
+                        }),
                     }),
                   }),
                   m.Div({ class: "pv6" }),

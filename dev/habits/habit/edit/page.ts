@@ -1,7 +1,7 @@
 import { signal } from "@cyftech/signal";
-import { HabitEditorPage } from "../../../@components";
 import { HabitUI } from "../../../@common/types";
 import { getHabitFromUrl } from "../../../@common/transforms";
+import { HabitEditorPage } from "../../@components";
 
 const editableHabit = signal<HabitUI | undefined>(undefined);
 

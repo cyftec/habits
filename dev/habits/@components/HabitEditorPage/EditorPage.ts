@@ -1,25 +1,25 @@
 import { compute, derive, op, signal, trap } from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
+import { INITIAL_SETTINGS } from "../../../@common/constants";
+import {
+  getEditPageSettings,
+  saveHabit,
+  stopHabit,
+} from "../../../@common/localstorage";
+import {
+  getHabitValidationError,
+  getNewHabit,
+  getUpdatedTrackerDataForModifiedLevels,
+} from "../../../@common/transforms";
+import { HabitUI } from "../../../@common/types";
 import {
   GoBackButton,
   HabitDeleteModal,
   HabitStopModal,
   HTMLPage,
   Section,
-} from "..";
-import { INITIAL_SETTINGS } from "../../@common/constants";
-import {
-  getEditPageSettings,
-  saveHabit,
-  stopHabit,
-} from "../../@common/localstorage";
-import {
-  getHabitValidationError,
-  getNewHabit,
-  getUpdatedTrackerDataForModifiedLevels,
-} from "../../@common/transforms";
-import { HabitUI } from "../../@common/types";
-import { Button, Link, Scaffold } from "../../@elements";
+} from "../../../@components";
+import { Button, Link, Scaffold } from "../../../@elements";
 import { HabitEditor } from "./HabitEditor";
 
 type HabitEditorPageProps = {

@@ -1,4 +1,11 @@
-import { compute, tmpl, MaybeSignalObject, trap, op } from "@cyftech/signal";
+import {
+  compute,
+  tmpl,
+  MaybeSignalObject,
+  trap,
+  op,
+  dispose,
+} from "@cyftech/signal";
 import { component, m } from "@mufw/maya";
 import { getColorsForLevel } from "../@common/transforms";
 import { handleTap } from "../@common/utils";
@@ -39,30 +46,62 @@ export const ColorDot = component<ColorDotProps>(
     const outerBg = op(level)
       .isLT(0)
       .ternary("bg-transparent", "bg-light-gray");
+    const colorsData = compute(
+      getColorsForLevel,
+      level,
+      totalLevels,
+      colorIndex,
+      showText
+    );
     const { peakBackgroundColor, backgroundColor, fontColor, levelPercent } =
-      trap(
-        compute(getColorsForLevel, level, totalLevels, colorIndex, showText)
-      ).props;
+      trap(colorsData).props;
     const text = trap(textContent).or("·");
     const showIcon = op(showHeight)
       .and(icon)
       .andThisIsGT(levelPercent, 99).truthy;
+    const classes = tmpl`pointer relative overflow-hidden ${outerBorder} ${outerBg} ${cssClasses}`;
+    const heightedDotClass = tmpl`flex items-center justify-around absolute left-0 right-0 bottom-0 br0 ${dotCssClasses}`;
+    const heightedDotStyle = tmpl`
+      background-color: ${peakBackgroundColor};
+      color: white;
+      height: ${levelPercent}%;`;
+    const gradientDotClass = tmpl`flex items-center justify-around absolute absolute--fill ${dotCssClasses}`;
+    const gradientDotStyle = tmpl`
+      background-color: ${backgroundColor};
+      color: ${fontColor};`;
 
     const onTap = () => {
       if (onClick && level.value >= 0) onClick();
     };
 
+    const onUnmount = () => {
+      dispose(
+        outerBorder,
+        outerBg,
+        colorsData,
+        peakBackgroundColor,
+        backgroundColor,
+        fontColor,
+        levelPercent,
+        text,
+        showIcon,
+        classes,
+        heightedDotClass,
+        heightedDotStyle,
+        gradientDotClass,
+        gradientDotStyle
+      );
+    };
+
     return m.Span({
-      class: tmpl`pointer relative overflow-hidden ${outerBorder} ${outerBg} ${cssClasses}`,
+      onunmount: onUnmount,
+      class: classes,
       onclick: handleTap(onTap),
       children: m.If({
         subject: showHeight,
         isTruthy: m.Span({
-          class: tmpl`flex items-center justify-around absolute left-0 right-0 bottom-0 br0 ${dotCssClasses}`,
-          style: tmpl`
-            background-color: ${peakBackgroundColor};
-            color: white;
-            height: ${levelPercent}%;`,
+          class: heightedDotClass,
+          style: heightedDotStyle,
           children: m.If({
             subject: showIcon,
             isTruthy: Icon({
@@ -72,10 +111,8 @@ export const ColorDot = component<ColorDotProps>(
           }),
         }),
         isFalsy: m.Span({
-          class: tmpl`flex items-center justify-around absolute absolute--fill ${dotCssClasses}`,
-          style: tmpl`
-            background-color: ${backgroundColor};
-            color: ${fontColor};`,
+          class: gradientDotClass,
+          style: gradientDotStyle,
           children: m.If({
             subject: icon,
             isTruthy: Icon({

@@ -1,3 +1,3 @@
-import { HabitEditorPage } from "../../@components";
+import { HabitEditorPage } from "../@components";
 
 export default HabitEditorPage({});

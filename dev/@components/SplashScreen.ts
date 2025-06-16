@@ -1,6 +1,6 @@
 import { component, m } from "@mufw/maya";
 import { ProgressBar } from "../@elements";
-import { tmpl } from "@cyftech/signal";
+import { dispose, tmpl } from "@cyftech/signal";
 
 type SplashScreenProps = {
   cssClasses?: string;
@@ -9,8 +9,11 @@ type SplashScreenProps = {
 
 export const SplashScreen = component<SplashScreenProps>(
   ({ cssClasses, progress }) => {
+    const classes = tmpl`flex flex-column justify-center items-center vh-100 ${cssClasses}`;
+
     return m.Div({
-      class: tmpl`flex flex-column justify-center items-center vh-100 ${cssClasses}`,
+      onunmount: () => dispose(classes),
+      class: classes,
       children: [
         m.Img({
           class: "mt6 br4",

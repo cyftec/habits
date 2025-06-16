@@ -67,6 +67,7 @@ export const getLevelUI = (level: number, levels: string[]): LevelUI => {
 };
 
 export const getEmptyDailyStatus = (date: Date): DailyStatus => ({
+  key: date.getTime(),
   level: getLevelUI(-1, []),
   date: date,
 });
@@ -76,6 +77,7 @@ export const getDailyStatus = (
   levels: string[],
   date: Date
 ): DailyStatus => ({
+  key: date.getTime(),
   level: getLevelUI(level, levels),
   date: date,
 });
@@ -422,6 +424,7 @@ export const getWeekwiseStatus = (habit: HabitUI) => {
     if (!weeklyTracker[index]) weeklyTracker[index] = [];
     weeklyTracker[index][i % 7] = fullWeekFilledStatusTracker.tracker[i];
   }
+  weeklyTracker.reverse();
 
   return weeklyTracker;
 };
