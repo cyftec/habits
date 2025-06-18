@@ -8,7 +8,7 @@ type HTMLPageProps = {
   onUnMount?: () => void;
 };
 
-const stylesheetLinkRel = signal<"preload" | "stylesheet">("preload");
+const stylesheetLinkRel = signal<"preload" | "stylesheet">("stylesheet");
 
 export const HTMLPage = component<HTMLPageProps>(
   ({ cssClasses, body, onMount, onUnMount }) => {
