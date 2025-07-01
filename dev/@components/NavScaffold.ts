@@ -22,7 +22,7 @@ export const NavScaffold = component<NavScaffoldProps>(
         children: [
           m.If({
             subject: navbarTop,
-            isTruthy: navbarTop as Child,
+            isTruthy: () => navbarTop,
           }),
           NavBar({
             cssClasses: "nl3 nr3 ph4",

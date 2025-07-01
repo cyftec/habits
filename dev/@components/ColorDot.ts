@@ -1,7 +1,7 @@
 import {
   compute,
   tmpl,
-  MaybeSignalObject,
+  SignalifiedObject,
   trap,
   op,
   dispose,
@@ -99,29 +99,33 @@ export const ColorDot = component<ColorDotProps>(
       onclick: handleTap(onTap),
       children: m.If({
         subject: showHeight,
-        isTruthy: m.Span({
-          class: heightedDotClass,
-          style: heightedDotStyle,
-          children: m.If({
-            subject: showIcon,
-            isTruthy: Icon({
-              iconName: icon as MaybeSignalObject<string>,
-              size: iconSize,
+        isTruthy: () =>
+          m.Span({
+            class: heightedDotClass,
+            style: heightedDotStyle,
+            children: m.If({
+              subject: showIcon,
+              isTruthy: () =>
+                Icon({
+                  iconName: icon as SignalifiedObject<string>,
+                  size: iconSize,
+                }),
             }),
           }),
-        }),
-        isFalsy: m.Span({
-          class: gradientDotClass,
-          style: gradientDotStyle,
-          children: m.If({
-            subject: icon,
-            isTruthy: Icon({
-              iconName: icon as MaybeSignalObject<string>,
-              size: iconSize,
+        isFalsy: () =>
+          m.Span({
+            class: gradientDotClass,
+            style: gradientDotStyle,
+            children: m.If({
+              subject: icon,
+              isTruthy: (subject) =>
+                Icon({
+                  iconName: subject,
+                  size: iconSize,
+                }),
+              isFalsy: () => m.Span(text),
             }),
-            isFalsy: m.Span(text),
           }),
-        }),
       }),
     });
   }

@@ -51,9 +51,9 @@ export const config: KarmaConfig = {
     sourceDirName: projectFileNames.static.sourceDir,
     packageJson: {
       dependencies: {
-        "@mufw/maya": "0.1.25",
+        "@mufw/maya": "0.1.29",
         "@cyftech/immutjs": "0.1.0",
-        "@cyftech/signal": "0.1.9",
+        "@cyftech/signal": "0.1.12",
         "@types/web-app-manifest": "1.0.8",
       },
     },

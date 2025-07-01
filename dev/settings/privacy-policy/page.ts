@@ -37,12 +37,13 @@ export default HTMLPage({
                   policy.description,
                   m.If({
                     subject: policy.bullets.length,
-                    isTruthy: m.Ul(
-                      m.For({
-                        subject: policy.bullets,
-                        map: (bulletPoint) => m.Li(bulletPoint),
-                      })
-                    ),
+                    isTruthy: () =>
+                      m.Ul(
+                        m.For({
+                          subject: policy.bullets,
+                          map: (bulletPoint) => m.Li(bulletPoint),
+                        })
+                      ),
                   }),
                 ],
               }),

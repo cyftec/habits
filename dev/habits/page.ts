@@ -102,89 +102,93 @@ export default HTMLPage({
     content: m.Div(
       m.If({
         subject: noHabitsInStore,
-        isTruthy: m.Div({
-          class: "flex flex-column items-center justify-around",
-          children: [
-            m.Img({
-              class: "mt3 pt4",
-              src: "/assets/images/empty.png",
-              height: "200",
-            }),
-            m.Div("It's all empty here!"),
-            AddHabitButton({
-              cssClasses: "pt5",
-              justifyCssClasses: "justify-around",
-              label: "Add your first habit",
-            }),
-          ],
-        }),
-        isFalsy: m.Div([
-          TabBar({
-            cssClasses: "nl1 f6",
-            tabs: tabs,
-            onTabChange: onTabChange,
+        isTruthy: () =>
+          m.Div({
+            class: "flex flex-column items-center justify-around",
+            children: [
+              m.Img({
+                class: "mt3 pt4",
+                src: "/assets/images/empty.png",
+                height: "200",
+              }),
+              m.Div("It's all empty here!"),
+              AddHabitButton({
+                cssClasses: "pt5",
+                justifyCssClasses: "justify-around",
+                label: "Add your first habit",
+              }),
+            ],
           }),
-          m.Div(
-            m.For({
-              subject: sortedActiveHabits,
-              itemKey: "id",
-              n: 0,
-              nthChild: m.Div({
-                class: "silver f6 mt3 pt1 mb4",
-                children: [
-                  "ACTIVE HABITS",
-                  m.If({
-                    subject: trap(sortedActiveHabits).length,
-                    isFalsy: m.Div({
-                      class: "mt3",
-                      children: "None",
+        isFalsy: () =>
+          m.Div([
+            TabBar({
+              cssClasses: "nl1 f6",
+              tabs: tabs,
+              onTabChange: onTabChange,
+            }),
+            m.Div(
+              m.For({
+                subject: sortedActiveHabits,
+                itemKey: "id",
+                n: 0,
+                nthChild: m.Div({
+                  class: "silver f6 mt3 pt1 mb4",
+                  children: [
+                    "ACTIVE HABITS",
+                    m.If({
+                      subject: trap(sortedActiveHabits).length,
+                      isFalsy: () =>
+                        m.Div({
+                          class: "mt3",
+                          children: "None",
+                        }),
                     }),
-                  }),
-                ],
-              }),
-              map: (activeHabit) =>
-                HabitCard({
-                  cssClasses: "mb4",
-                  habit: activeHabit,
-                  months: totalOverviewMonths,
-                  onClick: () => goToHabitPage(activeHabit.value.id),
+                  ],
                 }),
-            })
-          ),
-          m.Div(
-            m.For({
-              subject: sortedStoppedHabits,
-              itemKey: "id",
-              n: 0,
-              nthChild: m.Div({
-                class: "silver f6 mt5 mb2",
-                children: [
-                  "STOPPED HABITS",
-                  m.If({
-                    subject: trap(sortedStoppedHabits).length,
-                    isFalsy: m.Div({
-                      class: "mt3",
-                      children: "None",
+                map: (activeHabit) =>
+                  HabitCard({
+                    cssClasses: "mb4",
+                    habit: activeHabit,
+                    months: totalOverviewMonths,
+                    onClick: () => goToHabitPage(activeHabit.value.id),
+                  }),
+              })
+            ),
+            m.Div(
+              m.For({
+                subject: sortedStoppedHabits,
+                itemKey: "id",
+                n: 0,
+                nthChild: m.Div({
+                  class: "silver f6 mt5 mb2",
+                  children: [
+                    "STOPPED HABITS",
+                    m.If({
+                      subject: trap(sortedStoppedHabits).length,
+                      isFalsy: () =>
+                        m.Div({
+                          class: "mt3",
+                          children: "None",
+                        }),
                     }),
-                  }),
-                ],
-              }),
-              map: (stoppedHabit) =>
-                HabitCard({
-                  cssClasses: "mb4",
-                  habit: stoppedHabit,
-                  months: totalOverviewMonths,
-                  onClick: () => goToHabitPage(stoppedHabit.value.id),
+                  ],
                 }),
-            })
-          ),
-        ]),
+                map: (stoppedHabit) =>
+                  HabitCard({
+                    cssClasses: "mb4",
+                    habit: stoppedHabit,
+                    months: totalOverviewMonths,
+                    onClick: () => goToHabitPage(stoppedHabit.value.id),
+                  }),
+              })
+            ),
+          ]),
       })
     ),
     navbarTop: m.Div(
       m.If({
         subject: noHabitsInStore,
-        isFalsy: AddHabitButton({}),
+        isFalsy: () => AddHabitButton({}),
       })
     ),
   }),

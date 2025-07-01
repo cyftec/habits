@@ -31,19 +31,21 @@ export const AddRemoveButton = component<AddRemoveButtonProps>(
       children: [
         m.If({
           subject: hideRemove,
-          isFalsy: m.Span({
-            class: removeBtnClasses,
-            onclick: handleTap(onRemove),
-            children: "-",
-          }),
+          isFalsy: () =>
+            m.Span({
+              class: removeBtnClasses,
+              onclick: handleTap(onRemove),
+              children: "-",
+            }),
         }),
         m.If({
           subject: hideAdd,
-          isFalsy: m.Span({
-            class: "pointer ph2 pb1",
-            onclick: handleTap(onAdd),
-            children: "+",
-          }),
+          isFalsy: () =>
+            m.Span({
+              class: "pointer ph2 pb1",
+              onclick: handleTap(onAdd),
+              children: "+",
+            }),
         }),
       ],
     });
