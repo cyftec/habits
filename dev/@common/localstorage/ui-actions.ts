@@ -44,6 +44,45 @@ export const updateInteractionTime = (date: Date) => {
  *
  *
  *
+ *    SETTINGS
+ */
+
+export const getHabitsPageSettings = (): LocalSettings["habitsPage"] => {
+  const settings = fetchSettings();
+  return settings.habitsPage;
+};
+
+export const updateHabitsPageSettings = (
+  habitsPageSettings: LocalSettings["habitsPage"]
+) => {
+  const settings = fetchSettings();
+  updateSettings({
+    ...settings,
+    habitsPage: habitsPageSettings,
+  });
+};
+
+export const getEditPageSettings = (): LocalSettings["editPage"] => {
+  const settings = fetchSettings();
+  return settings.editPage;
+};
+
+export const updateEditPageSettings = (
+  editPageSettings: LocalSettings["editPage"]
+) => {
+  const settings = fetchSettings();
+  updateSettings({
+    ...settings,
+    editPage: editPageSettings,
+  });
+};
+
+export const getStorageData = (): StorageDetails => getStorageSpaceData();
+
+/**
+ *
+ *
+ *
  *    HABITS
  */
 
@@ -127,42 +166,3 @@ export const stopHabit = (habit: HabitUI) => {
 };
 export const deleteHabit = (habitId: number) =>
   hardDeleteHabitFromStore(habitId);
-
-/**
- *
- *
- *
- *    SETTINGS
- */
-
-export const getHabitsPageSettings = (): LocalSettings["habitsPage"] => {
-  const settings = fetchSettings();
-  return settings.habitsPage;
-};
-
-export const updateHabitsPageSettings = (
-  habitsPageSettings: LocalSettings["habitsPage"]
-) => {
-  const settings = fetchSettings();
-  updateSettings({
-    ...settings,
-    habitsPage: habitsPageSettings,
-  });
-};
-
-export const getEditPageSettings = (): LocalSettings["editPage"] => {
-  const settings = fetchSettings();
-  return settings.editPage;
-};
-
-export const updateEditPageSettings = (
-  editPageSettings: LocalSettings["editPage"]
-) => {
-  const settings = fetchSettings();
-  updateSettings({
-    ...settings,
-    editPage: editPageSettings,
-  });
-};
-
-export const getStorageData = (): StorageDetails => getStorageSpaceData();

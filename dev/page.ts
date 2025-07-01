@@ -112,70 +112,72 @@ export default HTMLPage({
       }),
       m.If({
         subject: showSplashScreen,
-        isTruthy: SplashScreen({ progress }),
-        isFalsy: NavScaffold({
-          cssClasses: "ph3 bg-white",
-          route: "/",
-          header: "Tasks in a day",
-          content: m.Div(
-            m.If({
-              subject: noHabitsInStore,
-              isTruthy: EmptyHomePageIllustration({}),
-              isFalsy: m.Div({
-                children: [
+        isTruthy: () => SplashScreen({ progress }),
+        isFalsy: () =>
+          NavScaffold({
+            cssClasses: "ph3 bg-white",
+            route: "/",
+            header: "Tasks in a day",
+            content: m.Div(
+              m.If({
+                subject: noHabitsInStore,
+                isTruthy: () => EmptyHomePageIllustration({}),
+                isFalsy: () =>
                   m.Div({
-                    onmount: (el) => (el.scrollLeft = el.scrollWidth),
-                    class: `sticky top-3 bg-white pb2 flex items-center justify-between z-999 w-100`,
-                    children: m.For({
-                      subject: sevenDays,
-                      map: (date) =>
-                        WeekDateSelector({
-                          date: date,
-                          selectedDate: selectedDate,
-                          onChange: (date) => (selectedDate.value = date),
+                    children: [
+                      m.Div({
+                        onmount: (el) => (el.scrollLeft = el.scrollWidth),
+                        class: `sticky top-3 bg-white pb2 flex items-center justify-between z-999 w-100`,
+                        children: m.For({
+                          subject: sevenDays,
+                          map: (date) =>
+                            WeekDateSelector({
+                              date: date,
+                              selectedDate: selectedDate,
+                              onChange: (date) => (selectedDate.value = date),
+                            }),
                         }),
-                    }),
-                  }),
-                  m.Div({
-                    class: "mt2 mb2 f4 b",
-                    children: readableDateLabel,
-                  }),
-                  m.Div({
-                    class: "mb4 pb2 silver",
-                    children: habitsStatusLabel,
-                  }),
-                  m.Div({
-                    class: "mt4",
-                    children: m.For({
-                      subject: habits,
-                      itemKey: "id",
-                      n: Infinity,
-                      nthChild: Link({
-                        cssClasses: "flex pl5 pr3 nl3 mt4",
-                        onClick: goToNewHabitsPage,
-                        children: createNewHabitBtnLabel,
                       }),
-                      map: (habit, habitIndex) =>
-                        DayHabitTile({
-                          habit: habit,
-                          day: selectedDate,
-                          onColorDotClick: () =>
-                            openHabitEditor(habitIndex.value),
+                      m.Div({
+                        class: "mt2 mb2 f4 b",
+                        children: readableDateLabel,
+                      }),
+                      m.Div({
+                        class: "mb4 pb2 silver",
+                        children: habitsStatusLabel,
+                      }),
+                      m.Div({
+                        class: "mt4",
+                        children: m.For({
+                          subject: habits,
+                          itemKey: "id",
+                          n: Infinity,
+                          nthChild: Link({
+                            cssClasses: "flex pl5 pr3 nl3 mt4",
+                            onClick: goToNewHabitsPage,
+                            children: createNewHabitBtnLabel,
+                          }),
+                          map: (habit, habitIndex) =>
+                            DayHabitTile({
+                              habit: habit,
+                              day: selectedDate,
+                              onColorDotClick: () =>
+                                openHabitEditor(habitIndex.value),
+                            }),
                         }),
-                    }),
+                      }),
+                      m.Div({ class: "pv6" }),
+                    ],
                   }),
-                  m.Div({ class: "pv6" }),
-                ],
-              }),
-            })
-          ),
-          navbarTop: m.Div(
-            m.If({
-              subject: noHabitsInStore,
-              isFalsy: AddHabitButton({}),
-            })
-          ),
-        }),
+              })
+            ),
+            navbarTop: m.Div(
+              m.If({
+                subject: noHabitsInStore,
+                isFalsy: () => AddHabitButton({}),
+              })
+            ),
+          }),
       }),
     ],
   }),

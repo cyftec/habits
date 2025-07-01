@@ -32,10 +32,11 @@ export const Section = component<SectionProps>(
         }),
         m.If({
           subject: showDescription,
-          isTruthy: m.Div({
-            class: "mb3 f6 silver fw5",
-            children: description,
-          }),
+          isTruthy: () =>
+            m.Div({
+              class: "mb3 f6 silver fw5",
+              children: description,
+            }),
         }),
         m.Div({ class: contentCssClasses, children }),
       ],

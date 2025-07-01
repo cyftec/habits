@@ -99,36 +99,37 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
         content: m.Div([
           m.If({
             subject: editableHabit,
-            isTruthy: m.Div([
-              Section({
-                cssClasses: "pb2",
-                title: "Actions",
-                children: [
-                  HabitDeleteModal({
-                    isOpen: deleteActionModalOpen,
-                    habit: editedHabit,
-                    onClose: closeDeleteModal,
-                    onDone: onHabitDelete,
-                  }),
-                  Link({
-                    cssClasses: "db mb3 f6 red",
-                    children: `Delete this habit permanently along with its data`,
-                    onClick: openDeleteModal,
-                  }),
-                  HabitStopModal({
-                    isOpen: stopActionModalOpen,
-                    habit: editedHabit,
-                    onClose: closeHabitStopModal,
-                    onDone: onStopHabitUpdate,
-                  }),
-                  Link({
-                    cssClasses: "db mb3 f6 gray",
-                    children: `Stop this habit permanently and keep it for future`,
-                    onClick: openHabitStopModal,
-                  }),
-                ],
-              }),
-            ]),
+            isTruthy: () =>
+              m.Div([
+                Section({
+                  cssClasses: "pb2",
+                  title: "Actions",
+                  children: [
+                    HabitDeleteModal({
+                      isOpen: deleteActionModalOpen,
+                      habit: editedHabit,
+                      onClose: closeDeleteModal,
+                      onDone: onHabitDelete,
+                    }),
+                    Link({
+                      cssClasses: "db mb3 f6 red",
+                      children: `Delete this habit permanently along with its data`,
+                      onClick: openDeleteModal,
+                    }),
+                    HabitStopModal({
+                      isOpen: stopActionModalOpen,
+                      habit: editedHabit,
+                      onClose: closeHabitStopModal,
+                      onDone: onStopHabitUpdate,
+                    }),
+                    Link({
+                      cssClasses: "db mb3 f6 gray",
+                      children: `Stop this habit permanently and keep it for future`,
+                      onClick: openHabitStopModal,
+                    }),
+                  ],
+                }),
+              ]),
           }),
           HabitEditor({
             editableHabit: editableHabit,
@@ -145,10 +146,11 @@ export const HabitEditorPage = component<HabitEditorPageProps>(
           children: [
             m.If({
               subject: error,
-              isTruthy: m.Div({
-                class: "red mb3",
-                children: error,
-              }),
+              isTruthy: () =>
+                m.Div({
+                  class: "red mb3",
+                  children: error,
+                }),
             }),
             m.Div({
               class: "flex items-center justify-stretch",

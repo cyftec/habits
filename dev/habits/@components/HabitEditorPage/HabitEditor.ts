@@ -169,37 +169,38 @@ export const HabitEditor = component<HabitEditorProps>(
         }),
         m.If({
           subject: customisationsVisible,
-          isTruthy: m.Div([
-            Section({
-              cssClasses: "pb1",
-              title: "Select a color tag",
-              children: m.Div({
-                class: "mb1 flex items-center",
-                children: m.For({
-                  subject: BASE_COLORS,
-                  map: (colorOption, i) => {
-                    const borderColorCss = op(colorIndex)
-                      .equals(i)
-                      .ternary("#999", "#f4f4f4");
+          isTruthy: () =>
+            m.Div([
+              Section({
+                cssClasses: "pb1",
+                title: "Select a color tag",
+                children: m.Div({
+                  class: "mb1 flex items-center",
+                  children: m.For({
+                    subject: BASE_COLORS,
+                    map: (colorOption, i) => {
+                      const borderColorCss = op(colorIndex)
+                        .equals(i)
+                        .ternary("#999", "#f4f4f4");
 
-                    return m.Span({
-                      class: `pointer mb2 mr3 pa1 br-100 bw2 ba flex`,
-                      style: tmpl`border-color: ${borderColorCss}`,
-                      onclick: handleTap(() => updateColor(i)),
-                      children: m.Span({
-                        class: tmpl`pa2 br-100`,
-                        style: `background-color: ${colorOption}`,
-                      }),
-                    });
-                  },
+                      return m.Span({
+                        class: `pointer mb2 mr3 pa1 br-100 bw2 ba flex`,
+                        style: tmpl`border-color: ${borderColorCss}`,
+                        onclick: handleTap(() => updateColor(i)),
+                        children: m.Span({
+                          class: tmpl`pa2 br-100`,
+                          style: `background-color: ${colorOption}`,
+                        }),
+                      });
+                    },
+                  }),
                 }),
               }),
-            }),
-            Section({
-              cssClasses: "pb3",
-              title: "Status update levels",
-              hideDescription: hideDescriptions,
-              description: `
+              Section({
+                cssClasses: "pb3",
+                title: "Status update levels",
+                hideDescription: hideDescriptions,
+                description: `
                   When updating a habit status in a day, we generally have only two levels - "${BASE_LEVELS[0]}"
                   or "${BASE_LEVELS[1]}". But a habit can have more than 2 levels as well.
                   Like for example, the habit of 'Drink 2 litres water daily'
@@ -207,151 +208,156 @@ export const HabitEditor = component<HabitEditorProps>(
                   You can add or remove levels by clicking on + or - buttons. Click on textbox
                   for editing the status level name. The levels from top to bottom should go from lowest
                   to the highest.`,
-              children: m.For({
-                subject: levels,
-                map: (currentLevel, i) => {
-                  const oldLevels = editableHabit?.value?.levels || [];
-                  const newLevels = levels.value;
-                  const { hideAddButton, hideRemoveButton } =
-                    getAddRemoveButtonsVisibility(oldLevels, newLevels, i);
-                  const textboxDisabled = levelTextboxDisability(
-                    oldLevels,
-                    newLevels,
-                    i
-                  );
+                children: m.For({
+                  subject: levels,
+                  map: (currentLevel, i) => {
+                    const oldLevels = editableHabit?.value?.levels || [];
+                    const newLevels = levels.value;
+                    const { hideAddButton, hideRemoveButton } =
+                      getAddRemoveButtonsVisibility(oldLevels, newLevels, i);
+                    const textboxDisabled = levelTextboxDisability(
+                      oldLevels,
+                      newLevels,
+                      i
+                    );
 
-                  return m.Div({
-                    children: [
-                      m.Div({
-                        class: "flex items-center justify-between",
-                        children: [
-                          m.Div({
-                            class:
-                              "flex items-center ba bw1 b--light-silver br3 w-70 w-80-ns",
-                            children: [
-                              ColorDot({
-                                cssClasses: "w1 h2 br3 br--left ml1px",
-                                dotCssClasses: "br3 br--left",
-                                colorIndex,
-                                level: i,
-                                isRectangular: true,
-                                totalLevels: levels.value.length,
-                              }),
-                              TextBox({
-                                cssClasses: "bn pa2 br3 w-100 outline-0",
-                                placeholder: `Level ${i}`,
-                                disabled: textboxDisabled,
-                                text: currentLevel.name,
-                                onchange: (text) => updateLevel(text, i),
-                              }),
-                            ],
-                          }),
-                          AddRemoveButton({
-                            hideAdd: hideAddButton,
-                            hideRemove: hideRemoveButton,
-                            onAdd: () => addLevel(i + 1),
-                            onRemove: () => removeLevel(i),
-                          }),
-                        ],
-                      }),
-                      m.If({
-                        subject: op(levels).lengthGT(i + 1).truthy,
-                        isTruthy: m.Div({
-                          class: "pa2 ml2 pl1 bl bw1 b--silver",
+                    return m.Div({
+                      children: [
+                        m.Div({
+                          class: "flex items-center justify-between",
+                          children: [
+                            m.Div({
+                              class:
+                                "flex items-center ba bw1 b--light-silver br3 w-70 w-80-ns",
+                              children: [
+                                ColorDot({
+                                  cssClasses: "w1 h2 br3 br--left ml1px",
+                                  dotCssClasses: "br3 br--left",
+                                  colorIndex,
+                                  level: i,
+                                  isRectangular: true,
+                                  totalLevels: levels.value.length,
+                                }),
+                                TextBox({
+                                  cssClasses: "bn pa2 br3 w-100 outline-0",
+                                  placeholder: `Level ${i}`,
+                                  disabled: textboxDisabled,
+                                  text: currentLevel.name,
+                                  onchange: (text) => updateLevel(text, i),
+                                }),
+                              ],
+                            }),
+                            AddRemoveButton({
+                              hideAdd: hideAddButton,
+                              hideRemove: hideRemoveButton,
+                              onAdd: () => addLevel(i + 1),
+                              onRemove: () => removeLevel(i),
+                            }),
+                          ],
                         }),
-                      }),
-                    ],
-                  });
-                },
+                        m.If({
+                          subject: op(levels).lengthGT(i + 1).truthy,
+                          isTruthy: () =>
+                            m.Div({
+                              class: "pa2 ml2 pl1 bl bw1 b--silver",
+                            }),
+                        }),
+                      ],
+                    });
+                  },
+                }),
               }),
-            }),
-            Section({
-              title: "Habit completion goal",
-              hideDescription: hideDescriptions,
-              description: tmpl`
+              Section({
+                title: "Habit completion goal",
+                hideDescription: hideDescriptions,
+                description: tmpl`
                   Goals are something for long-term. Let's say based on below table, after
                   a month or two, you followed your habit for 67% of the times, then you
                   just crossed the milestone - '${() =>
                     getAchievedMilestone(editedHabit.value.milestones, 67)
                       .label}'. For achieving your goal (in %), you can set your
                   own custom milestones depending on the difficulty of the habit.`,
-              children: m.For({
-                subject: milestones,
-                n: 0,
-                nthChild: m.Div({
-                  class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",
-                  children: [
-                    m.Span({ class: "lh-copy", children: "" }),
-                    m.Span({
-                      class: `w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1`,
-                      children: [
-                        m.Span({
-                          class: `w-100 bg-white bn bw1 ph2dot5 di f4 b light-silver pb3 nl1`,
-                          children: "100",
-                        }),
-                        m.Span({
-                          class: "ph2 bg-white light-silver b pb3 mr1",
-                          children: "%",
-                        }),
-                      ],
-                    }),
-                  ],
-                }),
-                map: (milestone, i) =>
-                  m.Div({
-                    class: `mb1 ph4 pv4 ba br3 bw1 b--light-gray relative`,
+                children: m.For({
+                  subject: milestones,
+                  n: 0,
+                  nthChild: m.Div({
+                    class: "mb1 ph2 pv0 bn bw1 relative ts-white-1",
                     children: [
-                      m.Span({
-                        class: `lh-copy flex items-center`,
-                        children: [
-                          Icon({
-                            cssClasses: `mr2 ${milestone.color}`,
-                            size: 20,
-                            iconName: milestone.icon,
-                          }),
-                          milestone.label,
-                        ],
-                      }),
+                      m.Span({ class: "lh-copy", children: "" }),
                       m.Span({
                         class: `w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1`,
                         children: [
-                          m.If({
-                            subject: i === 3,
-                            isTruthy: m.Span({
-                              class: `w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1`,
-                              children: "00",
-                            }),
-                            isFalsy: NumberBox({
-                              cssClasses: `w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray`,
-                              num: milestone.percent,
-                              onchange: (value) => updateMilestone(value, i),
-                            }),
+                          m.Span({
+                            class: `w-100 bg-white bn bw1 ph2dot5 di f4 b light-silver pb3 nl1`,
+                            children: "100",
                           }),
                           m.Span({
-                            class: "ph2 bg-white light-silver b",
+                            class: "ph2 bg-white light-silver b pb3 mr1",
                             children: "%",
                           }),
                         ],
                       }),
                     ],
                   }),
+                  map: (milestone, i) =>
+                    m.Div({
+                      class: `mb1 ph4 pv4 ba br3 bw1 b--light-gray relative`,
+                      children: [
+                        m.Span({
+                          class: `lh-copy flex items-center`,
+                          children: [
+                            Icon({
+                              cssClasses: `mr2 ${milestone.color}`,
+                              size: 20,
+                              iconName: milestone.icon,
+                            }),
+                            milestone.label,
+                          ],
+                        }),
+                        m.Span({
+                          class: `w-30 absolute mt3 right-2 bottom--1dot5 flex items-center z-1`,
+                          children: [
+                            m.If({
+                              subject: i === 3,
+                              isTruthy: () =>
+                                m.Span({
+                                  class: `w-100 bg-white bn bw1 br3 pa2dot5 di f4 b light-silver mb1`,
+                                  children: "00",
+                                }),
+                              isFalsy: () =>
+                                NumberBox({
+                                  cssClasses: `w-100 ba bw1 b--light-silver br3 pa2dot5 di f5 b dark-gray`,
+                                  num: milestone.percent,
+                                  onchange: (value) =>
+                                    updateMilestone(value, i),
+                                }),
+                            }),
+                            m.Span({
+                              class: "ph2 bg-white light-silver b",
+                              children: "%",
+                            }),
+                          ],
+                        }),
+                      ],
+                    }),
+                }),
               }),
-            }),
-          ]),
+            ]),
         }),
         m.If({
           subject: showFullCustomisations,
-          isFalsy: Button({
-            cssClasses: "pv2 ph3 flex items-center",
-            onTap: () => (moreDetails.value = !moreDetails.value),
-            children: [
-              Icon({
-                cssClasses: "mr1",
-                iconName: customisationsButtonIcon,
-              }),
-              customisationsButtonLabel,
-            ],
-          }),
+          isFalsy: () =>
+            Button({
+              cssClasses: "pv2 ph3 flex items-center",
+              onTap: () => (moreDetails.value = !moreDetails.value),
+              children: [
+                Icon({
+                  cssClasses: "mr1",
+                  iconName: customisationsButtonIcon,
+                }),
+                customisationsButtonLabel,
+              ],
+            }),
         }),
       ],
     });

@@ -104,12 +104,13 @@ export default HTMLPage({
         }),
         m.If({
           subject: habitIsStopped,
-          isFalsy: Icon({
-            cssClasses: "mt1 mr1 ba b--silver bw1 br-100 pa1 noselect",
-            size: 18,
-            iconName: "edit",
-            onClick: () => goToHabitEditPage(habitId.value),
-          }),
+          isFalsy: () =>
+            Icon({
+              cssClasses: "mt1 mr1 ba b--silver bw1 br-100 pa1 noselect",
+              size: 18,
+              iconName: "edit",
+              onClick: () => goToHabitEditPage(habitId.value),
+            }),
         }),
       ],
     }),
@@ -130,125 +131,130 @@ export default HTMLPage({
         }),
         m.If({
           subject: error,
-          isTruthy: m.Div({ class: "red", children: error }),
-          isFalsy: m.Div(
-            m.If({
-              subject: habit,
-              isFalsy: m.Div({ class: "", children: "habit.." }),
-              isTruthy: m.Div({
-                children: [
-                  m.If({
-                    subject: habitIsStopped,
-                    isTruthy: m.Div([
-                      m.Div({
-                        class: "red mb3",
-                        children: "Status: STOPPED PERMANENTLY",
-                      }),
-                      Button({
-                        cssClasses: "pv2 ph3 nt2 mb4 red",
-                        onTap: openDeleteModal,
-                        children: "Delete Permanently",
-                      }),
-                    ]),
-                  }),
-                  Section({
-                    cssClasses: "pb3",
-                    title: tmpl`Completion status ${() =>
-                      showGoalStatus.value
-                        ? ""
-                        : `(target ${habitMilestones.value[0].percent}%)`}`,
+          isTruthy: () => m.Div({ class: "red", children: error }),
+          isFalsy: () =>
+            m.Div(
+              m.If({
+                subject: habit,
+                isFalsy: () => m.Div({ class: "", children: "habit.." }),
+                isTruthy: () =>
+                  m.Div({
                     children: [
-                      m.Div({
-                        class: "mt3",
-                        children: m.For({
-                          subject: levelsCompletionList,
-                          n: Infinity,
-                          nthChild: m.Div({
-                            class: `flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray`,
-                            children: [
-                              m.Div({
-                                class: "flex items-center",
-                                children: [
-                                  Icon({
-                                    cssClasses: tmpl`mr1 ${achievedMilestoneColor}`,
-                                    size: 12,
-                                    iconName: achievedMilestoneIcon,
-                                  }),
-                                  achievedMilestoneLabel,
-                                ],
-                              }),
-                              m.Div({
-                                class: "flex items-center",
-                                children: [
-                                  allLevelsCompletionLabel,
-                                  m.Span({ class: "ml1" }),
-                                  m.Div(tmpl` (${completion}%)`),
-                                ],
-                              }),
-                            ],
-                          }),
-                          map: (acheievemnt) =>
+                      m.If({
+                        subject: habitIsStopped,
+                        isTruthy: () =>
+                          m.Div([
                             m.Div({
-                              class: "flex items-center justify-between mb2",
-                              children: [
+                              class: "red mb3",
+                              children: "Status: STOPPED PERMANENTLY",
+                            }),
+                            Button({
+                              cssClasses: "pv2 ph3 nt2 mb4 red",
+                              onTap: openDeleteModal,
+                              children: "Delete Permanently",
+                            }),
+                          ]),
+                      }),
+                      Section({
+                        cssClasses: "pb3",
+                        title: tmpl`Completion status ${() =>
+                          showGoalStatus.value
+                            ? ""
+                            : `(target ${habitMilestones.value[0].percent}%)`}`,
+                        children: [
+                          m.Div({
+                            class: "mt3",
+                            children: m.For({
+                              subject: levelsCompletionList,
+                              n: Infinity,
+                              nthChild: m.Div({
+                                class: `flex items-center justify-between mt2 pt1 bt bw1 b--near-white b mid-gray`,
+                                children: [
+                                  m.Div({
+                                    class: "flex items-center",
+                                    children: [
+                                      Icon({
+                                        cssClasses: tmpl`mr1 ${achievedMilestoneColor}`,
+                                        size: 12,
+                                        iconName: achievedMilestoneIcon,
+                                      }),
+                                      achievedMilestoneLabel,
+                                    ],
+                                  }),
+                                  m.Div({
+                                    class: "flex items-center",
+                                    children: [
+                                      allLevelsCompletionLabel,
+                                      m.Span({ class: "ml1" }),
+                                      m.Div(tmpl` (${completion}%)`),
+                                    ],
+                                  }),
+                                ],
+                              }),
+                              map: (acheievemnt) =>
                                 m.Div({
-                                  class: "flex items-center",
+                                  class:
+                                    "flex items-center justify-between mb2",
                                   children: [
-                                    ColorDot({
-                                      cssClasses: `pa1 mr2`,
-                                      colorIndex: habitColorIndex,
-                                      level: acheievemnt.level.code,
-                                      totalLevels: habitLevels.value.length,
-                                      isRectangular: true,
+                                    m.Div({
+                                      class: "flex items-center",
+                                      children: [
+                                        ColorDot({
+                                          cssClasses: `pa1 mr2`,
+                                          colorIndex: habitColorIndex,
+                                          level: acheievemnt.level.code,
+                                          totalLevels: habitLevels.value.length,
+                                          isRectangular: true,
+                                        }),
+                                        m.Div(acheievemnt.level.name),
+                                      ],
                                     }),
-                                    m.Div(acheievemnt.level.name),
+                                    m.Div(
+                                      `${acheievemnt.count} times (${acheievemnt.percent}%)`
+                                    ),
                                   ],
                                 }),
-                                m.Div(
-                                  `${acheievemnt.count} times (${acheievemnt.percent}%)`
-                                ),
-                              ],
                             }),
-                        }),
+                          }),
+                          m.If({
+                            subject: showGoalStatus,
+                            isTruthy: () =>
+                              GoalStatus({
+                                cssClasses: "pt4 mt3 mb3",
+                                milestones: habitMilestones,
+                                achievedMilestone: milestoneAchieved,
+                                completionPercent: completion,
+                              }),
+                          }),
+                          Button({
+                            cssClasses: "pa2 ph3 mt4 mb2",
+                            children: tmpl`${op(showGoalStatus).ternary(
+                              "Hide",
+                              "Show"
+                            )} target goal status`,
+                            onTap: () =>
+                              (showGoalStatus.value = !showGoalStatus.value),
+                          }),
+                        ],
                       }),
-                      m.If({
-                        subject: showGoalStatus,
-                        isTruthy: GoalStatus({
-                          cssClasses: "pt4 mt3 mb3",
-                          milestones: habitMilestones,
-                          achievedMilestone: milestoneAchieved,
-                          completionPercent: completion,
+                      Section({
+                        title: "Tracker",
+                        children: Calendar({
+                          habit: habit,
+                          onDateClick: (dayStatus) => {
+                            if (habitIsStopped.value) return;
+                            updateLevelModalOpen.value = true;
+                            updateLevelModalData.value = {
+                              date: dayStatus.date,
+                              selectedLevelIndex: dayStatus.level.code,
+                            };
+                          },
                         }),
-                      }),
-                      Button({
-                        cssClasses: "pa2 ph3 mt4 mb2",
-                        children: tmpl`${op(showGoalStatus).ternary(
-                          "Hide",
-                          "Show"
-                        )} target goal status`,
-                        onTap: () =>
-                          (showGoalStatus.value = !showGoalStatus.value),
                       }),
                     ],
                   }),
-                  Section({
-                    title: "Tracker",
-                    children: Calendar({
-                      habit: habit,
-                      onDateClick: (dayStatus) => {
-                        if (habitIsStopped.value) return;
-                        updateLevelModalOpen.value = true;
-                        updateLevelModalData.value = {
-                          date: dayStatus.date,
-                          selectedLevelIndex: dayStatus.level.code,
-                        };
-                      },
-                    }),
-                  }),
-                ],
-              }),
-            })
-          ),
+              })
+            ),
         }),
       ],
     }),
