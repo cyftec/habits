@@ -7,7 +7,7 @@ import {
   WeekdayFrequency,
 } from "./types";
 
-export const APP_VERSION = "1.2.4";
+export const APP_VERSION = "1.2.5";
 
 export const BASE_COLORS = [
   `#e87b52`,
