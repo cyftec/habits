@@ -8,5 +8,5 @@ export * from "./NumberBox";
 export * from "./Progressbar";
 export * from "./Scaffold";
 export * from "./TabBar";
-export * from "./TextBox";
+export * from "./Textbox";
 export * from "./Toggle";

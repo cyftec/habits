@@ -1,18 +1,22 @@
 import type { KarmaConfig, ProjectFileNames } from "./karma-types.ts";
 
 // DO NOT CHANGE exported variable name
-export const projectFileNames: ProjectFileNames = {
-  systemGenerated: {
-    dsStoreDir: ".DS_Store",
+export const projectFileNames = {
+  buildable: {
+    mayaSrcDir: "dev",
+    pageFile: "page.ts",
+    manifestFile: "manifest.ts",
   },
   static: {
     sourceDir: "dev",
     karmaTypesFile: "karma-types.ts",
-    licenceFile: "LICENCE",
-    readMeFile: "README.md",
+  },
+  systemGenerated: {
+    dsStoreDir: ".DS_Store",
   },
   generated: {
     stagingDir: "stage",
+    publishDir: "docs",
     bunLockFile: "bun.lock",
     bunLockBFile: "bun.lockb",
     gitIgnoreFile: ".gitignore",
@@ -20,42 +24,37 @@ export const projectFileNames: ProjectFileNames = {
     nodeModulesDir: "node_modules",
     packageJsonFile: "package.json",
   },
-  built: {
-    publishDir: "docs",
-    pageFile: "page.ts",
-    manifestFile: "manifest.ts",
-  },
-};
+} as const satisfies ProjectFileNames;
 
 // DO NOT CHANGE exported variable name
 export const config: KarmaConfig = {
   brahma: {
+    version: "0.1.31",
     build: {
-      stagingDirName: projectFileNames.generated.stagingDir,
-      publishDirName: projectFileNames.built.publishDir,
-      buildablePageFileName: projectFileNames.built.pageFile,
-      buildableManifestFileName: projectFileNames.built.manifestFile,
-      ignoreDelimiter: "@",
+      mode: "pwa",
       skipErrorAndBuildNext: true,
+      ignoreDelimiter: "@",
+      sourceDirName: projectFileNames.static.sourceDir,
+      mayaSrcDir: projectFileNames.buildable.mayaSrcDir,
+      buildablePageFileName: projectFileNames.buildable.pageFile,
+      buildableManifestFileName: projectFileNames.buildable.manifestFile,
+      stagingDirName: projectFileNames.generated.stagingDir,
+      publishDirName: projectFileNames.generated.publishDir,
     },
-    localServer: {
+    serve: {
       port: 3000,
       redirectOnStart: false,
       reloadPageOnFocus: false,
-      otherWatchDirs: [],
-      serveDirectory: `${projectFileNames.generated.stagingDir}`,
+      watchDir: projectFileNames.static.sourceDir,
+      serveDir: projectFileNames.generated.stagingDir,
     },
   },
-  maya: {
-    mode: "pwa",
-    sourceDirName: projectFileNames.static.sourceDir,
-    packageJson: {
-      dependencies: {
-        "@mufw/maya": "0.1.29",
-        "@cyftech/immutjs": "0.1.0",
-        "@cyftech/signal": "0.1.12",
-        "@types/web-app-manifest": "1.0.8",
-      },
+  packageJson: {
+    dependencies: {
+      "@mufw/maya": "0.1.32",
+      "@cyftech/immutjs": "0.1.0",
+      "@cyftech/signal": "0.1.15",
+      "@types/web-app-manifest": "1.0.8",
     },
   },
   vscode: {
@@ -63,16 +62,14 @@ export const config: KarmaConfig = {
       "deno.enable": false,
       "files.exclude": {
         [projectFileNames.static.karmaTypesFile]: true,
-        [projectFileNames.static.licenceFile]: true,
-        [projectFileNames.static.readMeFile]: true,
         [projectFileNames.generated.stagingDir]: false,
+        [projectFileNames.generated.publishDir]: false,
         [projectFileNames.generated.bunLockFile]: true,
         [projectFileNames.generated.bunLockBFile]: true,
         [projectFileNames.generated.gitIgnoreFile]: true,
         [projectFileNames.generated.dotVscodeDir]: true,
         [projectFileNames.generated.nodeModulesDir]: true,
         [projectFileNames.generated.packageJsonFile]: true,
-        [projectFileNames.built.publishDir]: false,
       },
     },
   },
